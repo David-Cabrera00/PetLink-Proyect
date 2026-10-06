@@ -1,0 +1,147 @@
+import '../../models/pet.dart';
+import '../../models/pet_report.dart';
+import '../pet_report_repository.dart';
+
+class MockPetReportRepository implements PetReportRepository {
+  @override
+  Future<List<PetReport>> getNearbyReports() async {
+    await Future.delayed(const Duration(milliseconds: 800));
+
+    return [
+      PetReport(
+        id: '1',
+        pet: const Pet(
+          id: 'p1',
+          name: 'Luna',
+          species: 'Perro',
+          breed: 'Golden Retriever',
+          sex: 'Hembra',
+          age: '4 años',
+          size: 'Grande',
+          color: 'Dorado',
+          description: 'Golden Retriever hembra de 4 años',
+        ),
+        type: ReportType.lost,
+        status: ReportStatus.active,
+        latitude: 1.2136,
+        longitude: -77.2811,
+        address: 'Barrio La Aurora, Pasto',
+        createdAt: DateTime.now().subtract(const Duration(hours: 3)),
+        lastSeenAt: DateTime.now().subtract(const Duration(hours: 3)),
+        description: 'Perdida cerca del parque central',
+        distanceKm: 0.8,
+        sightingsCount: 3,
+      ),
+      PetReport(
+        id: '2',
+        pet: const Pet(
+          id: 'p2',
+          name: 'Toby',
+          species: 'Perro',
+          breed: 'Labrador',
+          sex: 'Macho',
+          age: '2 años',
+          size: 'Mediano',
+          color: 'Negro',
+          description: 'Labrador macho de 2 años',
+        ),
+        type: ReportType.lost,
+        status: ReportStatus.active,
+        latitude: 1.2200,
+        longitude: -77.2900,
+        address: 'Barrio San Andrés, Pasto',
+        createdAt: DateTime.now().subtract(const Duration(hours: 6)),
+        lastSeenAt: DateTime.now().subtract(const Duration(hours: 6)),
+        description: 'Se escapó del jardín',
+        distanceKm: 1.2,
+        sightingsCount: 1,
+      ),
+      PetReport(
+        id: '3',
+        pet: const Pet(
+          id: 'p3',
+          name: 'Golden',
+          species: 'Perro',
+          breed: 'Golden Retriever',
+          sex: 'Hembra',
+          age: 'Aprox. 3-4 años',
+          size: 'Grande',
+          color: 'Dorado',
+          description: 'Golden Retriever encontrada',
+        ),
+        type: ReportType.found,
+        status: ReportStatus.active,
+        latitude: 1.2180,
+        longitude: -77.2850,
+        address: 'Parque Infantil, Pasto',
+        createdAt: DateTime.now().subtract(const Duration(hours: 2)),
+        lastSeenAt: DateTime.now().subtract(const Duration(hours: 2)),
+        description: 'Encontrada cerca del parque infantil',
+        distanceKm: 1.4,
+        sightingsCount: 0,
+      ),
+      PetReport(
+        id: '4',
+        pet: const Pet(
+          id: 'p4',
+          name: 'Siamés',
+          species: 'Gato',
+          breed: 'Siamés',
+          sex: 'Hembra',
+          age: '1 año',
+          size: 'Pequeño',
+          color: 'Crema',
+          description: 'Gata siamés encontrada',
+        ),
+        type: ReportType.found,
+        status: ReportStatus.active,
+        latitude: 1.2150,
+        longitude: -77.2780,
+        address: 'Barrio Centro, Pasto',
+        createdAt: DateTime.now().subtract(const Duration(hours: 1)),
+        lastSeenAt: DateTime.now().subtract(const Duration(hours: 1)),
+        description: 'Gata siamés encontrada en la calle',
+        distanceKm: 0.5,
+        sightingsCount: 0,
+      ),
+    ];
+  }
+
+  @override
+  Future<List<PetReport>> getMyReports() async {
+    await Future.delayed(const Duration(milliseconds: 600));
+
+    return [
+      PetReport(
+        id: '1',
+        pet: const Pet(
+          id: 'p1',
+          name: 'Luna',
+          species: 'Perro',
+          breed: 'Golden Retriever',
+          sex: 'Hembra',
+          age: '4 años',
+          size: 'Grande',
+          color: 'Dorado',
+          description: 'Golden Retriever hembra de 4 años',
+        ),
+        type: ReportType.lost,
+        status: ReportStatus.active,
+        latitude: 1.2136,
+        longitude: -77.2811,
+        address: 'Barrio La Aurora, Pasto',
+        createdAt: DateTime.now().subtract(const Duration(hours: 3)),
+        lastSeenAt: DateTime.now().subtract(const Duration(hours: 3)),
+        description: 'Perdida cerca del parque central',
+        distanceKm: 0.8,
+        sightingsCount: 3,
+      ),
+    ];
+  }
+
+  @override
+  Future<PetReport?> getReportById(String id) async {
+    await Future.delayed(const Duration(milliseconds: 400));
+    return null;
+  }
+}
