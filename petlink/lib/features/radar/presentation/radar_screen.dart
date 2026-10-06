@@ -190,7 +190,7 @@ class RadarScreen extends ConsumerWidget {
             }
             return Column(
               children: matches
-                  .map((match) => Padding(
+                  .map<Widget>((match) => Padding(
                         padding: const EdgeInsets.only(bottom: PetSpacing.md),
                         child: MatchCard(
                           match: match,
@@ -261,7 +261,7 @@ class RadarScreen extends ConsumerWidget {
             return Column(
               children: reports
                   .take(3)
-                  .map((report) => Padding(
+                  .map<Widget>((report) => Padding(
                         padding: const EdgeInsets.only(bottom: PetSpacing.md),
                         child: PetCardCompact(
                           report: report,

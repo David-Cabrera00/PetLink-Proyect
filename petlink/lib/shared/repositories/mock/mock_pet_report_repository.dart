@@ -142,6 +142,11 @@ class MockPetReportRepository implements PetReportRepository {
   @override
   Future<PetReport?> getReportById(String id) async {
     await Future.delayed(const Duration(milliseconds: 400));
-    return null;
+    final reports = await getNearbyReports();
+    try {
+      return reports.firstWhere((r) => r.id == id);
+    } catch (_) {
+      return null;
+    }
   }
 }

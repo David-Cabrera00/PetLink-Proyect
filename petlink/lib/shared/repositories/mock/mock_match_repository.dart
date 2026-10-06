@@ -66,4 +66,15 @@ class MockMatchRepository implements MatchRepository {
       ),
     ];
   }
+
+  @override
+  Future<PetMatch?> getMatchById(String id) async {
+    await Future.delayed(const Duration(milliseconds: 400));
+    final matches = await getMatchesForUser();
+    try {
+      return matches.firstWhere((m) => m.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
 }
