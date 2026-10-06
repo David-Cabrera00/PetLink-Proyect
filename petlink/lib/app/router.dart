@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import '../features/radar/presentation/radar_screen.dart';
 import '../features/explore/presentation/explore_screen.dart';
 import '../features/reports/presentation/reports_screen.dart';
+import '../features/reports/presentation/report_detail_screen.dart';
+import '../features/matches/presentation/match_detail_screen.dart';
 import '../features/activity/activity_screen.dart';
 import '../features/profile/profile_screen.dart';
 
@@ -33,6 +35,14 @@ class AppRouter {
           GoRoute(
             path: '/reports',
             builder: (context, state) => const ReportsScreen(),
+          ),
+          GoRoute(
+            path: '/reports/:id',
+            builder: (context, state) => ReportDetailScreen(reportId: state.pathParameters['id']!),
+          ),
+          GoRoute(
+            path: '/matches/:id',
+            builder: (context, state) => MatchDetailScreen(matchId: state.pathParameters['id']!),
           ),
           GoRoute(
             path: '/activity',

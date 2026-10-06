@@ -23,3 +23,8 @@ final myReportsProvider = FutureProvider<List<PetReport>>((ref) async {
     }
   }).toList();
 });
+
+final reportByIdProvider = FutureProvider.family<PetReport?, String>((ref, id) async {
+  final repository = ref.watch(petReportRepositoryProvider);
+  return repository.getReportById(id);
+});
