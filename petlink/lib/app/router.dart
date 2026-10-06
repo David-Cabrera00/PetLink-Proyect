@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../features/radar/radar_screen.dart';
-import '../features/explore/explore_screen.dart';
-import '../features/reports/reports_screen.dart';
+import '../features/radar/presentation/radar_screen.dart';
+import '../features/explore/presentation/explore_screen.dart';
+import '../features/reports/presentation/reports_screen.dart';
 import '../features/activity/activity_screen.dart';
 import '../features/profile/profile_screen.dart';
 
