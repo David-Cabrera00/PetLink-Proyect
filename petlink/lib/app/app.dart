@@ -14,6 +14,8 @@ class PetLinkApp extends StatelessWidget {
         title: 'PetLink',
         debugShowCheckedModeBanner: false,
         theme: PetTheme.light,
+        darkTheme: PetTheme.dark,
+        themeMode: ThemeMode.system,
         routerConfig: AppRouter.router,
       ),
     );

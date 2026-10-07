@@ -147,7 +147,8 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                     fit: BoxFit.cover,
                     width: double.infinity,
                     height: double.infinity,
-                    errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+                    errorBuilder: (context, error, stackTrace) =>
+                        _buildPlaceholder(),
                   )
                 : _buildPlaceholder(),
           ),

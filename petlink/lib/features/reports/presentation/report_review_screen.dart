@@ -232,7 +232,8 @@ class ReportReviewScreen extends ConsumerWidget {
                 fit: BoxFit.cover,
                 width: 60,
                 height: 60,
-                errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+                errorBuilder: (context, error, stackTrace) =>
+                    _buildPlaceholder(),
               )
             : _buildPlaceholder(),
       ),
