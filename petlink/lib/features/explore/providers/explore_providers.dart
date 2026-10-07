@@ -1,10 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../shared/models/pet_report.dart';
 import '../../radar/providers/radar_providers.dart';
 
 enum ExploreFilter { all, lost, found, nearby }
 
-final exploreFilterProvider = StateProvider<ExploreFilter>((ref) => ExploreFilter.all);
+final exploreFilterProvider = StateProvider<ExploreFilter>(
+  (ref) => ExploreFilter.all,
+);
 
 final exploreReportsProvider = FutureProvider<List<PetReport>>((ref) async {
   final repository = ref.watch(petReportRepositoryProvider);

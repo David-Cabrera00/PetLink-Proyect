@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'pet_colors.dart';
 import 'pet_typography.dart';
 import 'pet_radius.dart';
@@ -44,9 +45,7 @@ class PetTheme {
           backgroundColor: PetColors.primary,
           foregroundColor: PetColors.surface,
           minimumSize: const Size(double.infinity, 52),
-          shape: RoundedRectangleBorder(
-            borderRadius: PetRadius.lgAll,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: PetRadius.lgAll),
           textStyle: PetTypography.button,
         ),
       ),
@@ -55,9 +54,7 @@ class PetTheme {
           foregroundColor: PetColors.primary,
           minimumSize: const Size(double.infinity, 52),
           side: const BorderSide(color: PetColors.primary, width: 1.5),
-          shape: RoundedRectangleBorder(
-            borderRadius: PetRadius.lgAll,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: PetRadius.lgAll),
           textStyle: PetTypography.button,
         ),
       ),

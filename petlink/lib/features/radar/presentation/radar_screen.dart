@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
 import '../../../design_system/buttons/pet_button.dart';
@@ -21,9 +22,7 @@ class RadarScreen extends ConsumerWidget {
     final summary = ref.watch(radarSummaryProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Radar'),
-      ),
+      appBar: AppBar(title: const Text('Radar')),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(nearbyReportsProvider);
@@ -177,12 +176,14 @@ class RadarScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMatchesSection(BuildContext context, AsyncValue matchesAsync, WidgetRef ref) {
+  Widget _buildMatchesSection(
+    BuildContext context,
+    AsyncValue matchesAsync,
+    WidgetRef ref,
+  ) {
     return Column(
       children: [
-        SectionHeader(
-          title: 'Posibles coincidencias',
-        ),
+        SectionHeader(title: 'Posibles coincidencias'),
         const SizedBox(height: PetSpacing.md),
         matchesAsync.when(
           data: (matches) {
@@ -191,13 +192,15 @@ class RadarScreen extends ConsumerWidget {
             }
             return Column(
               children: matches
-                  .map<Widget>((match) => Padding(
-                        padding: const EdgeInsets.only(bottom: PetSpacing.md),
-                        child: MatchCard(
-                          match: match,
-                          onTap: () => context.go('/matches/${match.id}'),
-                        ),
-                      ))
+                  .map<Widget>(
+                    (match) => Padding(
+                      padding: const EdgeInsets.only(bottom: PetSpacing.md),
+                      child: MatchCard(
+                        match: match,
+                        onTap: () => context.go('/matches/${match.id}'),
+                      ),
+                    ),
+                  )
                   .toList(),
             );
           },
@@ -243,12 +246,14 @@ class RadarScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildNearbySection(BuildContext context, AsyncValue nearbyAsync, WidgetRef ref) {
+  Widget _buildNearbySection(
+    BuildContext context,
+    AsyncValue nearbyAsync,
+    WidgetRef ref,
+  ) {
     return Column(
       children: [
-        SectionHeader(
-          title: 'Cerca de ti',
-        ),
+        SectionHeader(title: 'Cerca de ti'),
         const SizedBox(height: PetSpacing.md),
         nearbyAsync.when(
           data: (reports) {
@@ -262,13 +267,15 @@ class RadarScreen extends ConsumerWidget {
             return Column(
               children: reports
                   .take(3)
-                  .map<Widget>((report) => Padding(
-                        padding: const EdgeInsets.only(bottom: PetSpacing.md),
-                        child: PetCardCompact(
-                          report: report,
-                          onTap: () => context.go('/reports/${report.id}'),
-                        ),
-                      ))
+                  .map<Widget>(
+                    (report) => Padding(
+                      padding: const EdgeInsets.only(bottom: PetSpacing.md),
+                      child: PetCardCompact(
+                        report: report,
+                        onTap: () => context.go('/reports/${report.id}'),
+                      ),
+                    ),
+                  )
                   .toList(),
             );
           },
@@ -291,9 +298,7 @@ class RadarScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: PetColors.border),
       ),
-      child: Center(
-        child: CircularProgressIndicator(color: PetColors.primary),
-      ),
+      child: Center(child: CircularProgressIndicator(color: PetColors.primary)),
     );
   }
 }

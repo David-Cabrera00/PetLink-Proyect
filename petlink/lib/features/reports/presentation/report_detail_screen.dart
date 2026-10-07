@@ -15,10 +15,7 @@ import '../providers/reports_providers.dart';
 class ReportDetailScreen extends ConsumerWidget {
   final String reportId;
 
-  const ReportDetailScreen({
-    super.key,
-    required this.reportId,
-  });
+  const ReportDetailScreen({super.key, required this.reportId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,14 +25,8 @@ class ReportDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Detalle de mascota'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.bookmark_border),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.share),
-            onPressed: () {},
-          ),
+          IconButton(icon: const Icon(Icons.bookmark_border), onPressed: () {}),
+          IconButton(icon: const Icon(Icons.share), onPressed: () {}),
         ],
       ),
       body: reportAsync.when(
@@ -61,8 +52,7 @@ class ReportDetailScreen extends ConsumerWidget {
     return const EmptyState(
       icon: Icons.description,
       title: 'No encontramos este reporte.',
-      subtitle:
-          'El reporte puede haber sido eliminado o el ID es incorrecto.',
+      subtitle: 'El reporte puede haber sido eliminado o el ID es incorrecto.',
     );
   }
 
@@ -102,10 +92,7 @@ class ReportDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildReportDetail(
-    BuildContext context,
-    dynamic report,
-  ) {
+  Widget _buildReportDetail(BuildContext context, dynamic report) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(PetSpacing.lg),
       child: Column(
@@ -119,21 +106,15 @@ class ReportDetailScreen extends ConsumerWidget {
           const SizedBox(height: PetSpacing.lg),
           _buildTimeSection(context, report),
           const SizedBox(height: PetSpacing.lg),
-          const SectionHeader(
-            title: 'Rasgos y señas particulares',
-          ),
+          const SectionHeader(title: 'Rasgos y señas particulares'),
           const SizedBox(height: PetSpacing.md),
           _buildTraitsSection(context),
           const SizedBox(height: PetSpacing.lg),
-          const SectionHeader(
-            title: '¿Cómo ocurrió?',
-          ),
+          const SectionHeader(title: '¿Cómo ocurrió?'),
           const SizedBox(height: PetSpacing.md),
           _buildDescriptionSection(context, report),
           const SizedBox(height: PetSpacing.lg),
-          const SectionHeader(
-            title: 'Última ubicación',
-          ),
+          const SectionHeader(title: 'Última ubicación'),
           const SizedBox(height: PetSpacing.md),
           _buildMapPlaceholder(context),
           const SizedBox(height: PetSpacing.lg),
@@ -144,10 +125,7 @@ class ReportDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPhotoSection(
-    BuildContext context,
-    dynamic report,
-  ) {
+  Widget _buildPhotoSection(BuildContext context, dynamic report) {
     return Container(
       width: double.infinity,
       height: 240,
@@ -179,10 +157,7 @@ class ReportDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeaderSection(
-    BuildContext context,
-    dynamic report,
-  ) {
+  Widget _buildHeaderSection(BuildContext context, dynamic report) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -197,15 +172,9 @@ class ReportDetailScreen extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: PetSpacing.md),
-        Text(
-          report.pet.name,
-          style: Theme.of(context).textTheme.displaySmall,
-        ),
+        Text(report.pet.name, style: Theme.of(context).textTheme.displaySmall),
         const SizedBox(height: PetSpacing.xs),
-        Text(
-          report.pet.breed,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
+        Text(report.pet.breed, style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: PetSpacing.xs),
         Text(
           '${report.pet.sex} · ${report.pet.age}',
@@ -220,10 +189,7 @@ class ReportDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildLocationSection(
-    BuildContext context,
-    dynamic report,
-  ) {
+  Widget _buildLocationSection(BuildContext context, dynamic report) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -259,22 +225,12 @@ class ReportDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTimeSection(
-    BuildContext context,
-    dynamic report,
-  ) {
+  Widget _buildTimeSection(BuildContext context, dynamic report) {
     return Row(
       children: [
-        const Icon(
-          Icons.access_time,
-          size: 20,
-          color: PetColors.textSecondary,
-        ),
+        const Icon(Icons.access_time, size: 20, color: PetColors.textSecondary),
         const SizedBox(width: PetSpacing.xs),
-        Text(
-          'Hace 3 horas',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+        Text('Hace 3 horas', style: Theme.of(context).textTheme.bodyMedium),
       ],
     );
   }
@@ -290,9 +246,7 @@ class ReportDetailScreen extends ConsumerWidget {
     return Column(
       children: traits.map((trait) {
         return Padding(
-          padding: const EdgeInsets.only(
-            bottom: PetSpacing.md,
-          ),
+          padding: const EdgeInsets.only(bottom: PetSpacing.md),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -300,13 +254,10 @@ class ReportDetailScreen extends ConsumerWidget {
                 width: 100,
                 child: Text(
                   trait.$1,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: PetColors.textSecondary,
-                      ),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: PetColors.textSecondary,
+                  ),
                 ),
               ),
               const SizedBox(width: PetSpacing.md),
@@ -323,19 +274,14 @@ class ReportDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDescriptionSection(
-    BuildContext context,
-    dynamic report,
-  ) {
+  Widget _buildDescriptionSection(BuildContext context, dynamic report) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(PetSpacing.md),
       decoration: BoxDecoration(
         color: PetColors.surface,
         borderRadius: PetRadius.lgAll,
-        border: Border.all(
-          color: PetColors.border,
-        ),
+        border: Border.all(color: PetColors.border),
       ),
       child: Text(
         report.description,
@@ -351,9 +297,7 @@ class ReportDetailScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         color: PetColors.background,
         borderRadius: PetRadius.lgAll,
-        border: Border.all(
-          color: PetColors.border,
-        ),
+        border: Border.all(color: PetColors.border),
       ),
       child: Center(
         child: Column(
@@ -411,9 +355,7 @@ class ReportDetailScreen extends ConsumerWidget {
                 icon: const Icon(Icons.share),
                 label: const Text('Compartir'),
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: PetSpacing.md,
-                  ),
+                  padding: const EdgeInsets.symmetric(vertical: PetSpacing.md),
                 ),
               ),
             ),

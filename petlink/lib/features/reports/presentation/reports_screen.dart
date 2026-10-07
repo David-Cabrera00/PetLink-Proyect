@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
 import '../../../core/theme/pet_radius.dart';
@@ -20,9 +21,7 @@ class ReportsScreen extends ConsumerWidget {
     final filter = ref.watch(reportsFilterProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mis reportes'),
-      ),
+      appBar: AppBar(title: const Text('Mis reportes')),
       body: Column(
         children: [
           Padding(
@@ -36,7 +35,9 @@ class ReportsScreen extends ConsumerWidget {
                   return _buildEmptyState(context, filter);
                 }
                 return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: PetSpacing.lg),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: PetSpacing.lg,
+                  ),
                   itemCount: reports.length,
                   itemBuilder: (context, index) {
                     return Padding(
@@ -67,7 +68,11 @@ class ReportsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFilters(BuildContext context, WidgetRef ref, ReportsFilter currentFilter) {
+  Widget _buildFilters(
+    BuildContext context,
+    WidgetRef ref,
+    ReportsFilter currentFilter,
+  ) {
     return Wrap(
       spacing: PetSpacing.sm,
       runSpacing: PetSpacing.sm,
@@ -148,107 +153,120 @@ class ReportsScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-            Row(
-              children: [
-                Container(
-                  width: 64,
-                  height: 64,
-                  decoration: BoxDecoration(
-                    color: PetColors.primarySoft,
-                    borderRadius: PetRadius.mdAll,
+              Row(
+                children: [
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: PetColors.primarySoft,
+                      borderRadius: PetRadius.mdAll,
+                    ),
+                    child: Icon(Icons.pets, color: PetColors.primary, size: 32),
                   ),
-                  child: Icon(
-                    Icons.pets,
-                    color: PetColors.primary,
-                    size: 32,
-                  ),
-                ),
-                const SizedBox(width: PetSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              report.pet.name,
-                              style: Theme.of(context).textTheme.titleMedium,
+                  const SizedBox(width: PetSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                report.pet.name,
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
                             ),
-                          ),
-                          StatusBadge(
-                            status: report.type == ReportType.lost ? PetStatus.lost : PetStatus.found,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: PetSpacing.xs),
-                      Text(
-                        report.status == ReportStatus.active ? 'Búsqueda activa' : 'Recuperada',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ],
+                            StatusBadge(
+                              status: report.type == ReportType.lost
+                                  ? PetStatus.lost
+                                  : PetStatus.found,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: PetSpacing.xs),
+                        Text(
+                          report.status == ReportStatus.active
+                              ? 'Búsqueda activa'
+                              : 'Recuperada',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: PetSpacing.md),
-            Row(
-              children: [
-                Icon(Icons.location_on, size: 16, color: PetColors.textSecondary),
-                const SizedBox(width: PetSpacing.xs),
-                Expanded(
-                  child: Text(
-                    report.address,
+                ],
+              ),
+              const SizedBox(height: PetSpacing.md),
+              Row(
+                children: [
+                  Icon(
+                    Icons.location_on,
+                    size: 16,
+                    color: PetColors.textSecondary,
+                  ),
+                  const SizedBox(width: PetSpacing.xs),
+                  Expanded(
+                    child: Text(
+                      report.address,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: PetSpacing.xs),
+              Row(
+                children: [
+                  Icon(
+                    Icons.access_time,
+                    size: 16,
+                    color: PetColors.textSecondary,
+                  ),
+                  const SizedBox(width: PetSpacing.xs),
+                  Text(
+                    'Hace 3 horas',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: PetSpacing.xs),
-            Row(
-              children: [
-                Icon(Icons.access_time, size: 16, color: PetColors.textSecondary),
-                const SizedBox(width: PetSpacing.xs),
-                Text(
-                  'Hace 3 horas',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
-            ),
-            const SizedBox(height: PetSpacing.md),
-            Row(
-              children: [
-                _buildIndicator(
-                  context,
-                  Icons.visibility,
-                  '${report.sightingsCount} avistamientos',
-                  PetColors.primary,
-                ),
-                const SizedBox(width: PetSpacing.lg),
-                _buildIndicator(
-                  context,
-                  Icons.diamond,
-                  '1 posible coincidencia',
-                  PetColors.match,
-                ),
-              ],
-            ),
-            const SizedBox(height: PetSpacing.md),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () {},
-                child: const Text('Ver actividad'),
+                ],
               ),
-            ),
-          ],
+              const SizedBox(height: PetSpacing.md),
+              Row(
+                children: [
+                  _buildIndicator(
+                    context,
+                    Icons.visibility,
+                    '${report.sightingsCount} avistamientos',
+                    PetColors.primary,
+                  ),
+                  const SizedBox(width: PetSpacing.lg),
+                  _buildIndicator(
+                    context,
+                    Icons.diamond,
+                    '1 posible coincidencia',
+                    PetColors.match,
+                  ),
+                ],
+              ),
+              const SizedBox(height: PetSpacing.md),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () {},
+                  child: const Text('Ver actividad'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-  Widget _buildIndicator(BuildContext context, IconData icon, String label, Color color) {
+  Widget _buildIndicator(
+    BuildContext context,
+    IconData icon,
+    String label,
+    Color color,
+  ) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

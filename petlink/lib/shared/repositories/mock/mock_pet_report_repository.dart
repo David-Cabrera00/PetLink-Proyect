@@ -1,5 +1,6 @@
 import '../../models/pet.dart';
 import '../../models/pet_report.dart';
+import '../../models/report_draft.dart';
 import '../pet_report_repository.dart';
 
 class MockPetReportRepository implements PetReportRepository {
@@ -148,5 +149,37 @@ class MockPetReportRepository implements PetReportRepository {
     } catch (_) {
       return null;
     }
+  }
+
+  @override
+  Future<PetReport> createReport(ReportDraft draft) async {
+    await Future.delayed(const Duration(milliseconds: 800));
+
+    final newReport = PetReport(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      pet: Pet(
+        id: 'p${DateTime.now().millisecondsSinceEpoch}',
+        name: draft.name,
+        species: draft.species,
+        breed: draft.breed,
+        sex: draft.sex,
+        age: draft.age,
+        size: draft.size,
+        color: draft.color,
+        description: draft.description,
+      ),
+      type: draft.reportType!,
+      status: ReportStatus.active,
+      latitude: draft.latitude,
+      longitude: draft.longitude,
+      address: draft.address,
+      createdAt: DateTime.now(),
+      lastSeenAt: draft.lastSeenAt ?? DateTime.now(),
+      description: draft.description,
+      distanceKm: 0.0,
+      sightingsCount: 0,
+    );
+
+    return newReport;
   }
 }

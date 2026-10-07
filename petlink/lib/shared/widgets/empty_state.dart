@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/theme/pet_colors.dart';
 import '../../core/theme/pet_spacing.dart';
 
@@ -22,7 +23,11 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 64, color: PetColors.textSecondary.withValues(alpha: 0.5)),
+            Icon(
+              icon,
+              size: 64,
+              color: PetColors.textSecondary.withValues(alpha: 0.5),
+            ),
             const SizedBox(height: PetSpacing.lg),
             Text(
               title,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/theme/pet_colors.dart';
 import '../../core/theme/pet_spacing.dart';
 import '../../core/theme/pet_radius.dart';
@@ -49,9 +50,7 @@ class PetCardCompact extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        StatusBadge(
-                          status: _reportTypeToStatus(report.type),
-                        ),
+                        StatusBadge(status: _reportTypeToStatus(report.type)),
                       ],
                     ),
                     const SizedBox(height: PetSpacing.xs),
@@ -63,7 +62,11 @@ class PetCardCompact extends StatelessWidget {
                     const SizedBox(height: PetSpacing.xs),
                     Row(
                       children: [
-                        Icon(Icons.location_on, size: 14, color: PetColors.textSecondary),
+                        Icon(
+                          Icons.location_on,
+                          size: 14,
+                          color: PetColors.textSecondary,
+                        ),
                         const SizedBox(width: PetSpacing.xs),
                         Expanded(
                           child: Text(

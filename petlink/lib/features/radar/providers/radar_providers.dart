@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../shared/models/pet_report.dart';
 import '../../../shared/models/pet_match.dart';
 import '../../../shared/repositories/pet_report_repository.dart';
@@ -40,8 +41,10 @@ final radarSummaryProvider = Provider<RadarSummary>((ref) {
         matchesCount: matchesAsync.valueOrNull?.length ?? 0,
       );
     },
-    loading: () => const RadarSummary(totalReports: 0, recentReports: 0, matchesCount: 0),
-    error: (Object _, StackTrace _) => const RadarSummary(totalReports: 0, recentReports: 0, matchesCount: 0),
+    loading: () =>
+        const RadarSummary(totalReports: 0, recentReports: 0, matchesCount: 0),
+    error: (Object _, StackTrace _) =>
+        const RadarSummary(totalReports: 0, recentReports: 0, matchesCount: 0),
   );
 });
 

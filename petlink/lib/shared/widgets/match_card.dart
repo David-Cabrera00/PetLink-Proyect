@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/theme/pet_colors.dart';
 import '../../core/theme/pet_spacing.dart';
 import '../../core/theme/pet_radius.dart';
@@ -41,9 +42,7 @@ class MatchCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  StatusBadge(
-                    status: _matchLevelToStatus(match.level),
-                  ),
+                  StatusBadge(status: _matchLevelToStatus(match.level)),
                 ],
               ),
               const SizedBox(height: PetSpacing.md),
@@ -57,14 +56,22 @@ class MatchCard extends StatelessWidget {
               const SizedBox(height: PetSpacing.md),
               Row(
                 children: [
-                  Icon(Icons.location_on, size: 16, color: PetColors.textSecondary),
+                  Icon(
+                    Icons.location_on,
+                    size: 16,
+                    color: PetColors.textSecondary,
+                  ),
                   const SizedBox(width: PetSpacing.xs),
                   Text(
                     '${match.distanceKm} km',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   const SizedBox(width: PetSpacing.md),
-                  Icon(Icons.access_time, size: 16, color: PetColors.textSecondary),
+                  Icon(
+                    Icons.access_time,
+                    size: 16,
+                    color: PetColors.textSecondary,
+                  ),
                   const SizedBox(width: PetSpacing.xs),
                   Text(
                     _formatDuration(match.timeDifference),

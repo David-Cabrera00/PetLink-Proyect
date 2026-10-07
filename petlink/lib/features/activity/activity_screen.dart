@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/theme/pet_colors.dart';
 import '../../core/theme/pet_spacing.dart';
 
@@ -8,9 +9,7 @@ class ActivityScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Actividad'),
-      ),
+      appBar: AppBar(title: const Text('Actividad')),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(PetSpacing.xl),

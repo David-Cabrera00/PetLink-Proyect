@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
 import '../../../core/theme/pet_radius.dart';
@@ -22,9 +23,7 @@ class ExploreScreen extends ConsumerWidget {
     final filter = ref.watch(exploreFilterProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Explorar'),
-      ),
+      appBar: AppBar(title: const Text('Explorar')),
       body: Column(
         children: [
           Padding(
@@ -56,7 +55,11 @@ class ExploreScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFilters(BuildContext context, WidgetRef ref, ExploreFilter currentFilter) {
+  Widget _buildFilters(
+    BuildContext context,
+    WidgetRef ref,
+    ExploreFilter currentFilter,
+  ) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -151,7 +154,11 @@ class ExploreScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMapPlaceholder(BuildContext context, AsyncValue reportsAsync, WidgetRef ref) {
+  Widget _buildMapPlaceholder(
+    BuildContext context,
+    AsyncValue reportsAsync,
+    WidgetRef ref,
+  ) {
     return Container(
       color: PetColors.background,
       child: reportsAsync.when(
@@ -160,7 +167,8 @@ class ExploreScreen extends ConsumerWidget {
             return EmptyState(
               icon: Icons.map,
               title: 'No hay reportes en esta zona',
-              subtitle: 'Intenta cambiar los filtros o ampliar el radio de búsqueda.',
+              subtitle:
+                  'Intenta cambiar los filtros o ampliar el radio de búsqueda.',
             );
           }
           return LayoutBuilder(
@@ -191,15 +199,16 @@ class ExploreScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  ...reports.map((report) => _buildMarker(context, report, ref, maxW, maxH)),
+                  ...reports.map(
+                    (report) => _buildMarker(context, report, ref, maxW, maxH),
+                  ),
                 ],
               );
             },
           );
         },
-        loading: () => Center(
-          child: CircularProgressIndicator(color: PetColors.primary),
-        ),
+        loading: () =>
+            Center(child: CircularProgressIndicator(color: PetColors.primary)),
         error: (Object _, StackTrace _) => ErrorState(
           title: 'No pudimos cargar el mapa',
           subtitle: 'Verifica tu conexión e intenta nuevamente.',
@@ -209,7 +218,13 @@ class ExploreScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMarker(BuildContext context, report, WidgetRef ref, double maxW, double maxH) {
+  Widget _buildMarker(
+    BuildContext context,
+    report,
+    WidgetRef ref,
+    double maxW,
+    double maxH,
+  ) {
     final isLost = report.type == ReportType.lost;
     final color = isLost ? PetColors.lost : PetColors.found;
     final icon = isLost ? Icons.priority_high : Icons.check_circle;
@@ -259,7 +274,6 @@ class ExploreScreen extends ConsumerWidget {
               ),
             ],
           ),
-
         ),
       ),
     );
@@ -283,11 +297,7 @@ class ExploreScreen extends ConsumerWidget {
                     color: PetColors.primarySoft,
                     borderRadius: PetRadius.mdAll,
                   ),
-                  child: Icon(
-                    Icons.pets,
-                    color: PetColors.primary,
-                    size: 32,
-                  ),
+                  child: Icon(Icons.pets, color: PetColors.primary, size: 32),
                 ),
                 const SizedBox(width: PetSpacing.md),
                 Expanded(
@@ -303,7 +313,9 @@ class ExploreScreen extends ConsumerWidget {
                             ),
                           ),
                           StatusBadge(
-                            status: report.type == ReportType.lost ? PetStatus.lost : PetStatus.found,
+                            status: report.type == ReportType.lost
+                                ? PetStatus.lost
+                                : PetStatus.found,
                           ),
                         ],
                       ),
@@ -315,14 +327,22 @@ class ExploreScreen extends ConsumerWidget {
                       const SizedBox(height: PetSpacing.xs),
                       Row(
                         children: [
-                          Icon(Icons.location_on, size: 14, color: PetColors.textSecondary),
+                          Icon(
+                            Icons.location_on,
+                            size: 14,
+                            color: PetColors.textSecondary,
+                          ),
                           const SizedBox(width: PetSpacing.xs),
                           Text(
                             '${report.distanceKm} km',
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                           const SizedBox(width: PetSpacing.md),
-                          Icon(Icons.access_time, size: 14, color: PetColors.textSecondary),
+                          Icon(
+                            Icons.access_time,
+                            size: 14,
+                            color: PetColors.textSecondary,
+                          ),
                           const SizedBox(width: PetSpacing.xs),
                           Text(
                             'Hace 3 horas',
@@ -336,10 +356,7 @@ class ExploreScreen extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: PetSpacing.md),
-            Text(
-              report.address,
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
+            Text(report.address, style: Theme.of(context).textTheme.bodySmall),
             const SizedBox(height: PetSpacing.lg),
             Row(
               children: [

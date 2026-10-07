@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/theme/pet_colors.dart';
 import '../../core/theme/pet_spacing.dart';
 
@@ -12,6 +13,7 @@ class PetInput extends StatelessWidget {
   final int maxLines;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
+  final FormFieldValidator<String>? validator;
 
   const PetInput({
     super.key,
@@ -24,6 +26,7 @@ class PetInput extends StatelessWidget {
     this.maxLines = 1,
     this.prefixIcon,
     this.suffixIcon,
+    this.validator,
   });
 
   @override
@@ -35,9 +38,9 @@ class PetInput extends StatelessWidget {
           Text(
             label!,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: PetColors.textPrimary,
-                ),
+              fontWeight: FontWeight.w600,
+              color: PetColors.textPrimary,
+            ),
           ),
           const SizedBox(height: PetSpacing.xs),
         ],
@@ -46,6 +49,7 @@ class PetInput extends StatelessWidget {
           obscureText: obscureText,
           keyboardType: keyboardType,
           maxLines: maxLines,
+          validator: validator,
           decoration: InputDecoration(
             hintText: hint,
             errorText: errorText,

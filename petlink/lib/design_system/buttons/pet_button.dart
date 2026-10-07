@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/theme/pet_colors.dart';
 import '../../core/theme/pet_spacing.dart';
 
@@ -26,15 +27,19 @@ class PetButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final buttonStyle = ElevatedButton.styleFrom(
       minimumSize: const Size(double.infinity, 52),
-      padding: const EdgeInsets.symmetric(vertical: PetSpacing.md, horizontal: PetSpacing.lg),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+      padding: const EdgeInsets.symmetric(
+        vertical: PetSpacing.md,
+        horizontal: PetSpacing.lg,
       ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     );
 
     final outlineStyle = OutlinedButton.styleFrom(
       minimumSize: const Size(double.infinity, 52),
-      padding: const EdgeInsets.symmetric(vertical: PetSpacing.md, horizontal: PetSpacing.lg),
+      padding: const EdgeInsets.symmetric(
+        vertical: PetSpacing.md,
+        horizontal: PetSpacing.lg,
+      ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: const BorderSide(color: PetColors.primary, width: 1.5),
@@ -43,31 +48,31 @@ class PetButton extends StatelessWidget {
 
     Widget button = switch (variant) {
       PetButtonVariant.primary => ElevatedButton(
-          onPressed: isLoading ? null : onPressed,
-          style: buttonStyle,
-          child: _buildContent(PetColors.surface),
-        ),
+        onPressed: isLoading ? null : onPressed,
+        style: buttonStyle,
+        child: _buildContent(PetColors.surface),
+      ),
       PetButtonVariant.secondary => ElevatedButton(
-          onPressed: isLoading ? null : onPressed,
-          style: buttonStyle.copyWith(
-            backgroundColor: WidgetStatePropertyAll(PetColors.primarySoft),
-            foregroundColor: WidgetStatePropertyAll(PetColors.primaryDark),
-          ),
-          child: _buildContent(PetColors.primaryDark),
+        onPressed: isLoading ? null : onPressed,
+        style: buttonStyle.copyWith(
+          backgroundColor: WidgetStatePropertyAll(PetColors.primarySoft),
+          foregroundColor: WidgetStatePropertyAll(PetColors.primaryDark),
         ),
+        child: _buildContent(PetColors.primaryDark),
+      ),
       PetButtonVariant.outline => OutlinedButton(
-          onPressed: isLoading ? null : onPressed,
-          style: outlineStyle,
-          child: _buildContent(PetColors.primary),
-        ),
+        onPressed: isLoading ? null : onPressed,
+        style: outlineStyle,
+        child: _buildContent(PetColors.primary),
+      ),
       PetButtonVariant.danger => ElevatedButton(
-          onPressed: isLoading ? null : onPressed,
-          style: buttonStyle.copyWith(
-            backgroundColor: WidgetStatePropertyAll(PetColors.lost),
-            foregroundColor: WidgetStatePropertyAll(PetColors.surface),
-          ),
-          child: _buildContent(PetColors.surface),
+        onPressed: isLoading ? null : onPressed,
+        style: buttonStyle.copyWith(
+          backgroundColor: WidgetStatePropertyAll(PetColors.lost),
+          foregroundColor: WidgetStatePropertyAll(PetColors.surface),
         ),
+        child: _buildContent(PetColors.surface),
+      ),
     };
 
     if (semanticLabel != null) {
@@ -87,10 +92,7 @@ class PetButton extends StatelessWidget {
       return SizedBox(
         height: 24,
         width: 24,
-        child: CircularProgressIndicator(
-          strokeWidth: 2.5,
-          color: textColor,
-        ),
+        child: CircularProgressIndicator(strokeWidth: 2.5, color: textColor),
       );
     }
 

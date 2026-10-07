@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/theme/pet_spacing.dart';
 import '../../core/theme/pet_radius.dart';
 
@@ -7,12 +8,7 @@ class PetCard extends StatelessWidget {
   final VoidCallback? onTap;
   final EdgeInsets? padding;
 
-  const PetCard({
-    super.key,
-    required this.child,
-    this.onTap,
-    this.padding,
-  });
+  const PetCard({super.key, required this.child, this.onTap, this.padding});
 
   @override
   Widget build(BuildContext context) {
