@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/pet_colors.dart';
 import '../../core/theme/pet_spacing.dart';
 import '../../core/theme/pet_radius.dart';
+import '../../core/theme/pet_theme_extension.dart';
 
 enum PetStatus { lost, found, match, recovered }
 
@@ -13,7 +13,8 @@ class StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (label, color, icon) = _statusData;
+    final extension = PetThemeExtension.of(context);
+    final (label, color, icon) = _statusData(extension);
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -43,16 +44,16 @@ class StatusBadge extends StatelessWidget {
     );
   }
 
-  (String, Color, IconData) get _statusData {
+  (String, Color, IconData) _statusData(PetThemeExtension extension) {
     switch (status) {
       case PetStatus.lost:
-        return ('Perdida', PetColors.lost, Icons.priority_high);
+        return ('Perdida', extension.lost, Icons.priority_high);
       case PetStatus.found:
-        return ('Encontrada', PetColors.found, Icons.check_circle);
+        return ('Encontrada', extension.found, Icons.check_circle);
       case PetStatus.match:
-        return ('Posible coincidencia', PetColors.match, Icons.diamond);
+        return ('Posible coincidencia', extension.match, Icons.diamond);
       case PetStatus.recovered:
-        return ('Recuperada', PetColors.found, Icons.favorite);
+        return ('Recuperada', extension.found, Icons.favorite);
     }
   }
 }

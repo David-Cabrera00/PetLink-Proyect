@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/pet_colors.dart';
-
 class StepIndicator extends StatelessWidget {
   final int current;
   final int total;
@@ -20,8 +18,8 @@ class StepIndicator extends StatelessWidget {
               height: 4,
               decoration: BoxDecoration(
                 color: isActive || isCurrent
-                    ? PetColors.primary
-                    : PetColors.border,
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).dividerColor,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),

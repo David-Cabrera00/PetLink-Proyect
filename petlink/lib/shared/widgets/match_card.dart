@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/pet_colors.dart';
 import '../../core/theme/pet_spacing.dart';
 import '../../core/theme/pet_radius.dart';
 import '../../design_system/badges/status_badge.dart';
+import '../../core/theme/pet_theme_extension.dart';
 import '../models/pet_match.dart';
 
 class MatchCard extends StatelessWidget {
@@ -14,8 +14,14 @@ class MatchCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Card(
       margin: EdgeInsets.zero,
+      color: cs.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: PetRadius.xlAll,
+        side: BorderSide(color: Theme.of(context).dividerColor),
+      ),
       child: InkWell(
         onTap: onTap,
         borderRadius: PetRadius.xlAll,
@@ -50,28 +56,20 @@ class MatchCard extends StatelessWidget {
                 spacing: PetSpacing.sm,
                 runSpacing: PetSpacing.xs,
                 children: match.matchingTraits
-                    .map((trait) => _buildTraitChip(trait))
+                    .map((trait) => _buildTraitChip(context, trait))
                     .toList(),
               ),
               const SizedBox(height: PetSpacing.md),
               Row(
                 children: [
-                  Icon(
-                    Icons.location_on,
-                    size: 16,
-                    color: PetColors.textSecondary,
-                  ),
+                  Icon(Icons.location_on, size: 16, color: cs.onSurfaceVariant),
                   const SizedBox(width: PetSpacing.xs),
                   Text(
                     '${match.distanceKm} km',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   const SizedBox(width: PetSpacing.md),
-                  Icon(
-                    Icons.access_time,
-                    size: 16,
-                    color: PetColors.textSecondary,
-                  ),
+                  Icon(Icons.access_time, size: 16, color: cs.onSurfaceVariant),
                   const SizedBox(width: PetSpacing.xs),
                   Text(
                     _formatDuration(match.timeDifference),
@@ -86,27 +84,28 @@ class MatchCard extends StatelessWidget {
     );
   }
 
-  Widget _buildTraitChip(String trait) {
+  Widget _buildTraitChip(BuildContext context, String trait) {
+    final extension = PetThemeExtension.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: PetSpacing.sm,
         vertical: PetSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: PetColors.foundSoft,
+        color: extension.foundSoft,
         borderRadius: PetRadius.smAll,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.check, size: 12, color: PetColors.found),
+          Icon(Icons.check, size: 12, color: extension.found),
           const SizedBox(width: PetSpacing.xs),
           Text(
             trait,
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: PetColors.found,
+              color: extension.found,
             ),
           ),
         ],

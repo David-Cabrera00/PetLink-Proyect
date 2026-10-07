@@ -43,6 +43,10 @@ class PetThemeExtension extends ThemeExtension<PetThemeExtension> {
     surfaceVariant: Color(0xFF1D2A2A),
   );
 
+  static PetThemeExtension of(BuildContext context) {
+    return Theme.of(context).extension<PetThemeExtension>()!;
+  }
+
   @override
   PetThemeExtension copyWith({
     Color? lost,

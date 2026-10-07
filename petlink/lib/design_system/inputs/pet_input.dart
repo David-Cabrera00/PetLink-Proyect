@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/pet_colors.dart';
-import '../../core/theme/pet_spacing.dart';
-
 class PetInput extends StatelessWidget {
   final String? label;
   final String? hint;
@@ -31,18 +28,17 @@ class PetInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label != null) ...[
           Text(
             label!,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: PetColors.textPrimary,
-            ),
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(fontWeight: FontWeight.w600, color: cs.onSurface),
           ),
-          const SizedBox(height: PetSpacing.xs),
+          const SizedBox(height: 8),
         ],
         TextFormField(
           controller: controller,
@@ -55,6 +51,9 @@ class PetInput extends StatelessWidget {
             errorText: errorText,
             prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,
+            hintStyle: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
       ],

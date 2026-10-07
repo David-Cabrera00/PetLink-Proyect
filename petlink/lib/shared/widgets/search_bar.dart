@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/pet_colors.dart';
-import '../../core/theme/pet_spacing.dart';
 import '../../core/theme/pet_radius.dart';
 
 class PetSearchBar extends StatelessWidget {
@@ -15,21 +13,26 @@ class PetSearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: PetColors.surface,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: PetRadius.lgAll,
-        border: Border.all(color: PetColors.border),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: TextField(
         controller: controller,
         onChanged: onChanged,
         decoration: InputDecoration(
           hintText: hint ?? 'Buscar mascota o zona',
-          hintStyle: TextStyle(color: PetColors.textSecondary),
-          prefixIcon: Icon(Icons.search, color: PetColors.textSecondary),
+          hintStyle: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+          prefixIcon: Icon(
+            Icons.search,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
-            horizontal: PetSpacing.lg,
-            vertical: PetSpacing.md,
+            horizontal: 16,
+            vertical: 12,
           ),
         ),
       ),

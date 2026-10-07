@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/pet_spacing.dart';
 import '../../core/theme/pet_radius.dart';
 
 class PetCard extends StatelessWidget {
@@ -12,13 +11,19 @@ class PetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Card(
       margin: EdgeInsets.zero,
+      color: cs.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: PetRadius.xlAll,
+        side: BorderSide(color: Theme.of(context).dividerColor),
+      ),
       child: InkWell(
         onTap: onTap,
         borderRadius: PetRadius.xlAll,
         child: Padding(
-          padding: padding ?? const EdgeInsets.all(PetSpacing.lg),
+          padding: padding ?? const EdgeInsets.all(16),
           child: child,
         ),
       ),
