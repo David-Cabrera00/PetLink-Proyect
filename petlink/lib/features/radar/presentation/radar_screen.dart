@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
 import '../../../design_system/buttons/pet_button.dart';
 import '../../../shared/widgets/match_card.dart';
@@ -64,22 +63,23 @@ class RadarScreen extends ConsumerWidget {
   }
 
   Widget _buildZoneSelector(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(PetSpacing.lg),
       decoration: BoxDecoration(
-        color: PetColors.surface,
+        color: cs.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: PetColors.border),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(PetSpacing.md),
             decoration: BoxDecoration(
-              color: PetColors.primarySoft,
+              color: cs.primaryContainer,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(Icons.location_on, color: PetColors.primary),
+            child: Icon(Icons.location_on, color: cs.primary),
           ),
           const SizedBox(width: PetSpacing.md),
           Expanded(
@@ -98,13 +98,14 @@ class RadarScreen extends ConsumerWidget {
               ],
             ),
           ),
-          Icon(Icons.chevron_right, color: PetColors.textSecondary),
+          Icon(Icons.chevron_right, color: cs.onSurfaceVariant),
         ],
       ),
     );
   }
 
   Widget _buildRadarActiveSection(BuildContext context, RadarSummary summary) {
+    final cs = Theme.of(context).colorScheme;
     return Column(
       children: [
         SectionHeader(
@@ -115,7 +116,7 @@ class RadarScreen extends ConsumerWidget {
               vertical: PetSpacing.sm,
             ),
             decoration: BoxDecoration(
-              color: PetColors.primarySoft,
+              color: cs.primaryContainer,
               borderRadius: BorderRadius.circular(24),
             ),
             child: Text(
@@ -123,7 +124,7 @@ class RadarScreen extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: PetColors.primary,
+                color: cs.primary,
               ),
             ),
           ),
@@ -132,15 +133,15 @@ class RadarScreen extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(PetSpacing.lg),
           decoration: BoxDecoration(
-            color: PetColors.surface,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: PetColors.border),
+            border: Border.all(color: Theme.of(context).dividerColor),
           ),
           child: Column(
             children: [
               Row(
                 children: [
-                  Icon(Icons.pets, color: PetColors.primary, size: 24),
+                  Icon(Icons.pets, color: Theme.of(context).colorScheme.primary, size: 24),
                   const SizedBox(width: PetSpacing.md),
                   Expanded(
                     child: Text(
@@ -153,7 +154,7 @@ class RadarScreen extends ConsumerWidget {
               const SizedBox(height: PetSpacing.md),
               Row(
                 children: [
-                  Icon(Icons.access_time, color: PetColors.accent, size: 24),
+                  Icon(Icons.access_time, color: Theme.of(context).colorScheme.tertiary, size: 24),
                   const SizedBox(width: PetSpacing.md),
                   Expanded(
                     child: Text(
@@ -204,7 +205,7 @@ class RadarScreen extends ConsumerWidget {
                   .toList(),
             );
           },
-          loading: () => _buildLoadingCard(),
+          loading: () => _buildLoadingCard(context),
           error: (Object _, StackTrace _) => ErrorState(
             title: 'No pudimos cargar las coincidencias',
             subtitle: 'Verifica tu conexión e intenta nuevamente.',
@@ -216,19 +217,20 @@ class RadarScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyMatches(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(PetSpacing.xl),
       decoration: BoxDecoration(
-        color: PetColors.surface,
+        color: cs.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: PetColors.border),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         children: [
           Icon(
             Icons.search_off,
             size: 48,
-            color: PetColors.textSecondary.withValues(alpha: 0.5),
+            color: cs.onSurfaceVariant.withValues(alpha: 0.5),
           ),
           const SizedBox(height: PetSpacing.md),
           Text(
@@ -279,7 +281,7 @@ class RadarScreen extends ConsumerWidget {
                   .toList(),
             );
           },
-          loading: () => _buildLoadingCard(),
+          loading: () => _buildLoadingCard(context),
           error: (Object _, StackTrace _) => ErrorState(
             title: 'No pudimos cargar los reportes',
             subtitle: 'Verifica tu conexión e intenta nuevamente.',
@@ -290,15 +292,15 @@ class RadarScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildLoadingCard() {
+  Widget _buildLoadingCard(BuildContext context) {
     return Container(
       height: 120,
       decoration: BoxDecoration(
-        color: PetColors.surface,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: PetColors.border),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
-      child: Center(child: CircularProgressIndicator(color: PetColors.primary)),
+      child: Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary)),
     );
   }
 }
