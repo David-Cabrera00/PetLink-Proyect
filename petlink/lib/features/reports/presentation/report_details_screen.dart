@@ -23,6 +23,7 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _traitsController;
   late final TextEditingController _descriptionController;
+  late final TextEditingController _dateTimeController;
   DateTime? _selectedDateTime;
 
   @override
@@ -32,12 +33,16 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
     _traitsController = TextEditingController(text: draft.traits);
     _descriptionController = TextEditingController(text: draft.description);
     _selectedDateTime = draft.lastSeenAt;
+    _dateTimeController = TextEditingController(
+      text: draft.lastSeenAt != null ? _formatDateTime(draft.lastSeenAt!) : '',
+    );
   }
 
   @override
   void dispose() {
     _traitsController.dispose();
     _descriptionController.dispose();
+    _dateTimeController.dispose();
     super.dispose();
   }
 
@@ -120,7 +125,7 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
     );
   }
 
-  Widget _buildDateTimePicker(
+Widget _buildDateTimePicker(
     BuildContext context,
     WidgetRef ref,
     bool isLost,
@@ -128,37 +133,14 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          isLost
+        PetInput(
+          label: isLost
               ? '¿Cuándo fue vista por última vez?'
               : '¿Cuándo la encontraste?',
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          fontWeight: FontWeight.w600,
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        ),
-      ),
-      const SizedBox(height: 8),
-      PetInput(
-        label: isLost
-            ? '¿Cuándo fue vista por última vez?'
-            : '¿Cuándo la encontraste?',
-        hint: 'Seleccionar fecha y hora',
-        readOnly: true,
-        onTap: () => _pickDateTime(context, ref),
-        controller: TextEditingController(
-          text: _selectedDateTime != null
-              ? _formatDateTime(_selectedDateTime!)
-              : '',
-        ),
-      ),
-      if (_selectedDateTime == null)
-        Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: Text(
-            'Selecciona la fecha y hora',
-            style: Theme.of(context).textTheme.bodySmall
-                ?.copyWith(color: Theme.of(context).colorScheme.error),
-          ),
+          hint: 'Seleccionar fecha y hora',
+          readOnly: true,
+          onTap: () => _pickDateTime(context, ref),
+          controller: _dateTimeController,
         ),
       ],
     );
@@ -318,6 +300,8 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
           time.hour,
           time.minute,
         );
+        _selectedDateTime = newDateTime;
+        _dateTimeController.text = _formatDateTime(newDateTime);
         ref.read(reportDraftProvider.notifier).setLastSeenAt(newDateTime);
       }
     }
