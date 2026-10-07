@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import '../features/radar/presentation/radar_screen.dart';
 import '../features/explore/presentation/explore_screen.dart';
 import '../features/reports/presentation/reports_screen.dart';
 import '../features/reports/presentation/report_detail_screen.dart';
+import '../features/reports/presentation/report_type_screen.dart';
+import '../features/reports/presentation/report_pet_info_screen.dart';
+import '../features/reports/presentation/report_photos_screen.dart';
+import '../features/reports/presentation/report_location_screen.dart';
+import '../features/reports/presentation/report_details_screen.dart';
+import '../features/reports/presentation/report_review_screen.dart';
+import '../features/reports/presentation/report_published_screen.dart';
 import '../features/matches/presentation/match_detail_screen.dart';
 import '../features/activity/activity_screen.dart';
 import '../features/profile/profile_screen.dart';
@@ -18,6 +26,34 @@ class AppRouter {
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/radar',
     routes: [
+      GoRoute(
+        path: '/report/new',
+        builder: (context, state) => const ReportTypeScreen(),
+      ),
+      GoRoute(
+        path: '/report/new/pet-info',
+        builder: (context, state) => const ReportPetInfoScreen(),
+      ),
+      GoRoute(
+        path: '/report/new/photos',
+        builder: (context, state) => const ReportPhotosScreen(),
+      ),
+      GoRoute(
+        path: '/report/new/location',
+        builder: (context, state) => const ReportLocationScreen(),
+      ),
+      GoRoute(
+        path: '/report/new/details',
+        builder: (context, state) => const ReportDetailsScreen(),
+      ),
+      GoRoute(
+        path: '/report/new/review',
+        builder: (context, state) => const ReportReviewScreen(),
+      ),
+      GoRoute(
+        path: '/report/new/published',
+        builder: (context, state) => const ReportPublishedScreen(),
+      ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
         builder: (context, state, child) {
@@ -38,11 +74,13 @@ class AppRouter {
           ),
           GoRoute(
             path: '/reports/:id',
-            builder: (context, state) => ReportDetailScreen(reportId: state.pathParameters['id']!),
+            builder: (context, state) =>
+                ReportDetailScreen(reportId: state.pathParameters['id']!),
           ),
           GoRoute(
             path: '/matches/:id',
-            builder: (context, state) => MatchDetailScreen(matchId: state.pathParameters['id']!),
+            builder: (context, state) =>
+                MatchDetailScreen(matchId: state.pathParameters['id']!),
           ),
           GoRoute(
             path: '/activity',
@@ -88,7 +126,7 @@ class ScaffoldWithNav extends StatelessWidget {
             case 1:
               context.go('/explore');
             case 2:
-              context.go('/reports');
+              context.go('/report/new');
             case 3:
               context.go('/activity');
             case 4:
@@ -107,9 +145,9 @@ class ScaffoldWithNav extends StatelessWidget {
             label: 'Explorar',
           ),
           NavigationDestination(
-            icon: Icon(Icons.description_outlined),
-            selectedIcon: Icon(Icons.description),
-            label: 'Reportes',
+            icon: Icon(Icons.add_circle_outline),
+            selectedIcon: Icon(Icons.add_circle),
+            label: 'Reportar',
           ),
           NavigationDestination(
             icon: Icon(Icons.notifications_outlined),

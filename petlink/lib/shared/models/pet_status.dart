@@ -1,6 +1,1 @@
-enum PetStatus {
-  lost,
-  found,
-  match,
-  recovered,
-}
+enum PetStatus { lost, found, match, recovered }

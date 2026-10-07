@@ -1,10 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../shared/models/pet_report.dart';
 import '../../radar/providers/radar_providers.dart';
 
 enum ReportsFilter { active, recovered, all }
 
-final reportsFilterProvider = StateProvider<ReportsFilter>((ref) => ReportsFilter.active);
+final reportsFilterProvider = StateProvider<ReportsFilter>(
+  (ref) => ReportsFilter.active,
+);
 
 final myReportsProvider = FutureProvider<List<PetReport>>((ref) async {
   final repository = ref.watch(petReportRepositoryProvider);
@@ -24,7 +27,10 @@ final myReportsProvider = FutureProvider<List<PetReport>>((ref) async {
   }).toList();
 });
 
-final reportByIdProvider = FutureProvider.family<PetReport?, String>((ref, id) async {
+final reportByIdProvider = FutureProvider.family<PetReport?, String>((
+  ref,
+  id,
+) async {
   final repository = ref.watch(petReportRepositoryProvider);
   return repository.getReportById(id);
 });
