@@ -141,7 +141,11 @@ class RadarScreen extends ConsumerWidget {
             children: [
               Row(
                 children: [
-                  Icon(Icons.pets, color: Theme.of(context).colorScheme.primary, size: 24),
+                  Icon(
+                    Icons.pets,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 24,
+                  ),
                   const SizedBox(width: PetSpacing.md),
                   Expanded(
                     child: Text(
@@ -154,7 +158,11 @@ class RadarScreen extends ConsumerWidget {
               const SizedBox(height: PetSpacing.md),
               Row(
                 children: [
-                  Icon(Icons.access_time, color: Theme.of(context).colorScheme.tertiary, size: 24),
+                  Icon(
+                    Icons.access_time,
+                    color: Theme.of(context).colorScheme.tertiary,
+                    size: 24,
+                  ),
                   const SizedBox(width: PetSpacing.md),
                   Expanded(
                     child: Text(
@@ -300,7 +308,11 @@ class RadarScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Theme.of(context).dividerColor),
       ),
-      child: Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary)),
+      child: Center(
+        child: CircularProgressIndicator(
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      ),
     );
   }
 }

@@ -125,7 +125,7 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
     );
   }
 
-Widget _buildDateTimePicker(
+  Widget _buildDateTimePicker(
     BuildContext context,
     WidgetRef ref,
     bool isLost,
