@@ -132,59 +132,34 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
           isLost
               ? '¿Cuándo fue vista por última vez?'
               : '¿Cuándo la encontraste?',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: PetColors.textSecondary,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          fontWeight: FontWeight.w600,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+      ),
+      const SizedBox(height: 8),
+      PetInput(
+        label: isLost
+            ? '¿Cuándo fue vista por última vez?'
+            : '¿Cuándo la encontraste?',
+        hint: 'Seleccionar fecha y hora',
+        readOnly: true,
+        onTap: () => _pickDateTime(context, ref),
+        controller: TextEditingController(
+          text: _selectedDateTime != null
+              ? _formatDateTime(_selectedDateTime!)
+              : '',
+        ),
+      ),
+      if (_selectedDateTime == null)
+        Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Text(
+            'Selecciona la fecha y hora',
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: Theme.of(context).colorScheme.error),
           ),
         ),
-        const SizedBox(height: PetSpacing.xs),
-        GestureDetector(
-          onTap: () => _pickDateTime(context, ref),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(
-              horizontal: PetSpacing.lg,
-              vertical: PetSpacing.md,
-            ),
-            decoration: BoxDecoration(
-              color: PetColors.surface,
-              borderRadius: PetRadius.lgAll,
-              border: Border.all(color: PetColors.border),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.calendar_today,
-                  color: PetColors.textSecondary,
-                  size: 20,
-                ),
-                const SizedBox(width: PetSpacing.md),
-                Expanded(
-                  child: Text(
-                    _selectedDateTime != null
-                        ? _formatDateTime(_selectedDateTime!)
-                        : 'Seleccionar fecha y hora',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: _selectedDateTime != null
-                          ? PetColors.textPrimary
-                          : PetColors.textSecondary,
-                    ),
-                  ),
-                ),
-                Icon(Icons.arrow_drop_down, color: PetColors.textSecondary),
-              ],
-            ),
-          ),
-        ),
-        if (_selectedDateTime == null)
-          Padding(
-            padding: const EdgeInsets.only(top: PetSpacing.xs),
-            child: Text(
-              'Selecciona la fecha y hora',
-              style: Theme.of(context).textTheme.bodySmall
-                  ?.copyWith(color: PetColors.lost),
-            ),
-          ),
       ],
     );
   }

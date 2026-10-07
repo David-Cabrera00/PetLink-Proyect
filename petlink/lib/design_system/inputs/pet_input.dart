@@ -11,6 +11,8 @@ class PetInput extends StatelessWidget {
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final FormFieldValidator<String>? validator;
+  final VoidCallback? onTap;
+  final bool readOnly;
 
   const PetInput({
     super.key,
@@ -24,6 +26,8 @@ class PetInput extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.validator,
+    this.onTap,
+    this.readOnly = false,
   });
 
   @override
@@ -46,6 +50,8 @@ class PetInput extends StatelessWidget {
           keyboardType: keyboardType,
           maxLines: maxLines,
           validator: validator,
+          onTap: onTap,
+          readOnly: readOnly,
           decoration: InputDecoration(
             hintText: hint,
             errorText: errorText,
