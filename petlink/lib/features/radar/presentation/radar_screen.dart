@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
 import '../../../design_system/buttons/pet_button.dart';
@@ -194,7 +195,7 @@ class RadarScreen extends ConsumerWidget {
                         padding: const EdgeInsets.only(bottom: PetSpacing.md),
                         child: MatchCard(
                           match: match,
-                          onTap: () {},
+                          onTap: () => context.go('/matches/${match.id}'),
                         ),
                       ))
                   .toList(),
@@ -265,7 +266,7 @@ class RadarScreen extends ConsumerWidget {
                         padding: const EdgeInsets.only(bottom: PetSpacing.md),
                         child: PetCardCompact(
                           report: report,
-                          onTap: () {},
+                          onTap: () => context.go('/reports/${report.id}'),
                         ),
                       ))
                   .toList(),

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
 import '../../../core/theme/pet_radius.dart';
 import '../../../design_system/badges/status_badge.dart';
 import '../../../design_system/buttons/pet_button.dart';
+import '../../../shared/models/pet_report.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/error_state.dart';
 import '../providers/reports_providers.dart';
@@ -66,36 +68,30 @@ class ReportsScreen extends ConsumerWidget {
   }
 
   Widget _buildFilters(BuildContext context, WidgetRef ref, ReportsFilter currentFilter) {
-    return Row(
+    return Wrap(
+      spacing: PetSpacing.sm,
+      runSpacing: PetSpacing.sm,
       children: [
-        Expanded(
-          child: _buildFilterButton(
-            context,
-            ref,
-            'Activos',
-            ReportsFilter.active,
-            currentFilter,
-          ),
+        _buildFilterButton(
+          context,
+          ref,
+          'Activos',
+          ReportsFilter.active,
+          currentFilter,
         ),
-        const SizedBox(width: PetSpacing.sm),
-        Expanded(
-          child: _buildFilterButton(
-            context,
-            ref,
-            'Recuperados',
-            ReportsFilter.recovered,
-            currentFilter,
-          ),
+        _buildFilterButton(
+          context,
+          ref,
+          'Recuperados',
+          ReportsFilter.recovered,
+          currentFilter,
         ),
-        const SizedBox(width: PetSpacing.sm),
-        Expanded(
-          child: _buildFilterButton(
-            context,
-            ref,
-            'Todos',
-            ReportsFilter.all,
-            currentFilter,
-          ),
+        _buildFilterButton(
+          context,
+          ref,
+          'Todos',
+          ReportsFilter.all,
+          currentFilter,
         ),
       ],
     );
@@ -112,22 +108,28 @@ class ReportsScreen extends ConsumerWidget {
 
     return GestureDetector(
       onTap: () => ref.read(reportsFilterProvider.notifier).state = value,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: PetSpacing.md),
-        decoration: BoxDecoration(
-          color: isSelected ? PetColors.primary : PetColors.surface,
-          borderRadius: PetRadius.mdAll,
-          border: Border.all(
-            color: isSelected ? PetColors.primary : PetColors.border,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 48, minWidth: 80),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: PetSpacing.md,
+            vertical: PetSpacing.md,
           ),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-              color: isSelected ? PetColors.surface : PetColors.textPrimary,
+          decoration: BoxDecoration(
+            color: isSelected ? PetColors.primary : PetColors.surface,
+            borderRadius: PetRadius.mdAll,
+            border: Border.all(
+              color: isSelected ? PetColors.primary : PetColors.border,
+            ),
+          ),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                color: isSelected ? PetColors.surface : PetColors.textPrimary,
+              ),
             ),
           ),
         ),
@@ -138,11 +140,14 @@ class ReportsScreen extends ConsumerWidget {
   Widget _buildReportCard(BuildContext context, report) {
     return Card(
       margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.all(PetSpacing.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      child: InkWell(
+        onTap: () => context.go('/reports/${report.id}'),
+        borderRadius: PetRadius.xlAll,
+        child: Padding(
+          padding: const EdgeInsets.all(PetSpacing.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             Row(
               children: [
                 Container(
@@ -172,13 +177,13 @@ class ReportsScreen extends ConsumerWidget {
                             ),
                           ),
                           StatusBadge(
-                            status: report.type.name == 'lost' ? PetStatus.lost : PetStatus.found,
+                            status: report.type == ReportType.lost ? PetStatus.lost : PetStatus.found,
                           ),
                         ],
                       ),
                       const SizedBox(height: PetSpacing.xs),
                       Text(
-                        report.status.name == 'active' ? 'Búsqueda activa' : 'Recuperada',
+                        report.status == ReportStatus.active ? 'Búsqueda activa' : 'Recuperada',
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ],
@@ -239,8 +244,9 @@ class ReportsScreen extends ConsumerWidget {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildIndicator(BuildContext context, IconData icon, String label, Color color) {
     return Row(

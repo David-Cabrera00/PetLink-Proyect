@@ -137,7 +137,7 @@ class ReportDetailScreen extends ConsumerWidget {
           const SizedBox(height: PetSpacing.md),
           _buildMapPlaceholder(context),
           const SizedBox(height: PetSpacing.lg),
-          _buildCTASection(context),
+          _buildCTASection(context, report),
           const SizedBox(height: PetSpacing.xl),
         ],
       ),
@@ -381,12 +381,12 @@ class ReportDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildCTASection(BuildContext context) {
+  Widget _buildCTASection(BuildContext context, report) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '¿Viste a Luna o tienes una pista?',
+          '¿Viste a ${report.pet.name} o tienes una pista?',
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: PetSpacing.md),

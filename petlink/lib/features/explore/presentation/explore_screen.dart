@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
 import '../../../core/theme/pet_radius.dart';
 import '../../../design_system/badges/status_badge.dart';
 import '../../../design_system/buttons/pet_button.dart';
+import '../../../shared/models/pet_report.dart';
 import '../../../shared/widgets/search_bar.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/error_state.dart';
@@ -111,36 +113,39 @@ class ExploreScreen extends ConsumerWidget {
 
     return GestureDetector(
       onTap: () => ref.read(exploreFilterProvider.notifier).state = value,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: PetSpacing.md,
-          vertical: PetSpacing.sm,
-        ),
-        decoration: BoxDecoration(
-          color: isSelected ? PetColors.primary : PetColors.surface,
-          borderRadius: PetRadius.xxlAll,
-          border: Border.all(
-            color: isSelected ? PetColors.primary : PetColors.border,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 48),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: PetSpacing.md,
+            vertical: PetSpacing.md,
           ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 16,
-              color: isSelected ? PetColors.surface : PetColors.textSecondary,
+          decoration: BoxDecoration(
+            color: isSelected ? PetColors.primary : PetColors.surface,
+            borderRadius: PetRadius.xxlAll,
+            border: Border.all(
+              color: isSelected ? PetColors.primary : PetColors.border,
             ),
-            const SizedBox(width: PetSpacing.xs),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                color: isSelected ? PetColors.surface : PetColors.textPrimary,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 16,
+                color: isSelected ? PetColors.surface : PetColors.textSecondary,
               ),
-            ),
-          ],
+              const SizedBox(width: PetSpacing.xs),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                  color: isSelected ? PetColors.surface : PetColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -158,32 +163,38 @@ class ExploreScreen extends ConsumerWidget {
               subtitle: 'Intenta cambiar los filtros o ampliar el radio de búsqueda.',
             );
           }
-          return Stack(
-            children: [
-              Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.map,
-                      size: 64,
-                      color: PetColors.primary.withValues(alpha: 0.3),
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final maxW = constraints.maxWidth;
+              final maxH = constraints.maxHeight;
+              return Stack(
+                children: [
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.map,
+                          size: 64,
+                          color: PetColors.primary.withValues(alpha: 0.3),
+                        ),
+                        const SizedBox(height: PetSpacing.md),
+                        Text(
+                          'Mapa de exploración',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: PetSpacing.xs),
+                        Text(
+                          'Aquí se mostrará el mapa con los reportes',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: PetSpacing.md),
-                    Text(
-                      'Mapa de exploración',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: PetSpacing.xs),
-                    Text(
-                      'Aquí se mostrará el mapa con los reportes',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
-                ),
-              ),
-              ...reports.map((report) => _buildMarker(context, report, ref)),
-            ],
+                  ),
+                  ...reports.map((report) => _buildMarker(context, report, ref, maxW, maxH)),
+                ],
+              );
+            },
           );
         },
         loading: () => Center(
@@ -198,14 +209,23 @@ class ExploreScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMarker(BuildContext context, report, WidgetRef ref) {
-    final isLost = report.type.name == 'lost';
+  Widget _buildMarker(BuildContext context, report, WidgetRef ref, double maxW, double maxH) {
+    final isLost = report.type == ReportType.lost;
     final color = isLost ? PetColors.lost : PetColors.found;
     final icon = isLost ? Icons.priority_high : Icons.check_circle;
 
+    final safeLeft = (maxW * 0.1).clamp(16.0, maxW * 0.3);
+    final safeTop = (maxH * 0.15).clamp(24.0, maxH * 0.3);
+    final rangeX = (maxW * 0.7).clamp(100.0, 300.0);
+    final rangeY = (maxH * 0.5).clamp(80.0, 250.0);
+
+    final normalizedDist = (report.distanceKm / 10.0).clamp(0.0, 1.0);
+    final left = safeLeft + (normalizedDist * rangeX);
+    final top = safeTop + (normalizedDist * rangeY * 0.6);
+
     return Positioned(
-      left: 50.0 + (report.distanceKm * 30.0),
-      top: 100.0 + (report.distanceKm * 20.0),
+      left: left.clamp(0.0, maxW - 80),
+      top: top.clamp(0.0, maxH - 40),
       child: GestureDetector(
         onTap: () => ref.read(selectedReportProvider.notifier).state = report,
         child: Container(
@@ -239,6 +259,7 @@ class ExploreScreen extends ConsumerWidget {
               ),
             ],
           ),
+
         ),
       ),
     );
@@ -282,7 +303,7 @@ class ExploreScreen extends ConsumerWidget {
                             ),
                           ),
                           StatusBadge(
-                            status: report.type.name == 'lost' ? PetStatus.lost : PetStatus.found,
+                            status: report.type == ReportType.lost ? PetStatus.lost : PetStatus.found,
                           ),
                         ],
                       ),
@@ -325,7 +346,7 @@ class ExploreScreen extends ConsumerWidget {
                 Expanded(
                   child: PetButton(
                     label: 'Ver reporte',
-                    onPressed: () {},
+                    onPressed: () => context.go('/reports/${report.id}'),
                   ),
                 ),
                 const SizedBox(width: PetSpacing.md),
