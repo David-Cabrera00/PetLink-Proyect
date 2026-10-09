@@ -255,5 +255,21 @@
   "matchValueLarge": "Large",
   "matchValueFemale": "Female",
   "matchValueNoVisibleCollar": "No visible collar",
-  "matchValueCalm": "Calm and approachable"
+  "matchValueCalm": "Calm and approachable",
+  "authWelcomeTitle": "Find the way back home",
+  "authWelcomeDescription": "Report lost pets, help those who find them, and connect with your community.",
+  "authLogin": "Sign in",
+  "authCreateAccount": "Create account",
+  "authLoginTitle": "Welcome back",
+  "authLoginDescription": "Sign in to keep helping pets find their way home.",
+  "authEmail": "Email",
+  "authEmailHint": "you@email.com",
+  "authEmailRequired": "Email is required",
+  "authEmailInvalid": "Enter a valid email",
+  "authPassword": "Password",
+  "authPasswordHint": "Enter your password",
+  "authPasswordRequired": "Password is required",
+  "authPasswordVisibility": "Show or hide password",
+  "authForgotPassword": "Forgot your password?",
+  "authContinueWithGoogle": "Continue with Google"
 }

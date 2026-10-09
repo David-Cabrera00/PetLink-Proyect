@@ -410,4 +410,20 @@ class AppLocalizationsEn extends AppLocalizations {
   @override String get matchValueFemale => 'Female';
   @override String get matchValueNoVisibleCollar => 'No visible collar';
   @override String get matchValueCalm => 'Calm and approachable';
+  @override String get authWelcomeTitle => 'Find the way back home';
+  @override String get authWelcomeDescription => 'Report lost pets, help those who find them, and connect with your community.';
+  @override String get authLogin => 'Sign in';
+  @override String get authCreateAccount => 'Create account';
+  @override String get authLoginTitle => 'Welcome back';
+  @override String get authLoginDescription => 'Sign in to keep helping pets find their way home.';
+  @override String get authEmail => 'Email';
+  @override String get authEmailHint => 'you@email.com';
+  @override String get authEmailRequired => 'Email is required';
+  @override String get authEmailInvalid => 'Enter a valid email';
+  @override String get authPassword => 'Password';
+  @override String get authPasswordHint => 'Enter your password';
+  @override String get authPasswordRequired => 'Password is required';
+  @override String get authPasswordVisibility => 'Show or hide password';
+  @override String get authForgotPassword => 'Forgot your password?';
+  @override String get authContinueWithGoogle => 'Continue with Google';
 }

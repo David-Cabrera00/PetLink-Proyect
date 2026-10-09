@@ -333,4 +333,20 @@ class AppLocalizationsEs extends AppLocalizations {
   @override String get matchValueFemale => 'Hembra';
   @override String get matchValueNoVisibleCollar => 'Sin collar visible';
   @override String get matchValueCalm => 'Tranquila, se deja acercar';
+  @override String get authWelcomeTitle => 'Encuentra el camino de vuelta a casa';
+  @override String get authWelcomeDescription => 'Reporta mascotas perdidas, ayuda a quienes las encontraron y conecta con tu comunidad.';
+  @override String get authLogin => 'Iniciar sesión';
+  @override String get authCreateAccount => 'Crear cuenta';
+  @override String get authLoginTitle => 'Bienvenido de nuevo';
+  @override String get authLoginDescription => 'Inicia sesión para continuar ayudando a las mascotas a volver a casa.';
+  @override String get authEmail => 'Correo electrónico';
+  @override String get authEmailHint => 'tu@correo.com';
+  @override String get authEmailRequired => 'El correo es obligatorio';
+  @override String get authEmailInvalid => 'Ingresa un correo válido';
+  @override String get authPassword => 'Contraseña';
+  @override String get authPasswordHint => 'Ingresa tu contraseña';
+  @override String get authPasswordRequired => 'La contraseña es obligatoria';
+  @override String get authPasswordVisibility => 'Mostrar u ocultar contraseña';
+  @override String get authForgotPassword => '¿Olvidaste tu contraseña?';
+  @override String get authContinueWithGoogle => 'Continuar con Google';
 }

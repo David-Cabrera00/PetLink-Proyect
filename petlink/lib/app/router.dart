@@ -16,6 +16,8 @@ import '../features/reports/presentation/report_published_screen.dart';
 import '../features/matches/presentation/match_detail_screen.dart';
 import '../features/activity/activity_screen.dart';
 import '../features/profile/profile_screen.dart';
+import '../features/auth/presentation/login_screen.dart';
+import '../features/auth/presentation/welcome_screen.dart';
 
 class AppRouter {
   AppRouter._();
@@ -27,6 +29,14 @@ class AppRouter {
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/radar',
     routes: [
+      GoRoute(
+        path: '/welcome',
+        builder: (context, state) => const WelcomeScreen(),
+      ),
+      GoRoute(
+        path: '/login',
+        builder: (context, state) => const LoginScreen(),
+      ),
       GoRoute(
         path: '/report/new',
         builder: (context, state) => const ReportTypeScreen(),

@@ -387,6 +387,22 @@ abstract class AppLocalizations {
   String get matchValueFemale;
   String get matchValueNoVisibleCollar;
   String get matchValueCalm;
+  String get authWelcomeTitle;
+  String get authWelcomeDescription;
+  String get authLogin;
+  String get authCreateAccount;
+  String get authLoginTitle;
+  String get authLoginDescription;
+  String get authEmail;
+  String get authEmailHint;
+  String get authEmailRequired;
+  String get authEmailInvalid;
+  String get authPassword;
+  String get authPasswordHint;
+  String get authPasswordRequired;
+  String get authPasswordVisibility;
+  String get authForgotPassword;
+  String get authContinueWithGoogle;
 }
 
 class _AppLocalizationsDelegate

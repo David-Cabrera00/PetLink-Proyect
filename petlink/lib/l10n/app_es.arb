@@ -255,5 +255,21 @@
   "matchValueLarge": "Grande",
   "matchValueFemale": "Hembra",
   "matchValueNoVisibleCollar": "Sin collar visible",
-  "matchValueCalm": "Tranquila, se deja acercar"
+  "matchValueCalm": "Tranquila, se deja acercar",
+  "authWelcomeTitle": "Encuentra el camino de vuelta a casa",
+  "authWelcomeDescription": "Reporta mascotas perdidas, ayuda a quienes las encontraron y conecta con tu comunidad.",
+  "authLogin": "Iniciar sesión",
+  "authCreateAccount": "Crear cuenta",
+  "authLoginTitle": "Bienvenido de nuevo",
+  "authLoginDescription": "Inicia sesión para continuar ayudando a las mascotas a volver a casa.",
+  "authEmail": "Correo electrónico",
+  "authEmailHint": "tu@correo.com",
+  "authEmailRequired": "El correo es obligatorio",
+  "authEmailInvalid": "Ingresa un correo válido",
+  "authPassword": "Contraseña",
+  "authPasswordHint": "Ingresa tu contraseña",
+  "authPasswordRequired": "La contraseña es obligatoria",
+  "authPasswordVisibility": "Mostrar u ocultar contraseña",
+  "authForgotPassword": "¿Olvidaste tu contraseña?",
+  "authContinueWithGoogle": "Continuar con Google"
 }
