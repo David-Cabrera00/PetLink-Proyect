@@ -25,12 +25,12 @@ class ActivityScreen extends StatelessWidget {
               ),
               const SizedBox(height: PetSpacing.lg),
               Text(
-                'Actividad Reciente',
+                l10n.activityRecent,
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(height: PetSpacing.sm),
               Text(
-                'Recibe notificaciones sobre coincidencias y actualizaciones.',
+                l10n.activityDescription,
                 style: Theme.of(context).textTheme.bodyMedium,
                 textAlign: TextAlign.center,
               ),

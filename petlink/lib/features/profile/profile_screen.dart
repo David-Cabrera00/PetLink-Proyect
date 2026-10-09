@@ -28,10 +28,10 @@ class ProfileScreen extends ConsumerWidget {
             color: PetColors.primary.withValues(alpha: 0.5),
           ),
           const SizedBox(height: PetSpacing.lg),
-          Text('Mi Perfil', style: Theme.of(context).textTheme.headlineMedium),
+          Text(l10n.profileTitle, style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: PetSpacing.sm),
           Text(
-            'Gestiona tu información personal y configuración.',
+            l10n.profileDescription,
             style: Theme.of(context).textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),
@@ -49,16 +49,17 @@ class ProfileScreen extends ConsumerWidget {
     WidgetRef ref,
     Locale currentLocale,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     final options = [
-      (const Locale('es'), 'Español'),
-      (const Locale('en'), 'English'),
+      (const Locale('es'), l10n.languageSpanish),
+      (const Locale('en'), l10n.languageEnglish),
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Idioma',
+          l10n.language,
           style: Theme.of(context).textTheme.titleMedium
               ?.copyWith(fontWeight: FontWeight.w600),
         ),
@@ -101,7 +102,7 @@ class ProfileScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Apariencia',
+          l10n.appearance,
           style: Theme.of(context).textTheme.titleMedium
               ?.copyWith(fontWeight: FontWeight.w600),
         ),
@@ -121,7 +122,7 @@ class ProfileScreen extends ConsumerWidget {
                 currentMode,
                 Icons.settings_brightness,
                 l10n.themeSystem,
-                'Usa la configuración del dispositivo',
+                l10n.themeSystemDescription,
               ),
               _buildDivider(context),
               _buildThemeOption(
@@ -131,7 +132,7 @@ class ProfileScreen extends ConsumerWidget {
                 currentMode,
                 Icons.light_mode,
                 l10n.themeLight,
-                'Tema claro siempre',
+                l10n.themeLightDescription,
               ),
               _buildDivider(context),
               _buildThemeOption(
@@ -141,7 +142,7 @@ class ProfileScreen extends ConsumerWidget {
                 currentMode,
                 Icons.dark_mode,
                 l10n.themeDark,
-                'Tema oscuro siempre',
+                l10n.themeDarkDescription,
               ),
             ],
           ),

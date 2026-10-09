@@ -7,5 +7,73 @@
   "navigationProfile": "Profile",
   "themeSystem": "System",
   "themeLight": "Light",
-  "themeDark": "Dark"
+  "themeDark": "Dark",
+  "radarGreeting": "Good morning, {name}",
+  "@radarGreeting": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "radarNearYou": "This is what is happening near you.",
+  "radarLocation": "La Aurora, Pasto",
+  "radarRadius": "5 km radius",
+  "radarActive": "Active radar",
+  "radarReportsCount": "{count} reports",
+  "@radarReportsCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "radarReportsWithinRadius": "{count} reports within a 5 km radius",
+  "@radarReportsWithinRadius": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "radarPublishedLast24Hours": "{count} published in the last 24 hours",
+  "@radarPublishedLast24Hours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "radarExplore": "Explore the radar",
+  "radarPossibleMatches": "Possible matches",
+  "radarMatchesLoadError": "We couldn't load the matches",
+  "radarNoMatches": "No matches yet",
+  "radarNoMatchesDescription": "We are still comparing your report with pets found near you.",
+  "radarNearby": "Near you",
+  "radarNoNearbyReports": "No reports nearby",
+  "radarNoNearbyReportsDescription": "Pet reports will appear here when they are near your location.",
+  "radarReportsLoadError": "We couldn't load the reports",
+  "connectionRetryDescription": "Check your connection and try again.",
+  "exploreSearchHint": "Search for a pet or area",
+  "exploreAll": "All",
+  "exploreLost": "Lost",
+  "exploreFound": "Found",
+  "exploreNearby": "< 5 km",
+  "exploreNoReports": "No reports in this area",
+  "exploreNoReportsDescription": "Try changing the filters or expanding the search radius.",
+  "exploreMapTitle": "Explore map",
+  "exploreMapDescription": "The map with reports will appear here",
+  "exploreMapLoadError": "We couldn't load the map",
+  "exploreHoursAgo": "3 hours ago",
+  "exploreViewReport": "View report",
+  "activityRecent": "Recent Activity",
+  "activityDescription": "Receive notifications about matches and updates.",
+  "profileTitle": "My Profile",
+  "profileDescription": "Manage your personal information and settings.",
+  "appearance": "Appearance",
+  "themeSystemDescription": "Use the device settings",
+  "themeLightDescription": "Always use light theme",
+  "themeDarkDescription": "Always use dark theme",
+  "language": "Language",
+  "languageSpanish": "Español",
+  "languageEnglish": "English",
+  "reportCreate": "Create report",
+  "reportWhatHappened": "What happened?",
+  "reportLostTitle": "I lost my pet",
+  "reportLostDescription": "Post its details so people nearby can help you find it.",
+  "reportFoundTitle": "I found a pet",
+  "reportFoundDescription": "Share where you found it to help it get back home.",
+  "continueAction": "Continue"
 }

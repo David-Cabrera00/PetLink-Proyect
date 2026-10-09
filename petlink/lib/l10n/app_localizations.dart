@@ -145,6 +145,102 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Oscuro'**
   String get themeDark;
+
+  String radarGreeting({required Object name});
+
+  String get radarNearYou;
+
+  String get radarLocation;
+
+  String get radarRadius;
+
+  String get radarActive;
+
+  String radarReportsCount({required Object count});
+
+  String radarReportsWithinRadius({required Object count});
+
+  String radarPublishedLast24Hours({required Object count});
+
+  String get radarExplore;
+
+  String get radarPossibleMatches;
+
+  String get radarMatchesLoadError;
+
+  String get radarNoMatches;
+
+  String get radarNoMatchesDescription;
+
+  String get radarNearby;
+
+  String get radarNoNearbyReports;
+
+  String get radarNoNearbyReportsDescription;
+
+  String get radarReportsLoadError;
+
+  String get connectionRetryDescription;
+
+  String get exploreSearchHint;
+
+  String get exploreAll;
+
+  String get exploreLost;
+
+  String get exploreFound;
+
+  String get exploreNearby;
+
+  String get exploreNoReports;
+
+  String get exploreNoReportsDescription;
+
+  String get exploreMapTitle;
+
+  String get exploreMapDescription;
+
+  String get exploreMapLoadError;
+
+  String get exploreHoursAgo;
+
+  String get exploreViewReport;
+
+  String get activityRecent;
+
+  String get activityDescription;
+
+  String get profileTitle;
+
+  String get profileDescription;
+
+  String get appearance;
+
+  String get themeSystemDescription;
+
+  String get themeLightDescription;
+
+  String get themeDarkDescription;
+
+  String get language;
+
+  String get languageSpanish;
+
+  String get languageEnglish;
+
+  String get reportCreate;
+
+  String get reportWhatHappened;
+
+  String get reportLostTitle;
+
+  String get reportLostDescription;
+
+  String get reportFoundTitle;
+
+  String get reportFoundDescription;
+
+  String get continueAction;
 }
 
 class _AppLocalizationsDelegate

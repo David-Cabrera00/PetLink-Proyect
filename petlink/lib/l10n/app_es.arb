@@ -7,5 +7,73 @@
   "navigationProfile": "Perfil",
   "themeSystem": "Sistema",
   "themeLight": "Claro",
-  "themeDark": "Oscuro"
+  "themeDark": "Oscuro",
+  "radarGreeting": "Buenos días, {name}",
+  "@radarGreeting": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "radarNearYou": "Esto está ocurriendo cerca de ti.",
+  "radarLocation": "La Aurora, Pasto",
+  "radarRadius": "Radio 5 km",
+  "radarActive": "Radar activo",
+  "radarReportsCount": "{count} reportes",
+  "@radarReportsCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "radarReportsWithinRadius": "{count} reportes en un radio de 5 km",
+  "@radarReportsWithinRadius": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "radarPublishedLast24Hours": "{count} publicados en las últimas 24 h",
+  "@radarPublishedLast24Hours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "radarExplore": "Explorar el radar",
+  "radarPossibleMatches": "Posibles coincidencias",
+  "radarMatchesLoadError": "No pudimos cargar las coincidencias",
+  "radarNoMatches": "Sin coincidencias todavía",
+  "radarNoMatchesDescription": "Seguimos comparando tu reporte con mascotas encontradas cerca de ti.",
+  "radarNearby": "Cerca de ti",
+  "radarNoNearbyReports": "No hay reportes cerca",
+  "radarNoNearbyReportsDescription": "Los reportes de mascotas aparecerán aquí cuando estén cerca de tu ubicación.",
+  "radarReportsLoadError": "No pudimos cargar los reportes",
+  "connectionRetryDescription": "Verifica tu conexión e intenta nuevamente.",
+  "exploreSearchHint": "Buscar mascota o zona",
+  "exploreAll": "Todos",
+  "exploreLost": "Perdidas",
+  "exploreFound": "Encontradas",
+  "exploreNearby": "< 5 km",
+  "exploreNoReports": "No hay reportes en esta zona",
+  "exploreNoReportsDescription": "Intenta cambiar los filtros o ampliar el radio de búsqueda.",
+  "exploreMapTitle": "Mapa de exploración",
+  "exploreMapDescription": "Aquí se mostrará el mapa con los reportes",
+  "exploreMapLoadError": "No pudimos cargar el mapa",
+  "exploreHoursAgo": "Hace 3 horas",
+  "exploreViewReport": "Ver reporte",
+  "activityRecent": "Actividad Reciente",
+  "activityDescription": "Recibe notificaciones sobre coincidencias y actualizaciones.",
+  "profileTitle": "Mi Perfil",
+  "profileDescription": "Gestiona tu información personal y configuración.",
+  "appearance": "Apariencia",
+  "themeSystemDescription": "Usa la configuración del dispositivo",
+  "themeLightDescription": "Tema claro siempre",
+  "themeDarkDescription": "Tema oscuro siempre",
+  "language": "Idioma",
+  "languageSpanish": "Español",
+  "languageEnglish": "English",
+  "reportCreate": "Crear reporte",
+  "reportWhatHappened": "¿Qué ocurrió?",
+  "reportLostTitle": "Perdí a mi mascota",
+  "reportLostDescription": "Publica sus datos para que personas cerca puedan ayudarte a encontrarla.",
+  "reportFoundTitle": "Encontré una mascota",
+  "reportFoundDescription": "Comparte dónde la encontraste para ayudarla a volver a casa.",
+  "continueAction": "Continuar"
 }

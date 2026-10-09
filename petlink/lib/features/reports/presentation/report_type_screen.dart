@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -15,11 +16,12 @@ class ReportTypeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final draft = ref.watch(reportDraftProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Crear reporte'),
+        title: Text(l10n.reportCreate),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -37,12 +39,12 @@ class ReportTypeScreen extends ConsumerWidget {
               const StepIndicator(current: 1, total: 6),
               const SizedBox(height: PetSpacing.xl),
               Text(
-                'Crear reporte',
+                l10n.reportCreate,
                 style: Theme.of(context).textTheme.displaySmall,
               ),
               const SizedBox(height: PetSpacing.xs),
               Text(
-                '¿Qué ocurrió?',
+                l10n.reportWhatHappened,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: PetSpacing.xl),
@@ -54,8 +56,8 @@ class ReportTypeScreen extends ConsumerWidget {
                       ref,
                       type: ReportType.lost,
                       icon: Icons.priority_high,
-                      title: 'Perdí a mi mascota',
-                      subtitle: 'Publica sus datos para que personas cerca puedan ayudarte a encontrarla.',
+                      title: l10n.reportLostTitle,
+                      subtitle: l10n.reportLostDescription,
                       color: PetColors.lost,
                       isSelected: draft.reportType == ReportType.lost,
                       onTap: () => _selectType(ref, ReportType.lost, context),
@@ -66,8 +68,8 @@ class ReportTypeScreen extends ConsumerWidget {
                       ref,
                       type: ReportType.found,
                       icon: Icons.check_circle,
-                      title: 'Encontré una mascota',
-                      subtitle: 'Comparte dónde la encontraste para ayudarla a volver a casa.',
+                      title: l10n.reportFoundTitle,
+                      subtitle: l10n.reportFoundDescription,
                       color: PetColors.found,
                       isSelected: draft.reportType == ReportType.found,
                       onTap: () => _selectType(ref, ReportType.found, context),
@@ -77,7 +79,7 @@ class ReportTypeScreen extends ConsumerWidget {
               ),
               const SizedBox(height: PetSpacing.lg),
               PetButton(
-                label: 'Continuar',
+                label: l10n.continueAction,
                 onPressed: draft.reportType != null
                     ? () => context.go('/report/new/pet-info')
                     : null,
