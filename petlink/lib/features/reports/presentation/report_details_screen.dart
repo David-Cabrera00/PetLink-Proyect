@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -48,13 +49,14 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final draft = ref.watch(reportDraftProvider);
     final isLost = draft.reportType == ReportType.lost;
     final isFound = draft.reportType == ReportType.found;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detalles'),
+        title: Text(l10n.reportDetailsTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/report/new/location'),
@@ -69,12 +71,12 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
               const StepIndicator(current: 5, total: 6),
               const SizedBox(height: PetSpacing.xl),
               Text(
-                'Detalles adicionales',
+                l10n.reportDetailsHeading,
                 style: Theme.of(context).textTheme.displaySmall,
               ),
               const SizedBox(height: PetSpacing.xs),
               Text(
-                'Información que ayudará a identificar a la mascota.',
+                  l10n.reportDetailsDescription,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: PetSpacing.xl),
@@ -86,23 +88,23 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         PetInput(
-                          label: 'Señas particulares',
+                          label: l10n.reportDetailsTraits,
                           hint:
-                              'Ej. Mancha blanca en el pecho, collar marrón...',
+                              l10n.reportDetailsTraitsHint,
                           controller: _traitsController,
                           maxLines: 3,
                         ),
                         const SizedBox(height: PetSpacing.md),
                         PetInput(
                           label: isLost
-                              ? '¿Qué ocurrió?'
-                              : 'Cuéntanos cómo la encontraste',
-                          hint: 'Describe las circunstancias...',
+                              ? l10n.reportDetailsLostQuestion
+                              : l10n.reportDetailsFoundQuestion,
+                          hint: l10n.reportDetailsDescriptionHint,
                           controller: _descriptionController,
                           maxLines: 4,
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
-                              return 'Este campo es obligatorio';
+                              return l10n.requiredField;
                             }
                             return null;
                           },
@@ -135,9 +137,9 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
       children: [
         PetInput(
           label: isLost
-              ? '¿Cuándo fue vista por última vez?'
-              : '¿Cuándo la encontraste?',
-          hint: 'Seleccionar fecha y hora',
+              ? l10n.reportDetailsDateLost
+              : l10n.reportDetailsDateFound,
+          hint: l10n.selectDateTime,
           readOnly: true,
           onTap: () => _pickDateTime(context, ref),
           controller: _dateTimeController,
@@ -153,7 +155,7 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '¿La mascota está contigo?',
+          l10n.reportDetailsWithPet,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
             fontWeight: FontWeight.w600,
             color: PetColors.textSecondary,
@@ -169,7 +171,7 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
                     .setIsPetWithFinder(true),
                 child: _buildOptionCard(
                   context,
-                  'Sí',
+                  l10n.yes,
                   Icons.check_circle,
                   draft.isPetWithFinder == true,
                 ),
@@ -183,7 +185,7 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
                     .setIsPetWithFinder(false),
                 child: _buildOptionCard(
                   context,
-                  'No',
+                  l10n.no,
                   Icons.cancel,
                   draft.isPetWithFinder == false,
                 ),
@@ -233,6 +235,7 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
   }
 
   Widget _buildActionButtons(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Expanded(
@@ -241,17 +244,17 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: PetSpacing.md),
             ),
-            child: const Text('Volver'),
+            child: Text(l10n.backAction),
           ),
         ),
         const SizedBox(width: PetSpacing.md),
         Expanded(
           child: PetButton(
-            label: 'Continuar',
+            label: l10n.continueAction,
             onPressed: () {
               if (_formKey.currentState?.validate() ?? false) {
                 if (_selectedDateTime == null) {
-                  _showError(context, 'Selecciona la fecha y hora');
+                  _showError(context, l10n.selectDateTimeError);
                   return;
                 }
                 _saveDetails(ref);

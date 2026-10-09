@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../core/theme/pet_spacing.dart';
 import '../../core/theme/pet_radius.dart';
@@ -14,7 +15,7 @@ class StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final extension = PetThemeExtension.of(context);
-    final (label, color, icon) = _statusData(extension);
+    final (label, color, icon) = _statusData(context, extension);
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -44,16 +45,20 @@ class StatusBadge extends StatelessWidget {
     );
   }
 
-  (String, Color, IconData) _statusData(PetThemeExtension extension) {
+  (String, Color, IconData) _statusData(
+    BuildContext context,
+    PetThemeExtension extension,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
     switch (status) {
       case PetStatus.lost:
-        return ('Perdida', extension.lost, Icons.priority_high);
+        return (l10n.statusLost, extension.lost, Icons.priority_high);
       case PetStatus.found:
-        return ('Encontrada', extension.found, Icons.check_circle);
+        return (l10n.statusFound, extension.found, Icons.check_circle);
       case PetStatus.match:
-        return ('Posible coincidencia', extension.match, Icons.diamond);
+        return (l10n.statusMatch, extension.match, Icons.diamond);
       case PetStatus.recovered:
-        return ('Recuperada', extension.found, Icons.favorite);
+        return (l10n.statusRecovered, extension.found, Icons.favorite);
     }
   }
 }

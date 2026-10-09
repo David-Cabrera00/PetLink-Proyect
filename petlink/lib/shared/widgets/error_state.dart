@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../core/theme/pet_theme_extension.dart';
 
@@ -16,6 +17,7 @@ class ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final extension = PetThemeExtension.of(context);
     return Center(
       child: Padding(
@@ -46,7 +48,7 @@ class ErrorState extends StatelessWidget {
               const SizedBox(height: 24),
               OutlinedButton(
                 onPressed: onRetry,
-                child: const Text('Reintentar'),
+                child: Text(l10n.retryAction),
               ),
             ],
           ],

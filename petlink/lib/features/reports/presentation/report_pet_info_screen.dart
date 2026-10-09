@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_spacing.dart';
 import '../../../design_system/buttons/pet_button.dart';
@@ -54,12 +55,13 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final draft = ref.watch(reportDraftProvider);
     final isFound = draft.reportType == ReportType.found;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Datos de la mascota'),
+        title: Text(l10n.reportPetInfoTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/report/new'),
@@ -81,12 +83,12 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                       children: [
                         if (!isFound) ...[
                           PetInput(
-                            label: 'Nombre',
-                            hint: 'Ej. Luna',
+                            label: l10n.reportPetInfoName,
+                            hint: l10n.reportPetInfoNameHint,
                             controller: _nameController,
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return 'El nombre es obligatorio';
+                                return l10n.requiredName;
                               }
                               return null;
                             },
@@ -94,8 +96,12 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                           const SizedBox(height: PetSpacing.md),
                         ],
                         PetInput(
-                          label: isFound ? 'Nombre (opcional)' : 'Especie',
-                          hint: isFound ? 'Ej. Luna' : 'Ej. Perro',
+                          label: isFound
+                              ? l10n.reportPetInfoNameOptional
+                              : l10n.reportPetInfoSpecies,
+                          hint: isFound
+                              ? l10n.reportPetInfoNameHint
+                              : l10n.reportPetInfoSpeciesHint,
                           controller: isFound
                               ? _nameController
                               : _speciesController,
@@ -103,19 +109,19 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                               ? null
                               : (value) {
                                   if (value == null || value.trim().isEmpty) {
-                                    return 'La especie es obligatoria';
+                                    return l10n.requiredSpecies;
                                   }
                                   return null;
                                 },
                         ),
                         const SizedBox(height: PetSpacing.md),
                         PetInput(
-                          label: 'Raza',
-                          hint: 'Ej. Golden Retriever',
+                          label: l10n.reportPetInfoBreed,
+                          hint: l10n.reportPetInfoBreedHint,
                           controller: _breedController,
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
-                              return 'La raza es obligatoria';
+                              return l10n.requiredBreed;
                             }
                             return null;
                           },
@@ -125,12 +131,12 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                           children: [
                             Expanded(
                               child: PetInput(
-                                label: 'Sexo',
-                                hint: 'Macho / Hembra',
+                                label: l10n.reportPetInfoSex,
+                                hint: l10n.reportPetInfoSexHint,
                                 controller: _sexController,
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
-                                    return 'Requerido';
+                                    return l10n.requiredField;
                                   }
                                   return null;
                                 },
@@ -139,12 +145,12 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                             const SizedBox(width: PetSpacing.md),
                             Expanded(
                               child: PetInput(
-                                label: 'Edad',
-                                hint: 'Ej. 4 años',
+                                label: l10n.reportPetInfoAge,
+                                hint: l10n.reportPetInfoAgeHint,
                                 controller: _ageController,
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
-                                    return 'Requerido';
+                                    return l10n.requiredField;
                                   }
                                   return null;
                                 },
@@ -157,12 +163,12 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                           children: [
                             Expanded(
                               child: PetInput(
-                                label: 'Tamaño',
-                                hint: 'Pequeño / Mediano / Grande',
+                                label: l10n.reportPetInfoSize,
+                                hint: l10n.reportPetInfoSizeHint,
                                 controller: _sizeController,
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
-                                    return 'Requerido';
+                                    return l10n.requiredField;
                                   }
                                   return null;
                                 },
@@ -171,12 +177,12 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                             const SizedBox(width: PetSpacing.md),
                             Expanded(
                               child: PetInput(
-                                label: 'Color',
-                                hint: 'Ej. Dorado',
+                                label: l10n.reportPetInfoColor,
+                                hint: l10n.reportPetInfoColorHint,
                                 controller: _colorController,
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
-                                    return 'Requerido';
+                                    return l10n.requiredField;
                                   }
                                   return null;
                                 },
@@ -199,6 +205,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
   }
 
   Widget _buildActionButtons(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Expanded(
@@ -207,13 +214,13 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: PetSpacing.md),
             ),
-            child: const Text('Volver'),
+            child: Text(l10n.backAction),
           ),
         ),
         const SizedBox(width: PetSpacing.md),
         Expanded(
           child: PetButton(
-            label: 'Continuar',
+            label: l10n.continueAction,
             onPressed: () {
               if (_formKey.currentState?.validate() ?? false) {
                 _saveDraft(ref);

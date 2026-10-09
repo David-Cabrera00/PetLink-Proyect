@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -19,10 +20,11 @@ class MatchDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final matchAsync = ref.watch(matchByIdProvider(matchId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Posible coincidencia')),
+      appBar: AppBar(title: Text(l10n.matchDetailTitle)),
       body: matchAsync.when(
         data: (match) {
           if (match == null) {
@@ -32,8 +34,8 @@ class MatchDetailScreen extends ConsumerWidget {
         },
         loading: () => _buildLoading(context),
         error: (Object _, StackTrace _) => ErrorState(
-          title: 'No pudimos cargar la coincidencia',
-          subtitle: 'Verifica tu conexión e intenta nuevamente.',
+          title: l10n.matchDetailLoadError,
+          subtitle: l10n.connectionRetryDescription,
           onRetry: () => ref.invalidate(matchByIdProvider(matchId)),
         ),
       ),
@@ -42,10 +44,11 @@ class MatchDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildNotFound(BuildContext context) {
-    return const EmptyState(
+    final l10n = AppLocalizations.of(context)!;
+    return EmptyState(
       icon: Icons.diamond,
-      title: 'Esta coincidencia ya no está disponible.',
-      subtitle: 'Puede haber sido descartada o eliminada.',
+      title: l10n.matchDetailNotFound,
+      subtitle: l10n.matchDetailNotFoundDescription,
     );
   }
 
@@ -73,6 +76,7 @@ class MatchDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildMatchDetail(BuildContext context, PetMatch match) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(PetSpacing.lg),
       child: LayoutBuilder(
@@ -85,15 +89,15 @@ class MatchDetailScreen extends ConsumerWidget {
               const SizedBox(height: PetSpacing.lg),
               _buildComparisonSection(context, match, isNarrow),
               const SizedBox(height: PetSpacing.lg),
-              const SectionHeader(title: 'Comparación de características'),
+              SectionHeader(title: l10n.matchDetailComparison),
               const SizedBox(height: PetSpacing.md),
               _buildTraitsComparison(context, match, isNarrow),
               const SizedBox(height: PetSpacing.lg),
-              const SectionHeader(title: 'Ubicación y momento'),
+              SectionHeader(title: l10n.matchDetailLocationTime),
               const SizedBox(height: PetSpacing.md),
               _buildLocationTimeSection(context, match, isNarrow),
               const SizedBox(height: PetSpacing.lg),
-              const SectionHeader(title: 'Rasgos particulares'),
+              SectionHeader(title: l10n.matchDetailTraits),
               const SizedBox(height: PetSpacing.md),
               _buildParticularTraitsSection(context, match),
               const SizedBox(height: PetSpacing.xl),
@@ -107,6 +111,7 @@ class MatchDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildSummarySection(BuildContext context, PetMatch match) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(PetSpacing.lg),
@@ -124,7 +129,7 @@ class MatchDetailScreen extends ConsumerWidget {
               const SizedBox(width: PetSpacing.md),
               Expanded(
                 child: Text(
-                  'Coincidencia alta',
+                  l10n.matchDetailHigh,
                   style:
                       (Theme.of(context).textTheme.titleMedium ??
                               const TextStyle())
@@ -138,7 +143,7 @@ class MatchDetailScreen extends ConsumerWidget {
           ),
           const SizedBox(height: PetSpacing.md),
           Text(
-            'Las características, la ubicación y el momento de ambos reportes son similares. Revisa la información antes de contactar.',
+            l10n.matchDetailDescription,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ],
@@ -180,7 +185,8 @@ class MatchDetailScreen extends ConsumerWidget {
     bool isLost,
   ) {
     final badgeStatus = isLost ? PetStatus.lost : PetStatus.found;
-    final title = isLost ? 'Tu reporte' : 'Mascota encontrada';
+    final l10n = AppLocalizations.of(context)!;
+    final title = isLost ? l10n.matchDetailYourReport : l10n.matchDetailFoundPet;
     final subtitle = report.address.split(',').first;
 
     return Container(
@@ -236,7 +242,9 @@ class MatchDetailScreen extends ConsumerWidget {
               ),
               const SizedBox(width: PetSpacing.xs),
               Text(
-                isLost ? 'Hace 5 h' : 'Hace 3 h',
+                isLost
+                    ? l10n.timeHoursAgo(count: 5)
+                    : l10n.timeHoursAgo(count: 3),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -251,12 +259,17 @@ class MatchDetailScreen extends ConsumerWidget {
     PetMatch match,
     bool isNarrow,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     final comparisons = [
-      ('Especie', 'Perro', 'Perro'),
-      ('Raza', 'Golden Retriever', 'Golden Retriever'),
-      ('Color', 'Dorado', 'Dorado'),
-      ('Tamaño', 'Grande', 'Grande'),
-      ('Sexo', 'Hembra', 'Hembra'),
+      (l10n.matchDetailSpecies, l10n.matchValueDog, l10n.matchValueDog),
+      (
+        l10n.matchDetailBreed,
+        l10n.matchValueGoldenRetriever,
+        l10n.matchValueGoldenRetriever,
+      ),
+      (l10n.matchDetailColor, l10n.matchValueGold, l10n.matchValueGold),
+      (l10n.matchDetailSize, l10n.matchValueLarge, l10n.matchValueLarge),
+      (l10n.matchDetailSex, l10n.matchValueFemale, l10n.matchValueFemale),
     ];
 
     return Column(
@@ -307,8 +320,8 @@ class MatchDetailScreen extends ConsumerWidget {
                                 color: PetColors.found,
                               ),
                               const SizedBox(width: PetSpacing.xs),
-                              const Text(
-                                'Coincide',
+                              Text(
+                                l10n.matchDetailMatches,
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -366,8 +379,8 @@ class MatchDetailScreen extends ConsumerWidget {
                             color: PetColors.found,
                           ),
                           const SizedBox(width: PetSpacing.xs),
-                          const Text(
-                            'Coincide',
+                          Text(
+                            l10n.matchDetailMatches,
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -397,6 +410,7 @@ class MatchDetailScreen extends ConsumerWidget {
     PetMatch match,
     bool isNarrow,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(PetSpacing.lg),
@@ -411,7 +425,7 @@ class MatchDetailScreen extends ConsumerWidget {
                 _buildLocationTimeItem(
                   context,
                   Icons.straighten,
-                  'Distancia entre reportes',
+                  l10n.matchDetailDistance,
                   '${match.distanceKm} km',
                 ),
                 const SizedBox(height: PetSpacing.md),
@@ -424,8 +438,8 @@ class MatchDetailScreen extends ConsumerWidget {
                 _buildLocationTimeItem(
                   context,
                   Icons.access_time,
-                  'Tiempo entre reportes',
-                  _formatDuration(match.timeDifference),
+                        l10n.matchDetailTimeBetween,
+                  _formatDuration(l10n, match.timeDifference),
                 ),
               ],
             )
@@ -441,7 +455,7 @@ class MatchDetailScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: PetSpacing.xs),
                       Text(
-                        'Distancia entre reportes',
+                        l10n.matchDetailDistance,
                         style: Theme.of(context).textTheme.bodySmall,
                         textAlign: TextAlign.center,
                       ),
@@ -467,13 +481,13 @@ class MatchDetailScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: PetSpacing.xs),
                       Text(
-                        'Tiempo entre reportes',
+                        l10n.matchDetailTimeBetween,
                         style: Theme.of(context).textTheme.bodySmall,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: PetSpacing.xs),
                       Text(
-                        _formatDuration(match.timeDifference),
+                        _formatDuration(l10n, match.timeDifference),
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           color: PetColors.primary,
                           fontWeight: FontWeight.w700,
@@ -512,23 +526,26 @@ class MatchDetailScreen extends ConsumerWidget {
     );
   }
 
-  String _formatDuration(Duration duration) {
-    if (duration.inHours > 0) return '${duration.inHours} horas';
-    return '${duration.inMinutes} minutos';
+  String _formatDuration(AppLocalizations l10n, Duration duration) {
+    if (duration.inHours > 0) {
+      return l10n.timeHoursAgo(count: duration.inHours);
+    }
+    return l10n.timeMinutesAgo(count: duration.inMinutes);
   }
 
   Widget _buildParticularTraitsSection(BuildContext context, PetMatch match) {
+    final l10n = AppLocalizations.of(context)!;
     final lostTraits = [
-      'Color: Dorado suave',
-      'Collar: Cuero marrón con hebilla dorada',
-      'Seña física: Mancha blanca en el pecho',
-      'Temperamento: Dócil, responde a su nombre',
+      '${l10n.reportDetailColor}: ${l10n.reportDetailSoftGold}',
+      '${l10n.reportDetailCollar}: ${l10n.reportDetailBrownCollar}',
+      '${l10n.reportDetailPhysicalMark}: ${l10n.reportDetailWhiteMark}',
+      '${l10n.reportDetailTemperament}: ${l10n.reportDetailDocile}',
     ];
     final foundTraits = [
-      'Color: Dorado',
-      'Collar: Sin collar visible',
-      'Seña física: Mancha blanca en el pecho',
-      'Temperamento: Tranquila, se deja acercar',
+      '${l10n.reportDetailColor}: ${l10n.matchValueGold}',
+      '${l10n.reportDetailCollar}: ${l10n.matchValueNoVisibleCollar}',
+      '${l10n.reportDetailPhysicalMark}: ${l10n.reportDetailWhiteMark}',
+      '${l10n.reportDetailTemperament}: ${l10n.matchValueCalm}',
     ];
 
     return Column(
@@ -555,8 +572,8 @@ class MatchDetailScreen extends ConsumerWidget {
                       color: PetColors.lostSoft,
                       borderRadius: PetRadius.smAll,
                     ),
-                    child: const Text(
-                      'Perdida',
+                    child: Text(
+                      l10n.statusLost,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -574,8 +591,8 @@ class MatchDetailScreen extends ConsumerWidget {
                       color: PetColors.foundSoft,
                       borderRadius: PetRadius.smAll,
                     ),
-                    child: const Text(
-                      'Encontrada',
+                    child: Text(
+                      l10n.statusFound,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -603,11 +620,12 @@ class MatchDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildCTASection(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PetButton(
-          label: 'Contactar a quien la encontró',
+          label: l10n.matchDetailContactFinder,
           onPressed: () {},
           icon: Icons.phone,
         ),
@@ -619,20 +637,21 @@ class MatchDetailScreen extends ConsumerWidget {
             foregroundColor: PetColors.lost,
             side: const BorderSide(color: PetColors.lost, width: 1.5),
           ),
-          child: const Text('Descartar coincidencia'),
+          child: Text(l10n.matchDetailDismiss),
         ),
       ],
     );
   }
 
   Widget _buildBottomBar(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       top: false,
       bottom: true,
       child: Padding(
         padding: const EdgeInsets.all(PetSpacing.lg),
         child: PetButton(
-          label: 'Volver',
+          label: l10n.matchDetailBack,
           onPressed: () => Navigator.of(context).pop(),
           variant: PetButtonVariant.outline,
         ),

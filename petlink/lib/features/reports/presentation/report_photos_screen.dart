@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -19,11 +20,12 @@ class ReportPhotosScreen extends ConsumerStatefulWidget {
 class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final draft = ref.watch(reportDraftProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Fotos'),
+        title: Text(l10n.reportPhotosTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/report/new/pet-info'),
@@ -38,12 +40,12 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
               const StepIndicator(current: 3, total: 6),
               const SizedBox(height: PetSpacing.xl),
               Text(
-                'Fotos de la mascota',
+                l10n.reportPhotosHeading,
                 style: Theme.of(context).textTheme.displaySmall,
               ),
               const SizedBox(height: PetSpacing.xs),
               Text(
-                'Las fotos claras ayudan a identificar mejor a la mascota.',
+                l10n.reportPhotosDescription,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: PetSpacing.xl),
@@ -76,7 +78,7 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                     const SizedBox(height: PetSpacing.lg),
                     if (draft.photos.isNotEmpty)
                       Text(
-                        '${draft.photos.length} de 3 fotos',
+                        l10n.reportPhotosCount(count: draft.photos.length),
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                   ],
@@ -111,17 +113,17 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
           ),
           const SizedBox(height: PetSpacing.lg),
           Text(
-            'Agrega fotos de la mascota',
+            l10n.reportPhotosAddPrompt,
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: PetSpacing.xs),
           Text(
-            'Puedes agregar hasta 3 fotografías',
+            l10n.reportPhotosLimit,
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: PetSpacing.xl),
           PetButton(
-            label: 'Agregar foto',
+            label: l10n.addPhoto,
             onPressed: () => _showPhotoOptions(context, ref),
             icon: Icons.add_a_photo,
           ),
@@ -215,7 +217,7 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
             ),
             const SizedBox(height: PetSpacing.sm),
             Text(
-              'Agregar',
+              AppLocalizations.of(context)!.addPhoto,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: PetColors.primary,
                 fontWeight: FontWeight.w600,
@@ -228,6 +230,7 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
   }
 
   void _showPhotoOptions(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -241,7 +244,7 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Agregar foto',
+                  l10n.addPhoto,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: PetSpacing.lg),
@@ -251,7 +254,7 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                       child: _buildPhotoOption(
                         context,
                         Icons.camera_alt,
-                        'Tomar foto',
+                        l10n.takePhoto,
                         () {
                           Navigator.pop(context);
                           _simulatePhoto(ref);
@@ -263,7 +266,7 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                       child: _buildPhotoOption(
                         context,
                         Icons.photo_library,
-                        'Galería',
+                        l10n.gallery,
                         () {
                           Navigator.pop(context);
                           _simulatePhoto(ref);
@@ -327,6 +330,7 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
   }
 
   Widget _buildActionButtons(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final draft = ref.watch(reportDraftProvider);
     final canContinue = draft.photos.isNotEmpty;
 
@@ -338,13 +342,13 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: PetSpacing.md),
             ),
-            child: const Text('Volver'),
+            child: Text(l10n.backAction),
           ),
         ),
         const SizedBox(width: PetSpacing.md),
         Expanded(
           child: PetButton(
-            label: 'Continuar',
+            label: l10n.continueAction,
             onPressed: canContinue
                 ? () => context.go('/report/new/location')
                 : null,

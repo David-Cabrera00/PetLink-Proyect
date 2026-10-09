@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -16,12 +17,13 @@ class ReportReviewScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final draft = ref.watch(reportDraftProvider);
     final isLost = draft.reportType == ReportType.lost;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Revisa tu reporte'),
+        title: Text(l10n.reportReviewTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/report/new/details'),
@@ -35,12 +37,12 @@ class ReportReviewScreen extends ConsumerWidget {
               _buildStepIndicator(context, 6, 6),
               const SizedBox(height: PetSpacing.xl),
               Text(
-                'Revisa tu reporte',
+                l10n.reportReviewTitle,
                 style: Theme.of(context).textTheme.displaySmall,
               ),
               const SizedBox(height: PetSpacing.xs),
               Text(
-                'Verifica que toda la información sea correcta antes de publicar.',
+                l10n.reportReviewDescription,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: PetSpacing.xl),
@@ -51,7 +53,7 @@ class ReportReviewScreen extends ConsumerWidget {
                     children: [
                       _buildSection(
                         context,
-                        'Tipo de reporte',
+                        l10n.reportReviewType,
                         Row(
                           children: [
                             StatusBadge(
@@ -59,7 +61,7 @@ class ReportReviewScreen extends ConsumerWidget {
                             ),
                             const SizedBox(width: PetSpacing.md),
                             Text(
-                              isLost ? 'Perdida' : 'Encontrada',
+                              isLost ? l10n.statusLost : l10n.statusFound,
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
                           ],
@@ -67,10 +69,10 @@ class ReportReviewScreen extends ConsumerWidget {
                       ),
                       _buildSection(
                         context,
-                        'Fotos',
+                        l10n.reportReviewPhotos,
                         draft.photos.isEmpty
                             ? Text(
-                                'Sin fotos',
+                                l10n.noPhotos,
                                 style: Theme.of(context).textTheme.bodyMedium,
                               )
                             : Wrap(
@@ -83,7 +85,7 @@ class ReportReviewScreen extends ConsumerWidget {
                       ),
                       _buildSection(
                         context,
-                        'Nombre',
+                        l10n.reportReviewName,
                         Text(
                           draft.name.isEmpty ? '—' : draft.name,
                           style: Theme.of(context).textTheme.bodyMedium,
@@ -91,7 +93,7 @@ class ReportReviewScreen extends ConsumerWidget {
                       ),
                       _buildSection(
                         context,
-                        'Especie',
+                        l10n.reportReviewSpecies,
                         Text(
                           draft.species,
                           style: Theme.of(context).textTheme.bodyMedium,
@@ -99,7 +101,7 @@ class ReportReviewScreen extends ConsumerWidget {
                       ),
                       _buildSection(
                         context,
-                        'Raza',
+                        l10n.reportReviewBreed,
                         Text(
                           draft.breed,
                           style: Theme.of(context).textTheme.bodyMedium,
@@ -107,7 +109,7 @@ class ReportReviewScreen extends ConsumerWidget {
                       ),
                       _buildSection(
                         context,
-                        'Sexo',
+                        l10n.reportReviewSex,
                         Text(
                           draft.sex,
                           style: Theme.of(context).textTheme.bodyMedium,
@@ -115,7 +117,7 @@ class ReportReviewScreen extends ConsumerWidget {
                       ),
                       _buildSection(
                         context,
-                        'Edad',
+                        l10n.reportReviewAge,
                         Text(
                           draft.age,
                           style: Theme.of(context).textTheme.bodyMedium,
@@ -123,7 +125,7 @@ class ReportReviewScreen extends ConsumerWidget {
                       ),
                       _buildSection(
                         context,
-                        'Tamaño',
+                        l10n.reportReviewSize,
                         Text(
                           draft.size,
                           style: Theme.of(context).textTheme.bodyMedium,
@@ -131,7 +133,7 @@ class ReportReviewScreen extends ConsumerWidget {
                       ),
                       _buildSection(
                         context,
-                        'Color',
+                        l10n.reportReviewColor,
                         Text(
                           draft.color,
                           style: Theme.of(context).textTheme.bodyMedium,
@@ -139,7 +141,7 @@ class ReportReviewScreen extends ConsumerWidget {
                       ),
                       _buildSection(
                         context,
-                        'Ubicación',
+                        l10n.reportReviewLocation,
                         Text(
                           draft.address,
                           style: Theme.of(context).textTheme.bodyMedium,
@@ -147,7 +149,9 @@ class ReportReviewScreen extends ConsumerWidget {
                       ),
                       _buildSection(
                         context,
-                        isLost ? 'Última vez vista' : 'Fecha de hallazgo',
+                        isLost
+                            ? l10n.reportReviewLastSeen
+                            : l10n.reportReviewFoundDate,
                         Text(
                           draft.lastSeenAt != null
                               ? _formatDateTime(draft.lastSeenAt!)
@@ -157,7 +161,7 @@ class ReportReviewScreen extends ConsumerWidget {
                       ),
                       _buildSection(
                         context,
-                        'Señas particulares',
+                        l10n.reportReviewTraits,
                         Text(
                           draft.traits.isEmpty ? '—' : draft.traits,
                           style: Theme.of(context).textTheme.bodyMedium,
@@ -165,7 +169,7 @@ class ReportReviewScreen extends ConsumerWidget {
                       ),
                       _buildSection(
                         context,
-                        '¿Qué ocurrió?',
+                        l10n.reportReviewWhatHappened,
                         Text(
                           draft.description,
                           style: Theme.of(context).textTheme.bodyMedium,
@@ -174,12 +178,12 @@ class ReportReviewScreen extends ConsumerWidget {
                       if (draft.reportType == ReportType.found) ...[
                         _buildSection(
                           context,
-                          '¿La mascota está contigo?',
+                          l10n.reportReviewPetWithFinder,
                           Text(
                             draft.isPetWithFinder == true
-                                ? 'Sí'
+                                ? l10n.yes
                                 : draft.isPetWithFinder == false
-                                ? 'No'
+                                ? l10n.no
                                 : '—',
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
@@ -280,10 +284,11 @@ class ReportReviewScreen extends ConsumerWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         PetButton(
-          label: 'Publicar reporte',
+          label: l10n.publishReport,
           onPressed: () => _publishReport(context, ref),
           icon: Icons.publish,
         ),
@@ -294,13 +299,14 @@ class ReportReviewScreen extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(vertical: PetSpacing.md),
             minimumSize: const Size(double.infinity, 52),
           ),
-          child: const Text('Volver a editar'),
+          child: Text(l10n.editReport),
         ),
       ],
     );
   }
 
   void _publishReport(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -327,7 +333,7 @@ class ReportReviewScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error al publicar: $e'),
+            content: Text(l10n.publishError(error: e)),
             backgroundColor: PetColors.lost,
           ),
         );
