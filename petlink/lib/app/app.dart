@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
 import '../core/theme/pet_theme.dart';
 import 'router.dart';
@@ -18,6 +20,14 @@ class PetLinkApp extends ConsumerWidget {
         theme: PetTheme.light,
         darkTheme: PetTheme.dark,
         themeMode: themeMode,
+        locale: const Locale('es'),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
         routerConfig: AppRouter.router,
       ),
     );

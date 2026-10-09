@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../core/theme/pet_colors.dart';
 import '../../core/theme/pet_spacing.dart';
@@ -8,8 +9,9 @@ class ActivityScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('Actividad')),
+      appBar: AppBar(title: Text(l10n.navigationActivity)),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(PetSpacing.xl),

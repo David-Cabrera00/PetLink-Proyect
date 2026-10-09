@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../core/theme/pet_colors.dart';
 import '../../core/theme/pet_spacing.dart';
@@ -11,10 +12,11 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final themeMode = ref.watch(themeModeProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Perfil')),
+      appBar: AppBar(title: Text(l10n.navigationProfile)),
       body: ListView(
         padding: const EdgeInsets.all(PetSpacing.lg),
         children: [
@@ -43,6 +45,7 @@ class ProfileScreen extends ConsumerWidget {
     WidgetRef ref,
     ThemeMode currentMode,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -66,7 +69,7 @@ class ProfileScreen extends ConsumerWidget {
                 ThemeMode.system,
                 currentMode,
                 Icons.settings_brightness,
-                'Sistema',
+                l10n.themeSystem,
                 'Usa la configuración del dispositivo',
               ),
               _buildDivider(context),
@@ -76,7 +79,7 @@ class ProfileScreen extends ConsumerWidget {
                 ThemeMode.light,
                 currentMode,
                 Icons.light_mode,
-                'Claro',
+                l10n.themeLight,
                 'Tema claro siempre',
               ),
               _buildDivider(context),
@@ -86,7 +89,7 @@ class ProfileScreen extends ConsumerWidget {
                 ThemeMode.dark,
                 currentMode,
                 Icons.dark_mode,
-                'Oscuro',
+                l10n.themeDark,
                 'Tema oscuro siempre',
               ),
             ],

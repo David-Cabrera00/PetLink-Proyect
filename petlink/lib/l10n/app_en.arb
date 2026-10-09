@@ -1,0 +1,11 @@
+{
+  "@@locale": "en",
+  "navigationRadar": "Radar",
+  "navigationExplore": "Explore",
+  "navigationReport": "Report",
+  "navigationActivity": "Activity",
+  "navigationProfile": "Profile",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark"
+}

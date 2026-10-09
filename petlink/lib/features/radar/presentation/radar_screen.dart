@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -16,12 +17,13 @@ class RadarScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final nearbyAsync = ref.watch(nearbyReportsProvider);
     final matchesAsync = ref.watch(matchesProvider);
     final summary = ref.watch(radarSummaryProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Radar')),
+      appBar: AppBar(title: Text(l10n.navigationRadar)),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(nearbyReportsProvider);

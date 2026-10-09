@@ -1,0 +1,11 @@
+{
+  "@@locale": "es",
+  "navigationRadar": "Radar",
+  "navigationExplore": "Explorar",
+  "navigationReport": "Reportar",
+  "navigationActivity": "Actividad",
+  "navigationProfile": "Perfil",
+  "themeSystem": "Sistema",
+  "themeLight": "Claro",
+  "themeDark": "Oscuro"
+}
