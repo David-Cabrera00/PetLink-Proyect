@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -12,6 +13,7 @@ class ReportPublishedScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -34,19 +36,19 @@ class ReportPublishedScreen extends ConsumerWidget {
               ),
               const SizedBox(height: PetSpacing.xl),
               Text(
-                'Tu reporte ya está activo',
+                l10n.reportPublishedTitle,
                 style: Theme.of(context).textTheme.displaySmall,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: PetSpacing.md),
               Text(
-                'Las personas cerca podrán verlo y PetLink buscará posibles coincidencias.',
+                l10n.reportPublishedDescription,
                 style: Theme.of(context).textTheme.bodyMedium,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: PetSpacing.xl),
               PetButton(
-                label: 'Ver mi reporte',
+                label: l10n.viewMyReport,
                 onPressed: () => context.go('/reports'),
                 icon: Icons.description,
               ),
@@ -57,7 +59,7 @@ class ReportPublishedScreen extends ConsumerWidget {
                   minimumSize: const Size(double.infinity, 52),
                   padding: const EdgeInsets.symmetric(vertical: PetSpacing.md),
                 ),
-                child: const Text('Volver al radar'),
+                child: Text(l10n.backToRadar),
               ),
             ],
           ),

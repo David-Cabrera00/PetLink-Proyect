@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../core/theme/pet_spacing.dart';
 import '../../core/theme/pet_radius.dart';
@@ -14,6 +15,7 @@ class MatchCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     return Card(
       margin: EdgeInsets.zero,
@@ -37,12 +39,12 @@ class MatchCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${match.lostReport.pet.name} — Tu reporte',
+                          '${match.lostReport.pet.name} — ${l10n.matchCardYourReport}',
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         const SizedBox(height: PetSpacing.xs),
                         Text(
-                          'Mascota encontrada',
+                          l10n.matchCardPetFound,
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ],
@@ -72,7 +74,7 @@ class MatchCard extends StatelessWidget {
                   Icon(Icons.access_time, size: 16, color: cs.onSurfaceVariant),
                   const SizedBox(width: PetSpacing.xs),
                   Text(
-                    _formatDuration(match.timeDifference),
+                    _formatDuration(l10n, match.timeDifference),
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
@@ -124,10 +126,10 @@ class MatchCard extends StatelessWidget {
     }
   }
 
-  String _formatDuration(Duration duration) {
+  String _formatDuration(AppLocalizations l10n, Duration duration) {
     if (duration.inHours > 0) {
-      return 'Hace ${duration.inHours} h';
+      return l10n.timeHoursAgo(duration.inHours);
     }
-    return 'Hace ${duration.inMinutes} min';
+    return l10n.timeMinutesAgo(duration.inMinutes);
   }
 }

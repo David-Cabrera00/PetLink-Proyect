@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../core/theme/pet_colors.dart';
 import '../../core/theme/pet_spacing.dart';
 import '../../core/theme/pet_radius.dart';
+import '../../design_system/buttons/pet_button.dart';
+import '../auth/providers/auth_provider.dart';
+import '../../features/profile/providers/locale_provider.dart';
 import '../../features/profile/providers/theme_mode_provider.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -11,10 +16,14 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final locale = ref.watch(localeProvider);
     final themeMode = ref.watch(themeModeProvider);
+    final authState = ref.watch(authProvider);
+    final user = authState.user;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Perfil')),
+      appBar: AppBar(title: Text(l10n.navigationProfile)),
       body: ListView(
         padding: const EdgeInsets.all(PetSpacing.lg),
         children: [
@@ -24,17 +33,123 @@ class ProfileScreen extends ConsumerWidget {
             color: PetColors.primary.withValues(alpha: 0.5),
           ),
           const SizedBox(height: PetSpacing.lg),
-          Text('Mi Perfil', style: Theme.of(context).textTheme.headlineMedium),
+          Text(
+            l10n.profileTitle,
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
           const SizedBox(height: PetSpacing.sm),
           Text(
-            'Gestiona tu información personal y configuración.',
+            l10n.profileDescription,
             style: Theme.of(context).textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: PetSpacing.xl),
+          if (user != null) ...[
+            _buildUserSection(context, user),
+            const SizedBox(height: PetSpacing.xl),
+          ],
           _buildAppearanceSection(context, ref, themeMode),
+          const SizedBox(height: PetSpacing.xl),
+          _buildLanguageSection(context, ref, locale),
+          if (user != null) ...[
+            const SizedBox(height: PetSpacing.xl),
+            PetButton(
+              label: l10n.profileLogout,
+              variant: PetButtonVariant.outline,
+              icon: Icons.logout,
+              onPressed: () {
+                ref.read(authProvider.notifier).logout();
+                context.go('/welcome');
+              },
+            ),
+          ],
         ],
       ),
+    );
+  }
+
+  Widget _buildUserSection(BuildContext context, AuthUser user) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(PetSpacing.lg),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: PetRadius.lgAll,
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 28,
+            backgroundColor: theme.colorScheme.primary,
+            child: Icon(Icons.person, color: theme.colorScheme.onPrimary),
+          ),
+          const SizedBox(width: PetSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  user.name,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: PetSpacing.xs),
+                Text(user.email, style: theme.textTheme.bodyMedium),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLanguageSection(
+    BuildContext context,
+    WidgetRef ref,
+    Locale currentLocale,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    final options = [
+      (const Locale('es'), l10n.languageSpanish),
+      (const Locale('en'), l10n.languageEnglish),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.language,
+          style: Theme.of(context).textTheme.titleMedium
+              ?.copyWith(fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: PetSpacing.md),
+        Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: PetRadius.lgAll,
+            border: Border.all(color: Theme.of(context).dividerColor),
+          ),
+          child: Column(
+            children: [
+              for (var index = 0; index < options.length; index++) ...[
+                RadioListTile<Locale>(
+                  value: options[index].$1,
+                  groupValue: currentLocale,
+                  title: Text(options[index].$2),
+                  onChanged: (locale) {
+                    if (locale != null) {
+                      ref.read(localeProvider.notifier).setLocale(locale);
+                    }
+                  },
+                ),
+                if (index < options.length - 1) _buildDivider(context),
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -43,11 +158,12 @@ class ProfileScreen extends ConsumerWidget {
     WidgetRef ref,
     ThemeMode currentMode,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Apariencia',
+          l10n.appearance,
           style: Theme.of(context).textTheme.titleMedium
               ?.copyWith(fontWeight: FontWeight.w600),
         ),
@@ -66,8 +182,8 @@ class ProfileScreen extends ConsumerWidget {
                 ThemeMode.system,
                 currentMode,
                 Icons.settings_brightness,
-                'Sistema',
-                'Usa la configuración del dispositivo',
+                l10n.themeSystem,
+                l10n.themeSystemDescription,
               ),
               _buildDivider(context),
               _buildThemeOption(
@@ -76,8 +192,8 @@ class ProfileScreen extends ConsumerWidget {
                 ThemeMode.light,
                 currentMode,
                 Icons.light_mode,
-                'Claro',
-                'Tema claro siempre',
+                l10n.themeLight,
+                l10n.themeLightDescription,
               ),
               _buildDivider(context),
               _buildThemeOption(
@@ -86,8 +202,8 @@ class ProfileScreen extends ConsumerWidget {
                 ThemeMode.dark,
                 currentMode,
                 Icons.dark_mode,
-                'Oscuro',
-                'Tema oscuro siempre',
+                l10n.themeDark,
+                l10n.themeDarkDescription,
               ),
             ],
           ),

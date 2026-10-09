@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -16,12 +17,13 @@ class RadarScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final nearbyAsync = ref.watch(nearbyReportsProvider);
     final matchesAsync = ref.watch(matchesProvider);
     final summary = ref.watch(radarSummaryProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Radar')),
+      appBar: AppBar(title: Text(l10n.navigationRadar)),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(nearbyReportsProvider);
@@ -46,23 +48,22 @@ class RadarScreen extends ConsumerWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Buenos días, David',
+          l10n.radarGreeting('David'),
           style: Theme.of(context).textTheme.headlineMedium,
         ),
         const SizedBox(height: PetSpacing.xs),
-        Text(
-          'Esto está ocurriendo cerca de ti.',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+        Text(l10n.radarNearYou, style: Theme.of(context).textTheme.bodyMedium),
       ],
     );
   }
 
   Widget _buildZoneSelector(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(PetSpacing.lg),
@@ -87,12 +88,12 @@ class RadarScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'La Aurora, Pasto',
+                  l10n.radarLocation,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: PetSpacing.xs),
                 Text(
-                  'Radio 5 km',
+                  l10n.radarRadius,
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
@@ -105,11 +106,12 @@ class RadarScreen extends ConsumerWidget {
   }
 
   Widget _buildRadarActiveSection(BuildContext context, RadarSummary summary) {
+    final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     return Column(
       children: [
         SectionHeader(
-          title: 'Radar activo',
+          title: l10n.radarActive,
           trailing: Container(
             padding: const EdgeInsets.symmetric(
               horizontal: PetSpacing.md,
@@ -120,7 +122,7 @@ class RadarScreen extends ConsumerWidget {
               borderRadius: BorderRadius.circular(24),
             ),
             child: Text(
-              '${summary.totalReports} reportes',
+              l10n.radarReportsCount(summary.totalReports),
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -149,7 +151,7 @@ class RadarScreen extends ConsumerWidget {
                   const SizedBox(width: PetSpacing.md),
                   Expanded(
                     child: Text(
-                      '${summary.totalReports} reportes en un radio de 5 km',
+                      l10n.radarReportsWithinRadius(summary.totalReports),
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),
@@ -166,7 +168,7 @@ class RadarScreen extends ConsumerWidget {
                   const SizedBox(width: PetSpacing.md),
                   Expanded(
                     child: Text(
-                      '${summary.recentReports} publicados en las últimas 24 h',
+                      l10n.radarPublishedLast24Hours(summary.recentReports),
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),
@@ -174,7 +176,7 @@ class RadarScreen extends ConsumerWidget {
               ),
               const SizedBox(height: PetSpacing.lg),
               PetButton(
-                label: 'Explorar el radar',
+                label: l10n.radarExplore,
                 onPressed: () {},
                 icon: Icons.explore,
               ),
@@ -190,9 +192,10 @@ class RadarScreen extends ConsumerWidget {
     AsyncValue matchesAsync,
     WidgetRef ref,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
-        SectionHeader(title: 'Posibles coincidencias'),
+        SectionHeader(title: l10n.radarPossibleMatches),
         const SizedBox(height: PetSpacing.md),
         matchesAsync.when(
           data: (matches) {
@@ -215,8 +218,8 @@ class RadarScreen extends ConsumerWidget {
           },
           loading: () => _buildLoadingCard(context),
           error: (Object _, StackTrace _) => ErrorState(
-            title: 'No pudimos cargar las coincidencias',
-            subtitle: 'Verifica tu conexión e intenta nuevamente.',
+            title: l10n.radarMatchesLoadError,
+            subtitle: l10n.connectionRetryDescription,
             onRetry: () => ref.invalidate(matchesProvider),
           ),
         ),
@@ -225,6 +228,7 @@ class RadarScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyMatches(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(PetSpacing.xl),
@@ -242,12 +246,12 @@ class RadarScreen extends ConsumerWidget {
           ),
           const SizedBox(height: PetSpacing.md),
           Text(
-            'Sin coincidencias todavía',
+            l10n.radarNoMatches,
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: PetSpacing.xs),
           Text(
-            'Seguimos comparando tu reporte con mascotas encontradas cerca de ti.',
+            l10n.radarNoMatchesDescription,
             style: Theme.of(context).textTheme.bodySmall,
             textAlign: TextAlign.center,
           ),
@@ -261,17 +265,18 @@ class RadarScreen extends ConsumerWidget {
     AsyncValue nearbyAsync,
     WidgetRef ref,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
-        SectionHeader(title: 'Cerca de ti'),
+        SectionHeader(title: l10n.radarNearby),
         const SizedBox(height: PetSpacing.md),
         nearbyAsync.when(
           data: (reports) {
             if (reports.isEmpty) {
               return EmptyState(
                 icon: Icons.location_off,
-                title: 'No hay reportes cerca',
-                subtitle: 'Los reportes de mascotas aparecerán aquí cuando estén cerca de tu ubicación.',
+                title: l10n.radarNoNearbyReports,
+                subtitle: l10n.radarNoNearbyReportsDescription,
               );
             }
             return Column(
@@ -291,8 +296,8 @@ class RadarScreen extends ConsumerWidget {
           },
           loading: () => _buildLoadingCard(context),
           error: (Object _, StackTrace _) => ErrorState(
-            title: 'No pudimos cargar los reportes',
-            subtitle: 'Verifica tu conexión e intenta nuevamente.',
+            title: l10n.radarReportsLoadError,
+            subtitle: l10n.connectionRetryDescription,
             onRetry: () => ref.invalidate(nearbyReportsProvider),
           ),
         ),

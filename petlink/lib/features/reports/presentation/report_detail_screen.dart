@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -19,11 +20,12 @@ class ReportDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final reportAsync = ref.watch(reportByIdProvider(reportId));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detalle de mascota'),
+        title: Text(l10n.reportDetailTitle),
         actions: [
           IconButton(icon: const Icon(Icons.bookmark_border), onPressed: () {}),
           IconButton(icon: const Icon(Icons.share), onPressed: () {}),
@@ -39,8 +41,8 @@ class ReportDetailScreen extends ConsumerWidget {
         },
         loading: () => _buildLoading(context),
         error: (Object _, StackTrace _) => ErrorState(
-          title: 'No pudimos cargar el reporte',
-          subtitle: 'Verifica tu conexión e intenta nuevamente.',
+          title: l10n.reportDetailLoadError,
+          subtitle: l10n.connectionRetryDescription,
           onRetry: () => ref.invalidate(reportByIdProvider(reportId)),
         ),
       ),
@@ -49,10 +51,11 @@ class ReportDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildNotFound(BuildContext context) {
-    return const EmptyState(
+    final l10n = AppLocalizations.of(context)!;
+    return EmptyState(
       icon: Icons.description,
-      title: 'No encontramos este reporte.',
-      subtitle: 'El reporte puede haber sido eliminado o el ID es incorrecto.',
+      title: l10n.reportDetailNotFound,
+      subtitle: l10n.reportDetailNotFoundDescription,
     );
   }
 
@@ -93,6 +96,7 @@ class ReportDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildReportDetail(BuildContext context, dynamic report) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(PetSpacing.lg),
       child: Column(
@@ -106,15 +110,15 @@ class ReportDetailScreen extends ConsumerWidget {
           const SizedBox(height: PetSpacing.lg),
           _buildTimeSection(context, report),
           const SizedBox(height: PetSpacing.lg),
-          const SectionHeader(title: 'Rasgos y señas particulares'),
+          SectionHeader(title: l10n.reportDetailTraits),
           const SizedBox(height: PetSpacing.md),
           _buildTraitsSection(context),
           const SizedBox(height: PetSpacing.lg),
-          const SectionHeader(title: '¿Cómo ocurrió?'),
+          SectionHeader(title: l10n.reportDetailHowItHappened),
           const SizedBox(height: PetSpacing.md),
           _buildDescriptionSection(context, report),
           const SizedBox(height: PetSpacing.lg),
-          const SectionHeader(title: 'Última ubicación'),
+          SectionHeader(title: l10n.reportDetailLastLocation),
           const SizedBox(height: PetSpacing.md),
           _buildMapPlaceholder(context),
           const SizedBox(height: PetSpacing.lg),
@@ -158,6 +162,7 @@ class ReportDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildHeaderSection(BuildContext context, dynamic report) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -182,7 +187,7 @@ class ReportDetailScreen extends ConsumerWidget {
         ),
         const SizedBox(height: PetSpacing.xs),
         Text(
-          '${report.pet.size} · 28 kg',
+          l10n.reportDetailWeight(report.pet.size),
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],
@@ -190,6 +195,7 @@ class ReportDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildLocationSection(BuildContext context, dynamic report) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -203,7 +209,7 @@ class ReportDetailScreen extends ConsumerWidget {
             const SizedBox(width: PetSpacing.xs),
             Expanded(
               child: Text(
-                'Última vez vista en ${report.address.split(',').first}',
+                l10n.reportDetailLastSeenAt(report.address.split(',').first),
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
@@ -215,7 +221,7 @@ class ReportDetailScreen extends ConsumerWidget {
             const SizedBox(width: 24),
             Expanded(
               child: Text(
-                'Pasto, Nariño',
+                l10n.reportDetailRegion,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ),
@@ -226,21 +232,26 @@ class ReportDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildTimeSection(BuildContext context, dynamic report) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         const Icon(Icons.access_time, size: 20, color: PetColors.textSecondary),
         const SizedBox(width: PetSpacing.xs),
-        Text('Hace 3 horas', style: Theme.of(context).textTheme.bodyMedium),
+        Text(
+          l10n.exploreHoursAgo,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
       ],
     );
   }
 
   Widget _buildTraitsSection(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final traits = [
-      ('Color', 'Dorado suave'),
-      ('Collar', 'Cuero marrón con hebilla dorada'),
-      ('Seña física', 'Mancha blanca en el pecho'),
-      ('Temperamento', 'Dócil, responde a su nombre'),
+      (l10n.reportDetailColor, l10n.reportDetailSoftGold),
+      (l10n.reportDetailCollar, l10n.reportDetailBrownCollar),
+      (l10n.reportDetailPhysicalMark, l10n.reportDetailWhiteMark),
+      (l10n.reportDetailTemperament, l10n.reportDetailDocile),
     ];
 
     return Column(
@@ -291,6 +302,7 @@ class ReportDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildMapPlaceholder(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       height: 180,
@@ -310,12 +322,12 @@ class ReportDetailScreen extends ConsumerWidget {
             ),
             const SizedBox(height: PetSpacing.md),
             Text(
-              'Mapa de la zona',
+              l10n.reportDetailMapTitle,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: PetSpacing.xs),
             Text(
-              'Aquí se mostrará la última ubicación conocida',
+              l10n.reportDetailMapDescription,
               style: Theme.of(context).textTheme.bodySmall,
               textAlign: TextAlign.center,
             ),
@@ -326,16 +338,17 @@ class ReportDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildCTASection(BuildContext context, report) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '¿Viste a ${report.pet.name} o tienes una pista?',
+          l10n.reportDetailSightingPrompt(report.pet.name),
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: PetSpacing.md),
         PetButton(
-          label: 'Reportar avistamiento',
+          label: l10n.reportDetailReportSighting,
           onPressed: () {},
           icon: Icons.add_location,
         ),
@@ -344,6 +357,7 @@ class ReportDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildBottomBar(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(PetSpacing.lg),
@@ -353,7 +367,7 @@ class ReportDetailScreen extends ConsumerWidget {
               child: OutlinedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.share),
-                label: const Text('Compartir'),
+                label: Text(l10n.shareAction),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: PetSpacing.md),
                 ),
@@ -362,7 +376,7 @@ class ReportDetailScreen extends ConsumerWidget {
             const SizedBox(width: PetSpacing.md),
             Expanded(
               child: PetButton(
-                label: 'Contactar',
+                label: l10n.contactAction,
                 onPressed: () {},
                 icon: Icons.phone,
               ),

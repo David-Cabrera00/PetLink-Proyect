@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -38,12 +39,13 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final draft = ref.watch(reportDraftProvider);
     final isLost = draft.reportType == ReportType.lost;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ubicación'),
+        title: Text(l10n.reportLocationTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/report/new/photos'),
@@ -58,14 +60,14 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
               const StepIndicator(current: 4, total: 6),
               const SizedBox(height: PetSpacing.xl),
               Text(
-                'Ubicación',
+                l10n.reportLocationTitle,
                 style: Theme.of(context).textTheme.displaySmall,
               ),
               const SizedBox(height: PetSpacing.xs),
               Text(
                 isLost
-                    ? '¿Dónde la viste por última vez?'
-                    : '¿Dónde la encontraste?',
+                    ? l10n.reportLocationLostQuestion
+                    : l10n.reportLocationFoundQuestion,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: PetSpacing.xl),
@@ -80,20 +82,20 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
                         const SizedBox(height: PetSpacing.xl),
                         PetInput(
                           label: isLost
-                              ? 'Última ubicación conocida'
-                              : 'Lugar donde la encontraste',
-                          hint: 'Ej. Barrio La Aurora, Pasto',
+                              ? l10n.reportLocationLostLabel
+                              : l10n.reportLocationFoundLabel,
+                          hint: l10n.reportLocationHint,
                           controller: _addressController,
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
-                              return 'La ubicación es obligatoria';
+                              return l10n.requiredLocation;
                             }
                             return null;
                           },
                         ),
                         const SizedBox(height: PetSpacing.md),
                         Text(
-                          'Ejemplo: Barrio La Aurora, Pasto',
+                          l10n.reportLocationExample,
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ],
@@ -111,6 +113,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
   }
 
   Widget _buildMapPlaceholder(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       height: 200,
@@ -132,12 +135,12 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
                 ),
                 const SizedBox(height: PetSpacing.md),
                 Text(
-                  'Mapa de la zona',
+                  l10n.reportLocationMapTitle,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: PetSpacing.xs),
                 Text(
-                  'Aquí se mostrará el mapa para seleccionar la ubicación',
+                  l10n.reportLocationMapDescription,
                   style: Theme.of(context).textTheme.bodySmall,
                   textAlign: TextAlign.center,
                 ),
@@ -164,7 +167,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
                     Icon(Icons.my_location, size: 16, color: PetColors.surface),
                     const SizedBox(width: PetSpacing.xs),
                     Text(
-                      'Usar ubicación actual',
+                      l10n.useCurrentLocation,
                       style: TextStyle(
                         color: PetColors.surface,
                         fontWeight: FontWeight.w600,
@@ -181,6 +184,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
   }
 
   Widget _buildActionButtons(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Expanded(
@@ -189,13 +193,13 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: PetSpacing.md),
             ),
-            child: const Text('Volver'),
+            child: Text(l10n.backAction),
           ),
         ),
         const SizedBox(width: PetSpacing.md),
         Expanded(
           child: PetButton(
-            label: 'Continuar',
+            label: l10n.continueAction,
             onPressed: () {
               if (_formKey.currentState?.validate() ?? false) {
                 _saveLocation(ref);

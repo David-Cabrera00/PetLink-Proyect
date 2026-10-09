@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -18,19 +19,20 @@ class ExploreScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final reportsAsync = ref.watch(exploreReportsProvider);
     final selectedReport = ref.watch(selectedReportProvider);
     final filter = ref.watch(exploreFilterProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Explorar')),
+      appBar: AppBar(title: Text(l10n.navigationExplore)),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(PetSpacing.lg),
             child: Column(
               children: [
-                const PetSearchBar(hint: 'Buscar mascota o zona'),
+                PetSearchBar(hint: l10n.exploreSearchHint),
                 const SizedBox(height: PetSpacing.md),
                 _buildFilters(context, ref, filter),
               ],
@@ -60,6 +62,7 @@ class ExploreScreen extends ConsumerWidget {
     WidgetRef ref,
     ExploreFilter currentFilter,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -67,7 +70,7 @@ class ExploreScreen extends ConsumerWidget {
           _buildFilterChip(
             context,
             ref,
-            'Todos',
+            l10n.exploreAll,
             ExploreFilter.all,
             currentFilter,
             Icons.list,
@@ -76,7 +79,7 @@ class ExploreScreen extends ConsumerWidget {
           _buildFilterChip(
             context,
             ref,
-            'Perdidas',
+            l10n.exploreLost,
             ExploreFilter.lost,
             currentFilter,
             Icons.priority_high,
@@ -85,7 +88,7 @@ class ExploreScreen extends ConsumerWidget {
           _buildFilterChip(
             context,
             ref,
-            'Encontradas',
+            l10n.exploreFound,
             ExploreFilter.found,
             currentFilter,
             Icons.check_circle,
@@ -94,7 +97,7 @@ class ExploreScreen extends ConsumerWidget {
           _buildFilterChip(
             context,
             ref,
-            '< 5 km',
+            l10n.exploreNearby,
             ExploreFilter.nearby,
             currentFilter,
             Icons.near_me,
@@ -159,6 +162,7 @@ class ExploreScreen extends ConsumerWidget {
     AsyncValue reportsAsync,
     WidgetRef ref,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       color: PetColors.background,
       child: reportsAsync.when(
@@ -166,9 +170,8 @@ class ExploreScreen extends ConsumerWidget {
           if (reports.isEmpty) {
             return EmptyState(
               icon: Icons.map,
-              title: 'No hay reportes en esta zona',
-              subtitle:
-                  'Intenta cambiar los filtros o ampliar el radio de búsqueda.',
+              title: l10n.exploreNoReports,
+              subtitle: l10n.exploreNoReportsDescription,
             );
           }
           return LayoutBuilder(
@@ -188,12 +191,12 @@ class ExploreScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: PetSpacing.md),
                         Text(
-                          'Mapa de exploración',
+                          l10n.exploreMapTitle,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         const SizedBox(height: PetSpacing.xs),
                         Text(
-                          'Aquí se mostrará el mapa con los reportes',
+                          l10n.exploreMapDescription,
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ],
@@ -210,8 +213,8 @@ class ExploreScreen extends ConsumerWidget {
         loading: () =>
             Center(child: CircularProgressIndicator(color: PetColors.primary)),
         error: (Object _, StackTrace _) => ErrorState(
-          title: 'No pudimos cargar el mapa',
-          subtitle: 'Verifica tu conexión e intenta nuevamente.',
+          title: l10n.exploreMapLoadError,
+          subtitle: l10n.connectionRetryDescription,
           onRetry: () => ref.invalidate(exploreReportsProvider),
         ),
       ),
@@ -280,6 +283,7 @@ class ExploreScreen extends ConsumerWidget {
   }
 
   Widget _buildReportPreview(BuildContext context, report, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       margin: EdgeInsets.zero,
       child: Padding(
@@ -345,7 +349,7 @@ class ExploreScreen extends ConsumerWidget {
                           ),
                           const SizedBox(width: PetSpacing.xs),
                           Text(
-                            'Hace 3 horas',
+                            l10n.exploreHoursAgo,
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
@@ -362,7 +366,7 @@ class ExploreScreen extends ConsumerWidget {
               children: [
                 Expanded(
                   child: PetButton(
-                    label: 'Ver reporte',
+                    label: l10n.exploreViewReport,
                     onPressed: () => context.go('/reports/${report.id}'),
                   ),
                 ),
