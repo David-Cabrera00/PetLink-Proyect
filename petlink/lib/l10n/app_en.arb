@@ -281,5 +281,9 @@
   "authConfirmPassword": "Confirm password",
   "authConfirmPasswordHint": "Repeat your password",
   "authConfirmPasswordRequired": "Confirm your password",
-  "authPasswordsMismatch": "Passwords do not match"
+  "authPasswordsMismatch": "Passwords do not match",
+  "authForgotPasswordTitle": "Reset your password",
+  "authForgotPasswordDescription": "We will send instructions to help you regain access to your account.",
+  "authSendInstructions": "Send instructions",
+  "authForgotPasswordConfirmation": "If the email is registered, you will receive instructions to reset your password."
 }

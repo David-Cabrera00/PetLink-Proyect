@@ -359,4 +359,8 @@ class AppLocalizationsEs extends AppLocalizations {
   @override String get authConfirmPasswordHint => 'Repite tu contraseña';
   @override String get authConfirmPasswordRequired => 'Confirma tu contraseña';
   @override String get authPasswordsMismatch => 'Las contraseñas no coinciden';
+  @override String get authForgotPasswordTitle => 'Recupera tu contraseña';
+  @override String get authForgotPasswordDescription => 'Te enviaremos instrucciones para recuperar el acceso a tu cuenta.';
+  @override String get authSendInstructions => 'Enviar instrucciones';
+  @override String get authForgotPasswordConfirmation => 'Si el correo está registrado, recibirás instrucciones para recuperar tu contraseña.';
 }

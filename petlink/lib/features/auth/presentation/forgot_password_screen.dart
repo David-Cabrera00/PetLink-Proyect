@@ -6,24 +6,30 @@ import '../../../core/theme/pet_spacing.dart';
 import '../../../design_system/buttons/pet_button.dart';
 import '../../../design_system/inputs/pet_input.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
+  bool _instructionsSent = false;
 
   @override
   void dispose() {
     _emailController.dispose();
-    _passwordController.dispose();
     super.dispose();
+  }
+
+  void _sendInstructions() {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    setState(() {
+      _instructionsSent = true;
+    });
   }
 
   @override
@@ -35,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/welcome'),
+          onPressed: () => context.go('/login'),
         ),
       ),
       body: SafeArea(
@@ -61,12 +67,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          l10n.authLoginTitle,
+                          l10n.authForgotPasswordTitle,
                           style: theme.textTheme.displaySmall,
                         ),
                         const SizedBox(height: PetSpacing.xs),
                         Text(
-                          l10n.authLoginDescription,
+                          l10n.authForgotPasswordDescription,
                           style: theme.textTheme.bodyMedium,
                         ),
                         const SizedBox(height: PetSpacing.xl),
@@ -87,58 +93,41 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                         ),
                         const SizedBox(height: PetSpacing.lg),
-                        PetInput(
-                          label: l10n.authPassword,
-                          hint: l10n.authPasswordHint,
-                          controller: _passwordController,
-                          obscureText: _obscurePassword,
-                          prefixIcon: const Icon(Icons.lock_outline),
-                          suffixIcon: IconButton(
-                            tooltip: l10n.authPasswordVisibility,
-                            icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _obscurePassword = !_obscurePassword;
-                              });
-                            },
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return l10n.authPasswordRequired;
-                            }
-                            return null;
-                          },
-                        ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () => context.go('/forgot-password'),
-                            child: Text(l10n.authForgotPassword),
-                          ),
-                        ),
-                        const SizedBox(height: PetSpacing.sm),
                         PetButton(
-                          label: l10n.authLogin,
-                          onPressed: () {
-                            _formKey.currentState?.validate();
-                          },
+                          label: l10n.authSendInstructions,
+                          onPressed: _sendInstructions,
                         ),
-                        const SizedBox(height: PetSpacing.md),
-                        OutlinedButton.icon(
-                          onPressed: () {},
-                          icon: const Icon(Icons.login),
-                          label: Text(l10n.authContinueWithGoogle),
-                          style: OutlinedButton.styleFrom(
-                            minimumSize: const Size(double.infinity, 52),
-                            shape: RoundedRectangleBorder(
+                        if (_instructionsSent) ...[
+                          const SizedBox(height: PetSpacing.lg),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(PetSpacing.md),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.secondaryContainer,
                               borderRadius: BorderRadius.circular(12),
                             ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.check_circle_outline,
+                                  color: theme.colorScheme.onSecondaryContainer,
+                                ),
+                                const SizedBox(width: PetSpacing.sm),
+                                Expanded(
+                                  child: Text(
+                                    l10n.authForgotPasswordConfirmation,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: theme
+                                          .colorScheme
+                                          .onSecondaryContainer,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+                        ],
                       ],
                     ),
                   ),

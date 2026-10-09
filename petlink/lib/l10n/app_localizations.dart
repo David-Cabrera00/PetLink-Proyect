@@ -413,6 +413,10 @@ abstract class AppLocalizations {
   String get authConfirmPasswordHint;
   String get authConfirmPasswordRequired;
   String get authPasswordsMismatch;
+  String get authForgotPasswordTitle;
+  String get authForgotPasswordDescription;
+  String get authSendInstructions;
+  String get authForgotPasswordConfirmation;
 }
 
 class _AppLocalizationsDelegate

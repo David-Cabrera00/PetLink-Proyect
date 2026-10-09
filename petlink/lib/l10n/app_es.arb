@@ -281,5 +281,9 @@
   "authConfirmPassword": "Confirmar contraseña",
   "authConfirmPasswordHint": "Repite tu contraseña",
   "authConfirmPasswordRequired": "Confirma tu contraseña",
-  "authPasswordsMismatch": "Las contraseñas no coinciden"
+  "authPasswordsMismatch": "Las contraseñas no coinciden",
+  "authForgotPasswordTitle": "Recupera tu contraseña",
+  "authForgotPasswordDescription": "Te enviaremos instrucciones para recuperar el acceso a tu cuenta.",
+  "authSendInstructions": "Enviar instrucciones",
+  "authForgotPasswordConfirmation": "Si el correo está registrado, recibirás instrucciones para recuperar tu contraseña."
 }

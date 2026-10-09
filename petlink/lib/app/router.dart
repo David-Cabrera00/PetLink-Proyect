@@ -18,6 +18,7 @@ import '../features/activity/activity_screen.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/create_account_screen.dart';
+import '../features/auth/presentation/forgot_password_screen.dart';
 import '../features/auth/presentation/welcome_screen.dart';
 
 class AppRouter {
@@ -41,6 +42,10 @@ class AppRouter {
       GoRoute(
         path: '/register',
         builder: (context, state) => const CreateAccountScreen(),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (context, state) => const ForgotPasswordScreen(),
       ),
       GoRoute(
         path: '/report/new',

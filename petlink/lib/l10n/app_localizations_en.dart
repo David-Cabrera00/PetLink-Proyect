@@ -436,4 +436,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override String get authConfirmPasswordHint => 'Repeat your password';
   @override String get authConfirmPasswordRequired => 'Confirm your password';
   @override String get authPasswordsMismatch => 'Passwords do not match';
+  @override String get authForgotPasswordTitle => 'Reset your password';
+  @override String get authForgotPasswordDescription => 'We will send instructions to help you regain access to your account.';
+  @override String get authSendInstructions => 'Send instructions';
+  @override String get authForgotPasswordConfirmation => 'If the email is registered, you will receive instructions to reset your password.';
 }
