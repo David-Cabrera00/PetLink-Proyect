@@ -78,7 +78,7 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                     const SizedBox(height: PetSpacing.lg),
                     if (draft.photos.isNotEmpty)
                       Text(
-                        l10n.reportPhotosCount(count: draft.photos.length),
+                        l10n.reportPhotosCount(draft.photos.length),
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                   ],
@@ -94,6 +94,7 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
   }
 
   Widget _buildEmptyPhotosPlaceholder(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

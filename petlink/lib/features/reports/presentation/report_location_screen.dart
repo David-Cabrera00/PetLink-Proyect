@@ -113,6 +113,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
   }
 
   Widget _buildMapPlaceholder(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       height: 200,
@@ -183,6 +184,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
   }
 
   Widget _buildActionButtons(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Expanded(

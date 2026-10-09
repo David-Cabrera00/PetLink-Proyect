@@ -131,6 +131,7 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
     WidgetRef ref,
     bool isLost,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -148,6 +149,7 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
   }
 
   Widget _buildIsPetWithFinder(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final draft = ref.watch(reportDraftProvider);
 
     return Column(

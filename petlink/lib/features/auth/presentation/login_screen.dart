@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_spacing.dart';
+import '../../../core/theme/pet_typography.dart';
 import '../../../design_system/buttons/pet_button.dart';
 import '../../../design_system/inputs/pet_input.dart';
 import '../providers/auth_provider.dart';
@@ -51,6 +52,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final isLoading = ref.watch(authProvider).isLoading;
 
     return Scaffold(
       appBar: AppBar(
@@ -73,95 +75,96 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 horizontalPadding,
                 PetSpacing.xxl,
               ),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 480),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.authLoginTitle,
-                          style: theme.textTheme.displaySmall,
-                        ),
-                        const SizedBox(height: PetSpacing.xs),
-                        Text(
-                          l10n.authLoginDescription,
-                          style: theme.textTheme.bodyMedium,
-                        ),
-                        const SizedBox(height: PetSpacing.xl),
-                        PetInput(
-                          label: l10n.authEmail,
-                          hint: l10n.authEmailHint,
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          prefixIcon: const Icon(Icons.email_outlined),
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return l10n.authEmailRequired;
-                            }
-                            if (!value.contains('@')) {
-                              return l10n.authEmailInvalid;
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: PetSpacing.lg),
-                        PetInput(
-                          label: l10n.authPassword,
-                          hint: l10n.authPasswordHint,
-                          controller: _passwordController,
-                          obscureText: _obscurePassword,
-                          prefixIcon: const Icon(Icons.lock_outline),
-                          suffixIcon: IconButton(
-                            tooltip: l10n.authPasswordVisibility,
-                            icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
+              child: SizedBox(
+                width: double.infinity,
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 480),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.authLoginTitle,
+                            style: PetTypography.display.copyWith(
+                              color: theme.colorScheme.onSurface,
                             ),
-                            onPressed: () {
-                              setState(() {
-                                _obscurePassword = !_obscurePassword;
-                              });
+                          ),
+                          const SizedBox(height: PetSpacing.xs),
+                          Text(
+                            l10n.authLoginDescription,
+                            style: PetTypography.bodySmall.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: PetSpacing.xl),
+                          PetInput(
+                            label: l10n.authEmail,
+                            hint: l10n.authEmailHint,
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            prefixIcon: const Icon(Icons.email_outlined),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return l10n.authEmailRequired;
+                              }
+                              if (!value.contains('@')) {
+                                return l10n.authEmailInvalid;
+                              }
+                              return null;
                             },
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return l10n.authPasswordRequired;
-                            }
-                            return null;
-                          },
-                        ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () => context.go('/forgot-password'),
-                            child: Text(l10n.authForgotPassword),
+                          const SizedBox(height: PetSpacing.lg),
+                          PetInput(
+                            label: l10n.authPassword,
+                            hint: l10n.authPasswordHint,
+                            controller: _passwordController,
+                            obscureText: _obscurePassword,
+                            prefixIcon: const Icon(Icons.lock_outline),
+                            suffixIcon: IconButton(
+                              tooltip: l10n.authPasswordVisibility,
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return l10n.authPasswordRequired;
+                              }
+                              return null;
+                            },
                           ),
-                        ),
-                        const SizedBox(height: PetSpacing.sm),
-                        PetButton(
-                          label: l10n.authLogin,
-                          isLoading: ref.watch(authProvider).isLoading,
-                          onPressed: _submit,
-                        ),
-                        const SizedBox(height: PetSpacing.md),
-                        OutlinedButton.icon(
-                          onPressed: ref.watch(authProvider).isLoading
-                              ? null
-                              : _continueWithGoogle,
-                          icon: const Icon(Icons.login),
-                          label: Text(l10n.authContinueWithGoogle),
-                          style: OutlinedButton.styleFrom(
-                            minimumSize: const Size(double.infinity, 52),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () => context.go('/forgot-password'),
+                              child: Text(l10n.authForgotPassword),
                             ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: PetSpacing.sm),
+                          PetButton(
+                            label: l10n.authLogin,
+                            isLoading: isLoading,
+                            onPressed: _submit,
+                          ),
+                          const SizedBox(height: PetSpacing.md),
+                          PetButton(
+                            label: l10n.authContinueWithGoogle,
+                            variant: PetButtonVariant.outline,
+                            icon: Icons.login,
+                            isLoading: isLoading,
+                            onPressed: _continueWithGoogle,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

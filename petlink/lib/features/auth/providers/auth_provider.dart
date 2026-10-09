@@ -42,10 +42,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true);
     await Future<void>.delayed(const Duration(milliseconds: 300));
     state = const AuthState(
-      user: AuthUser(
-        name: 'Google User',
-        email: 'google.user@petlink.demo',
-      ),
+      user: AuthUser(name: 'Google User', email: 'google.user@petlink.demo'),
     );
   }
 

@@ -333,7 +333,7 @@ class ReportReviewScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(l10n.publishError(error: e)),
+            content: Text(l10n.publishError(e)),
             backgroundColor: PetColors.lost,
           ),
         );

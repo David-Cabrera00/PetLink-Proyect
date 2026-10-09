@@ -128,8 +128,8 @@ class MatchCard extends StatelessWidget {
 
   String _formatDuration(AppLocalizations l10n, Duration duration) {
     if (duration.inHours > 0) {
-      return l10n.timeHoursAgo(count: duration.inHours);
+      return l10n.timeHoursAgo(duration.inHours);
     }
-    return l10n.timeMinutesAgo(count: duration.inMinutes);
+    return l10n.timeMinutesAgo(duration.inMinutes);
   }
 }

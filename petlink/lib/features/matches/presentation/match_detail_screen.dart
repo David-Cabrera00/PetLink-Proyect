@@ -244,9 +244,7 @@ class MatchDetailScreen extends ConsumerWidget {
               ),
               const SizedBox(width: PetSpacing.xs),
               Text(
-                isLost
-                    ? l10n.timeHoursAgo(count: 5)
-                    : l10n.timeHoursAgo(count: 3),
+                isLost ? l10n.timeHoursAgo(5) : l10n.timeHoursAgo(3),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -530,9 +528,9 @@ class MatchDetailScreen extends ConsumerWidget {
 
   String _formatDuration(AppLocalizations l10n, Duration duration) {
     if (duration.inHours > 0) {
-      return l10n.timeHoursAgo(count: duration.inHours);
+      return l10n.timeHoursAgo(duration.inHours);
     }
-    return l10n.timeMinutesAgo(count: duration.inMinutes);
+    return l10n.timeMinutesAgo(duration.inMinutes);
   }
 
   Widget _buildParticularTraitsSection(BuildContext context, PetMatch match) {

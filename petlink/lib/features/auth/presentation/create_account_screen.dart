@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_spacing.dart';
+import '../../../core/theme/pet_typography.dart';
 import '../../../design_system/buttons/pet_button.dart';
 import '../../../design_system/inputs/pet_input.dart';
 import '../providers/auth_provider.dart';
@@ -52,6 +53,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final isLoading = ref.watch(authProvider).isLoading;
 
     return Scaffold(
       appBar: AppBar(
@@ -74,64 +76,71 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                 horizontalPadding,
                 PetSpacing.xxl,
               ),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 480),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.authRegisterTitle,
-                          style: theme.textTheme.displaySmall,
-                        ),
-                        const SizedBox(height: PetSpacing.xs),
-                        Text(
-                          l10n.authRegisterDescription,
-                          style: theme.textTheme.bodyMedium,
-                        ),
-                        const SizedBox(height: PetSpacing.xl),
-                        PetInput(
-                          label: l10n.authName,
-                          hint: l10n.authNameHint,
-                          controller: _nameController,
-                          prefixIcon: const Icon(Icons.person_outline),
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return l10n.authNameRequired;
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: PetSpacing.lg),
-                        PetInput(
-                          label: l10n.authEmail,
-                          hint: l10n.authEmailHint,
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          prefixIcon: const Icon(Icons.email_outlined),
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return l10n.authEmailRequired;
-                            }
-                            if (!value.contains('@')) {
-                              return l10n.authEmailInvalid;
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: PetSpacing.lg),
-                        _buildPasswordInput(l10n),
-                        const SizedBox(height: PetSpacing.lg),
-                        _buildConfirmationInput(l10n),
-                        const SizedBox(height: PetSpacing.xl),
-                        PetButton(
-                          label: l10n.authRegister,
-                          isLoading: ref.watch(authProvider).isLoading,
-                          onPressed: _submit,
-                        ),
-                      ],
+              child: SizedBox(
+                width: double.infinity,
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 480),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.authRegisterTitle,
+                            style: PetTypography.display.copyWith(
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: PetSpacing.xs),
+                          Text(
+                            l10n.authRegisterDescription,
+                            style: PetTypography.bodySmall.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: PetSpacing.xl),
+                          PetInput(
+                            label: l10n.authName,
+                            hint: l10n.authNameHint,
+                            controller: _nameController,
+                            prefixIcon: const Icon(Icons.person_outline),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return l10n.authNameRequired;
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: PetSpacing.lg),
+                          PetInput(
+                            label: l10n.authEmail,
+                            hint: l10n.authEmailHint,
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            prefixIcon: const Icon(Icons.email_outlined),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return l10n.authEmailRequired;
+                              }
+                              if (!value.contains('@')) {
+                                return l10n.authEmailInvalid;
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: PetSpacing.lg),
+                          _buildPasswordInput(l10n),
+                          const SizedBox(height: PetSpacing.lg),
+                          _buildConfirmationInput(l10n),
+                          const SizedBox(height: PetSpacing.xl),
+                          PetButton(
+                            label: l10n.authRegister,
+                            isLoading: isLoading,
+                            onPressed: _submit,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

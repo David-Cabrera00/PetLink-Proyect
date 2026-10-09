@@ -187,7 +187,7 @@ class ReportDetailScreen extends ConsumerWidget {
         ),
         const SizedBox(height: PetSpacing.xs),
         Text(
-          l10n.reportDetailWeight(size: report.pet.size),
+          l10n.reportDetailWeight(report.pet.size),
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],
@@ -209,9 +209,7 @@ class ReportDetailScreen extends ConsumerWidget {
             const SizedBox(width: PetSpacing.xs),
             Expanded(
               child: Text(
-                l10n.reportDetailLastSeenAt(
-                  location: report.address.split(',').first,
-                ),
+                l10n.reportDetailLastSeenAt(report.address.split(',').first),
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
@@ -345,7 +343,7 @@ class ReportDetailScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          l10n.reportDetailSightingPrompt(name: report.pet.name),
+          l10n.reportDetailSightingPrompt(report.pet.name),
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: PetSpacing.md),

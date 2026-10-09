@@ -38,7 +38,8 @@ class AppRouter {
       redirect: (context, state) {
         final isAuthenticated = ref.read(authProvider).isAuthenticated;
         final path = state.uri.path;
-        final isProtected = path == '/radar' ||
+        final isProtected =
+            path == '/radar' ||
             path == '/explore' ||
             path == '/activity' ||
             path == '/profile' ||
@@ -52,85 +53,88 @@ class AppRouter {
         return null;
       },
       routes: [
-      GoRoute(
-        path: '/welcome',
-        builder: (context, state) => const WelcomeScreen(),
-      ),
-      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
-      GoRoute(
-        path: '/register',
-        builder: (context, state) => const CreateAccountScreen(),
-      ),
-      GoRoute(
-        path: '/forgot-password',
-        builder: (context, state) => const ForgotPasswordScreen(),
-      ),
-      GoRoute(
-        path: '/report/new',
-        builder: (context, state) => const ReportTypeScreen(),
-      ),
-      GoRoute(
-        path: '/report/new/pet-info',
-        builder: (context, state) => const ReportPetInfoScreen(),
-      ),
-      GoRoute(
-        path: '/report/new/photos',
-        builder: (context, state) => const ReportPhotosScreen(),
-      ),
-      GoRoute(
-        path: '/report/new/location',
-        builder: (context, state) => const ReportLocationScreen(),
-      ),
-      GoRoute(
-        path: '/report/new/details',
-        builder: (context, state) => const ReportDetailsScreen(),
-      ),
-      GoRoute(
-        path: '/report/new/review',
-        builder: (context, state) => const ReportReviewScreen(),
-      ),
-      GoRoute(
-        path: '/report/new/published',
-        builder: (context, state) => const ReportPublishedScreen(),
-      ),
-      ShellRoute(
-        navigatorKey: GlobalKey<NavigatorState>(),
-        builder: (context, state, child) {
-          return ScaffoldWithNav(child: child);
-        },
-        routes: [
-          GoRoute(
-            path: '/radar',
-            builder: (context, state) => const RadarScreen(),
-          ),
-          GoRoute(
-            path: '/explore',
-            builder: (context, state) => const ExploreScreen(),
-          ),
-          GoRoute(
-            path: '/reports',
-            builder: (context, state) => const ReportsScreen(),
-          ),
-          GoRoute(
-            path: '/reports/:id',
-            builder: (context, state) =>
-                ReportDetailScreen(reportId: state.pathParameters['id']!),
-          ),
-          GoRoute(
-            path: '/matches/:id',
-            builder: (context, state) =>
-                MatchDetailScreen(matchId: state.pathParameters['id']!),
-          ),
-          GoRoute(
-            path: '/activity',
-            builder: (context, state) => const ActivityScreen(),
-          ),
-          GoRoute(
-            path: '/profile',
-            builder: (context, state) => const ProfileScreen(),
-          ),
-        ],
-      ),
+        GoRoute(
+          path: '/welcome',
+          builder: (context, state) => const WelcomeScreen(),
+        ),
+        GoRoute(
+          path: '/login',
+          builder: (context, state) => const LoginScreen(),
+        ),
+        GoRoute(
+          path: '/register',
+          builder: (context, state) => const CreateAccountScreen(),
+        ),
+        GoRoute(
+          path: '/forgot-password',
+          builder: (context, state) => const ForgotPasswordScreen(),
+        ),
+        GoRoute(
+          path: '/report/new',
+          builder: (context, state) => const ReportTypeScreen(),
+        ),
+        GoRoute(
+          path: '/report/new/pet-info',
+          builder: (context, state) => const ReportPetInfoScreen(),
+        ),
+        GoRoute(
+          path: '/report/new/photos',
+          builder: (context, state) => const ReportPhotosScreen(),
+        ),
+        GoRoute(
+          path: '/report/new/location',
+          builder: (context, state) => const ReportLocationScreen(),
+        ),
+        GoRoute(
+          path: '/report/new/details',
+          builder: (context, state) => const ReportDetailsScreen(),
+        ),
+        GoRoute(
+          path: '/report/new/review',
+          builder: (context, state) => const ReportReviewScreen(),
+        ),
+        GoRoute(
+          path: '/report/new/published',
+          builder: (context, state) => const ReportPublishedScreen(),
+        ),
+        ShellRoute(
+          navigatorKey: GlobalKey<NavigatorState>(),
+          builder: (context, state, child) {
+            return ScaffoldWithNav(child: child);
+          },
+          routes: [
+            GoRoute(
+              path: '/radar',
+              builder: (context, state) => const RadarScreen(),
+            ),
+            GoRoute(
+              path: '/explore',
+              builder: (context, state) => const ExploreScreen(),
+            ),
+            GoRoute(
+              path: '/reports',
+              builder: (context, state) => const ReportsScreen(),
+            ),
+            GoRoute(
+              path: '/reports/:id',
+              builder: (context, state) =>
+                  ReportDetailScreen(reportId: state.pathParameters['id']!),
+            ),
+            GoRoute(
+              path: '/matches/:id',
+              builder: (context, state) =>
+                  MatchDetailScreen(matchId: state.pathParameters['id']!),
+            ),
+            GoRoute(
+              path: '/activity',
+              builder: (context, state) => const ActivityScreen(),
+            ),
+            GoRoute(
+              path: '/profile',
+              builder: (context, state) => const ProfileScreen(),
+            ),
+          ],
+        ),
       ],
     );
   }

@@ -53,7 +53,7 @@ class RadarScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          l10n.radarGreeting(name: 'David'),
+          l10n.radarGreeting('David'),
           style: Theme.of(context).textTheme.headlineMedium,
         ),
         const SizedBox(height: PetSpacing.xs),
@@ -122,7 +122,7 @@ class RadarScreen extends ConsumerWidget {
               borderRadius: BorderRadius.circular(24),
             ),
             child: Text(
-              l10n.radarReportsCount(count: summary.totalReports),
+              l10n.radarReportsCount(summary.totalReports),
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -151,9 +151,7 @@ class RadarScreen extends ConsumerWidget {
                   const SizedBox(width: PetSpacing.md),
                   Expanded(
                     child: Text(
-                      l10n.radarReportsWithinRadius(
-                        count: summary.totalReports,
-                      ),
+                      l10n.radarReportsWithinRadius(summary.totalReports),
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),
@@ -170,9 +168,7 @@ class RadarScreen extends ConsumerWidget {
                   const SizedBox(width: PetSpacing.md),
                   Expanded(
                     child: Text(
-                      l10n.radarPublishedLast24Hours(
-                        count: summary.recentReports,
-                      ),
+                      l10n.radarPublishedLast24Hours(summary.recentReports),
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),
