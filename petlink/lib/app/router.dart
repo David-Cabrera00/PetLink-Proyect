@@ -17,6 +17,7 @@ import '../features/matches/presentation/match_detail_screen.dart';
 import '../features/activity/activity_screen.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/auth/presentation/login_screen.dart';
+import '../features/auth/presentation/create_account_screen.dart';
 import '../features/auth/presentation/welcome_screen.dart';
 
 class AppRouter {
@@ -36,6 +37,10 @@ class AppRouter {
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/register',
+        builder: (context, state) => const CreateAccountScreen(),
       ),
       GoRoute(
         path: '/report/new',

@@ -403,6 +403,16 @@ abstract class AppLocalizations {
   String get authPasswordVisibility;
   String get authForgotPassword;
   String get authContinueWithGoogle;
+  String get authRegister;
+  String get authRegisterTitle;
+  String get authRegisterDescription;
+  String get authName;
+  String get authNameHint;
+  String get authNameRequired;
+  String get authConfirmPassword;
+  String get authConfirmPasswordHint;
+  String get authConfirmPasswordRequired;
+  String get authPasswordsMismatch;
 }
 
 class _AppLocalizationsDelegate

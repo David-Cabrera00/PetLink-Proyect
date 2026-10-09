@@ -349,4 +349,14 @@ class AppLocalizationsEs extends AppLocalizations {
   @override String get authPasswordVisibility => 'Mostrar u ocultar contraseña';
   @override String get authForgotPassword => '¿Olvidaste tu contraseña?';
   @override String get authContinueWithGoogle => 'Continuar con Google';
+  @override String get authRegister => 'Crear cuenta';
+  @override String get authRegisterTitle => 'Crea tu cuenta';
+  @override String get authRegisterDescription => 'Únete a la comunidad que ayuda a las mascotas a volver a casa.';
+  @override String get authName => 'Nombre';
+  @override String get authNameHint => 'Tu nombre';
+  @override String get authNameRequired => 'El nombre es obligatorio';
+  @override String get authConfirmPassword => 'Confirmar contraseña';
+  @override String get authConfirmPasswordHint => 'Repite tu contraseña';
+  @override String get authConfirmPasswordRequired => 'Confirma tu contraseña';
+  @override String get authPasswordsMismatch => 'Las contraseñas no coinciden';
 }

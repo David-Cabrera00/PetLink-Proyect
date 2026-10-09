@@ -426,4 +426,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override String get authPasswordVisibility => 'Show or hide password';
   @override String get authForgotPassword => 'Forgot your password?';
   @override String get authContinueWithGoogle => 'Continue with Google';
+  @override String get authRegister => 'Create account';
+  @override String get authRegisterTitle => 'Create your account';
+  @override String get authRegisterDescription => 'Join the community helping pets find their way home.';
+  @override String get authName => 'Name';
+  @override String get authNameHint => 'Your name';
+  @override String get authNameRequired => 'Name is required';
+  @override String get authConfirmPassword => 'Confirm password';
+  @override String get authConfirmPasswordHint => 'Repeat your password';
+  @override String get authConfirmPasswordRequired => 'Confirm your password';
+  @override String get authPasswordsMismatch => 'Passwords do not match';
 }

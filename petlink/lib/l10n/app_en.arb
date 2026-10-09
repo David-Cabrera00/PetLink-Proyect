@@ -271,5 +271,15 @@
   "authPasswordRequired": "Password is required",
   "authPasswordVisibility": "Show or hide password",
   "authForgotPassword": "Forgot your password?",
-  "authContinueWithGoogle": "Continue with Google"
+  "authContinueWithGoogle": "Continue with Google",
+  "authRegister": "Create account",
+  "authRegisterTitle": "Create your account",
+  "authRegisterDescription": "Join the community helping pets find their way home.",
+  "authName": "Name",
+  "authNameHint": "Your name",
+  "authNameRequired": "Name is required",
+  "authConfirmPassword": "Confirm password",
+  "authConfirmPasswordHint": "Repeat your password",
+  "authConfirmPasswordRequired": "Confirm your password",
+  "authPasswordsMismatch": "Passwords do not match"
 }

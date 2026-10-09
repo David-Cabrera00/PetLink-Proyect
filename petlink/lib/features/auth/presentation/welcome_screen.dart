@@ -57,7 +57,7 @@ class WelcomeScreen extends StatelessWidget {
                       PetButton(
                         label: l10n.authCreateAccount,
                         variant: PetButtonVariant.outline,
-                        onPressed: () {},
+                        onPressed: () => context.go('/register'),
                       ),
                     ],
                   ),

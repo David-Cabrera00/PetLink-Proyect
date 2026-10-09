@@ -271,5 +271,15 @@
   "authPasswordRequired": "La contraseña es obligatoria",
   "authPasswordVisibility": "Mostrar u ocultar contraseña",
   "authForgotPassword": "¿Olvidaste tu contraseña?",
-  "authContinueWithGoogle": "Continuar con Google"
+  "authContinueWithGoogle": "Continuar con Google",
+  "authRegister": "Crear cuenta",
+  "authRegisterTitle": "Crea tu cuenta",
+  "authRegisterDescription": "Únete a la comunidad que ayuda a las mascotas a volver a casa.",
+  "authName": "Nombre",
+  "authNameHint": "Tu nombre",
+  "authNameRequired": "El nombre es obligatorio",
+  "authConfirmPassword": "Confirmar contraseña",
+  "authConfirmPasswordHint": "Repite tu contraseña",
+  "authConfirmPasswordRequired": "Confirma tu contraseña",
+  "authPasswordsMismatch": "Las contraseñas no coinciden"
 }
