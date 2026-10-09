@@ -5,6 +5,7 @@ import 'package:petlink/l10n/app_localizations.dart';
 
 import '../core/theme/pet_theme.dart';
 import 'router.dart';
+import '../features/profile/providers/locale_provider.dart';
 import '../features/profile/providers/theme_mode_provider.dart';
 
 class PetLinkApp extends ConsumerWidget {
@@ -13,6 +14,7 @@ class PetLinkApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
+    final locale = ref.watch(localeProvider);
     return ProviderScope(
       child: MaterialApp.router(
         title: 'PetLink',
@@ -20,7 +22,7 @@ class PetLinkApp extends ConsumerWidget {
         theme: PetTheme.light,
         darkTheme: PetTheme.dark,
         themeMode: themeMode,
-        locale: const Locale('es'),
+        locale: locale,
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,

@@ -5,6 +5,7 @@ import 'package:petlink/l10n/app_localizations.dart';
 import '../../core/theme/pet_colors.dart';
 import '../../core/theme/pet_spacing.dart';
 import '../../core/theme/pet_radius.dart';
+import '../../features/profile/providers/locale_provider.dart';
 import '../../features/profile/providers/theme_mode_provider.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -13,6 +14,7 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final locale = ref.watch(localeProvider);
     final themeMode = ref.watch(themeModeProvider);
 
     return Scaffold(
@@ -35,8 +37,57 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: PetSpacing.xl),
           _buildAppearanceSection(context, ref, themeMode),
+          const SizedBox(height: PetSpacing.xl),
+          _buildLanguageSection(context, ref, locale),
         ],
       ),
+    );
+  }
+
+  Widget _buildLanguageSection(
+    BuildContext context,
+    WidgetRef ref,
+    Locale currentLocale,
+  ) {
+    final options = [
+      (const Locale('es'), 'Español'),
+      (const Locale('en'), 'English'),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Idioma',
+          style: Theme.of(context).textTheme.titleMedium
+              ?.copyWith(fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: PetSpacing.md),
+        Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: PetRadius.lgAll,
+            border: Border.all(color: Theme.of(context).dividerColor),
+          ),
+          child: Column(
+            children: [
+              for (var index = 0; index < options.length; index++) ...[
+                RadioListTile<Locale>(
+                  value: options[index].$1,
+                  groupValue: currentLocale,
+                  title: Text(options[index].$2),
+                  onChanged: (locale) {
+                    if (locale != null) {
+                      ref.read(localeProvider.notifier).setLocale(locale);
+                    }
+                  },
+                ),
+                if (index < options.length - 1) _buildDivider(context),
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
 
