@@ -186,7 +186,9 @@ class MatchDetailScreen extends ConsumerWidget {
   ) {
     final badgeStatus = isLost ? PetStatus.lost : PetStatus.found;
     final l10n = AppLocalizations.of(context)!;
-    final title = isLost ? l10n.matchDetailYourReport : l10n.matchDetailFoundPet;
+    final title = isLost
+        ? l10n.matchDetailYourReport
+        : l10n.matchDetailFoundPet;
     final subtitle = report.address.split(',').first;
 
     return Container(
@@ -438,7 +440,7 @@ class MatchDetailScreen extends ConsumerWidget {
                 _buildLocationTimeItem(
                   context,
                   Icons.access_time,
-                        l10n.matchDetailTimeBetween,
+                  l10n.matchDetailTimeBetween,
                   _formatDuration(l10n, match.timeDifference),
                 ),
               ],

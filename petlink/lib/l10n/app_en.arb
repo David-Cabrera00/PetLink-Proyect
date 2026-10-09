@@ -286,4 +286,5 @@
   "authForgotPasswordDescription": "We will send instructions to help you regain access to your account.",
   "authSendInstructions": "Send instructions",
   "authForgotPasswordConfirmation": "If the email is registered, you will receive instructions to reset your password."
+  ,"profileLogout": "Sign out"
 }

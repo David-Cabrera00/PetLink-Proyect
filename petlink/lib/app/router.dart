@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 
@@ -20,25 +21,42 @@ import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/create_account_screen.dart';
 import '../features/auth/presentation/forgot_password_screen.dart';
 import '../features/auth/presentation/welcome_screen.dart';
+import '../features/auth/providers/auth_provider.dart';
 
 class AppRouter {
   AppRouter._();
 
-  static final _rootNavigatorKey = GlobalKey<NavigatorState>();
-  static final _shellNavigatorKey = GlobalKey<NavigatorState>();
+  static GoRouter createRouter(Ref ref) {
+    final refresh = _AuthRouterRefresh();
+    ref.onDispose(refresh.dispose);
+    ref.listen<AuthState>(authProvider, (_, __) => refresh.notify());
 
-  static final GoRouter router = GoRouter(
-    navigatorKey: _rootNavigatorKey,
-    initialLocation: '/radar',
-    routes: [
+    return GoRouter(
+      navigatorKey: GlobalKey<NavigatorState>(),
+      initialLocation: '/radar',
+      refreshListenable: refresh,
+      redirect: (context, state) {
+        final isAuthenticated = ref.read(authProvider).isAuthenticated;
+        final path = state.uri.path;
+        final isProtected = path == '/radar' ||
+            path == '/explore' ||
+            path == '/activity' ||
+            path == '/profile' ||
+            path == '/report/new' ||
+            path.startsWith('/report/new/');
+        final isAuthRoute =
+            path == '/welcome' || path == '/login' || path == '/register';
+
+        if (!isAuthenticated && isProtected) return '/welcome';
+        if (isAuthenticated && isAuthRoute) return '/radar';
+        return null;
+      },
+      routes: [
       GoRoute(
         path: '/welcome',
         builder: (context, state) => const WelcomeScreen(),
       ),
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(
         path: '/register',
         builder: (context, state) => const CreateAccountScreen(),
@@ -76,7 +94,7 @@ class AppRouter {
         builder: (context, state) => const ReportPublishedScreen(),
       ),
       ShellRoute(
-        navigatorKey: _shellNavigatorKey,
+        navigatorKey: GlobalKey<NavigatorState>(),
         builder: (context, state, child) {
           return ScaffoldWithNav(child: child);
         },
@@ -113,8 +131,15 @@ class AppRouter {
           ),
         ],
       ),
-    ],
-  );
+      ],
+    );
+  }
+}
+
+final appRouterProvider = Provider<GoRouter>(AppRouter.createRouter);
+
+class _AuthRouterRefresh extends ChangeNotifier {
+  void notify() => notifyListeners();
 }
 
 class ScaffoldWithNav extends StatelessWidget {

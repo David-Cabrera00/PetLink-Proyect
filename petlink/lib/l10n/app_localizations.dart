@@ -417,6 +417,7 @@ abstract class AppLocalizations {
   String get authForgotPasswordDescription;
   String get authSendInstructions;
   String get authForgotPasswordConfirmation;
+  String get profileLogout;
 }
 
 class _AppLocalizationsDelegate

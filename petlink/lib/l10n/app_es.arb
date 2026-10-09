@@ -286,4 +286,5 @@
   "authForgotPasswordDescription": "Te enviaremos instrucciones para recuperar el acceso a tu cuenta.",
   "authSendInstructions": "Enviar instrucciones",
   "authForgotPasswordConfirmation": "Si el correo está registrado, recibirás instrucciones para recuperar tu contraseña."
+  ,"profileLogout": "Cerrar sesión"
 }

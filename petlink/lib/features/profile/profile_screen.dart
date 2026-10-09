@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../core/theme/pet_colors.dart';
 import '../../core/theme/pet_spacing.dart';
 import '../../core/theme/pet_radius.dart';
+import '../../design_system/buttons/pet_button.dart';
+import '../auth/providers/auth_provider.dart';
 import '../../features/profile/providers/locale_provider.dart';
 import '../../features/profile/providers/theme_mode_provider.dart';
 
@@ -16,6 +19,8 @@ class ProfileScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final locale = ref.watch(localeProvider);
     final themeMode = ref.watch(themeModeProvider);
+    final authState = ref.watch(authProvider);
+    final user = authState.user;
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.navigationProfile)),
@@ -28,7 +33,10 @@ class ProfileScreen extends ConsumerWidget {
             color: PetColors.primary.withValues(alpha: 0.5),
           ),
           const SizedBox(height: PetSpacing.lg),
-          Text(l10n.profileTitle, style: Theme.of(context).textTheme.headlineMedium),
+          Text(
+            l10n.profileTitle,
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
           const SizedBox(height: PetSpacing.sm),
           Text(
             l10n.profileDescription,
@@ -36,9 +44,62 @@ class ProfileScreen extends ConsumerWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: PetSpacing.xl),
+          if (user != null) ...[
+            _buildUserSection(context, user),
+            const SizedBox(height: PetSpacing.xl),
+          ],
           _buildAppearanceSection(context, ref, themeMode),
           const SizedBox(height: PetSpacing.xl),
           _buildLanguageSection(context, ref, locale),
+          if (user != null) ...[
+            const SizedBox(height: PetSpacing.xl),
+            PetButton(
+              label: l10n.profileLogout,
+              variant: PetButtonVariant.outline,
+              icon: Icons.logout,
+              onPressed: () {
+                ref.read(authProvider.notifier).logout();
+                context.go('/welcome');
+              },
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUserSection(BuildContext context, AuthUser user) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(PetSpacing.lg),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: PetRadius.lgAll,
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 28,
+            backgroundColor: theme.colorScheme.primary,
+            child: Icon(Icons.person, color: theme.colorScheme.onPrimary),
+          ),
+          const SizedBox(width: PetSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  user.name,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: PetSpacing.xs),
+                Text(user.email, style: theme.textTheme.bodyMedium),
+              ],
+            ),
+          ),
         ],
       ),
     );

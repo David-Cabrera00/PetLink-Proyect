@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_spacing.dart';
 import '../../../design_system/buttons/pet_button.dart';
 import '../../../design_system/inputs/pet_input.dart';
+import '../providers/auth_provider.dart';
 
-class CreateAccountScreen extends StatefulWidget {
+class CreateAccountScreen extends ConsumerStatefulWidget {
   const CreateAccountScreen({super.key});
 
   @override
-  State<CreateAccountScreen> createState() => _CreateAccountScreenState();
+  ConsumerState<CreateAccountScreen> createState() =>
+      _CreateAccountScreenState();
 }
 
-class _CreateAccountScreenState extends State<CreateAccountScreen> {
+class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -21,6 +24,20 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmation = true;
+
+  Future<void> _submit() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    await ref
+        .read(authProvider.notifier)
+        .register(
+          name: _nameController.text,
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+
+    if (mounted) context.go('/radar');
+  }
 
   @override
   void dispose() {
@@ -111,9 +128,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         const SizedBox(height: PetSpacing.xl),
                         PetButton(
                           label: l10n.authRegister,
-                          onPressed: () {
-                            _formKey.currentState?.validate();
-                          },
+                          isLoading: ref.watch(authProvider).isLoading,
+                          onPressed: _submit,
                         ),
                       ],
                     ),

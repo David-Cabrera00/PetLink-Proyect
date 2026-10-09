@@ -239,7 +239,10 @@ class ReportDetailScreen extends ConsumerWidget {
       children: [
         const Icon(Icons.access_time, size: 20, color: PetColors.textSecondary),
         const SizedBox(width: PetSpacing.xs),
-        Text(l10n.exploreHoursAgo, style: Theme.of(context).textTheme.bodyMedium),
+        Text(
+          l10n.exploreHoursAgo,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
       ],
     );
   }

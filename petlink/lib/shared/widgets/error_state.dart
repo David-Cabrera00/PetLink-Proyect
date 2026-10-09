@@ -46,10 +46,7 @@ class ErrorState extends StatelessWidget {
             ],
             if (onRetry != null) ...[
               const SizedBox(height: 24),
-              OutlinedButton(
-                onPressed: onRetry,
-                child: Text(l10n.retryAction),
-              ),
+              OutlinedButton(onPressed: onRetry, child: Text(l10n.retryAction)),
             ],
           ],
         ),

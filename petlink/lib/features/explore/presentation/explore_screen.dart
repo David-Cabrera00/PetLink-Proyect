@@ -171,8 +171,7 @@ class ExploreScreen extends ConsumerWidget {
             return EmptyState(
               icon: Icons.map,
               title: l10n.exploreNoReports,
-              subtitle:
-                  l10n.exploreNoReportsDescription,
+              subtitle: l10n.exploreNoReportsDescription,
             );
           }
           return LayoutBuilder(

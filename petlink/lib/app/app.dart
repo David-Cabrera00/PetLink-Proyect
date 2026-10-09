@@ -15,23 +15,23 @@ class PetLinkApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
     final locale = ref.watch(localeProvider);
-    return ProviderScope(
-      child: MaterialApp.router(
-        title: 'PetLink',
-        debugShowCheckedModeBanner: false,
-        theme: PetTheme.light,
-        darkTheme: PetTheme.dark,
-        themeMode: themeMode,
-        locale: locale,
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: AppLocalizations.supportedLocales,
-        routerConfig: AppRouter.router,
-      ),
+    final router = ref.watch(appRouterProvider);
+
+    return MaterialApp.router(
+      title: 'PetLink',
+      debugShowCheckedModeBanner: false,
+      theme: PetTheme.light,
+      darkTheme: PetTheme.dark,
+      themeMode: themeMode,
+      locale: locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: router,
     );
   }
 }

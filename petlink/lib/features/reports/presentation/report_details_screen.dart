@@ -76,7 +76,7 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
               ),
               const SizedBox(height: PetSpacing.xs),
               Text(
-                  l10n.reportDetailsDescription,
+                l10n.reportDetailsDescription,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: PetSpacing.xl),
@@ -89,8 +89,7 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
                       children: [
                         PetInput(
                           label: l10n.reportDetailsTraits,
-                          hint:
-                              l10n.reportDetailsTraitsHint,
+                          hint: l10n.reportDetailsTraitsHint,
                           controller: _traitsController,
                           maxLines: 3,
                         ),

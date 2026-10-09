@@ -57,10 +57,7 @@ class RadarScreen extends ConsumerWidget {
           style: Theme.of(context).textTheme.headlineMedium,
         ),
         const SizedBox(height: PetSpacing.xs),
-        Text(
-          l10n.radarNearYou,
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+        Text(l10n.radarNearYou, style: Theme.of(context).textTheme.bodyMedium),
       ],
     );
   }

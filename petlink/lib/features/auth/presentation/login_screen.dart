@@ -1,23 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_spacing.dart';
 import '../../../design_system/buttons/pet_button.dart';
 import '../../../design_system/inputs/pet_input.dart';
+import '../providers/auth_provider.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+
+  Future<void> _submit() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    await ref
+        .read(authProvider.notifier)
+        .login(
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+
+    if (mounted) context.go('/radar');
+  }
+
+  Future<void> _continueWithGoogle() async {
+    await ref.read(authProvider.notifier).loginWithGoogle();
+
+    if (mounted) context.go('/radar');
+  }
 
   @override
   void dispose() {
@@ -123,13 +144,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: PetSpacing.sm),
                         PetButton(
                           label: l10n.authLogin,
-                          onPressed: () {
-                            _formKey.currentState?.validate();
-                          },
+                          isLoading: ref.watch(authProvider).isLoading,
+                          onPressed: _submit,
                         ),
                         const SizedBox(height: PetSpacing.md),
                         OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: ref.watch(authProvider).isLoading
+                              ? null
+                              : _continueWithGoogle,
                           icon: const Icon(Icons.login),
                           label: Text(l10n.authContinueWithGoogle),
                           style: OutlinedButton.styleFrom(
