@@ -178,6 +178,19 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
             ),
           ),
           Positioned(
+            bottom: PetSpacing.xs,
+            right: PetSpacing.sm,
+            child: Text(
+              '\u00A9 OpenStreetMap contributors',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+                backgroundColor: Theme.of(context).colorScheme.surface.withValues(
+                  alpha: 0.85,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
             bottom: PetSpacing.md,
             left: 0,
             right: 0,

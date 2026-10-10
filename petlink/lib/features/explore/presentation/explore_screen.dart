@@ -176,7 +176,9 @@ class ExploreScreen extends ConsumerWidget {
               subtitle: l10n.exploreNoReportsDescription,
             );
           }
-          return FlutterMap(
+          return Stack(
+            children: [
+              FlutterMap(
             options: const MapOptions(
               initialCenter: LatLng(1.2136, -77.2811),
               initialZoom: 12,
@@ -194,24 +196,68 @@ class ExploreScreen extends ConsumerWidget {
                   for (final report in reports)
                     Marker(
                       point: LatLng(report.latitude, report.longitude),
-                      width: 48,
-                      height: 48,
-                      child: GestureDetector(
-                        onTap: () => ref
-                            .read(selectedReportProvider.notifier)
-                            .state = report,
-                        child: Icon(
-                          report.type == ReportType.lost
-                              ? Icons.location_on
-                              : Icons.location_on_outlined,
-                          size: 42,
-                          color: report.type == ReportType.lost
-                              ? PetColors.lost
-                              : PetColors.found,
+                      width: 44,
+                      height: 44,
+                      child: Tooltip(
+                        message: report.pet.name,
+                        child: GestureDetector(
+                          onTap: () => ref
+                              .read(selectedReportProvider.notifier)
+                              .state = report,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: report.type == ReportType.lost
+                                  ? PetColors.lost
+                                  : PetColors.found,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: PetColors.surface,
+                                width: 3,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.2),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              report.type == ReportType.lost
+                                  ? Icons.pets
+                                  : Icons.pets_outlined,
+                              size: 22,
+                              color: PetColors.surface,
+                            ),
+                          ),
                         ),
                       ),
                     ),
                 ],
+              ),
+            ],
+              ),
+              Positioned(
+                left: PetSpacing.sm,
+                top: PetSpacing.sm,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface.withValues(
+                      alpha: 0.85,
+                    ),
+                    borderRadius: PetRadius.smAll,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: PetSpacing.sm,
+                      vertical: PetSpacing.xs,
+                    ),
+                    child: Text(
+                      '\u00A9 OpenStreetMap contributors',
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  ),
+                ),
               ),
             ],
           );
