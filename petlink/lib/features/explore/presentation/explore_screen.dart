@@ -13,6 +13,7 @@ import '../../../core/theme/pet_radius.dart';
 import '../../../design_system/badges/status_badge.dart';
 import '../../../design_system/buttons/pet_button.dart';
 import '../../../shared/models/pet_report.dart';
+import '../../../shared/widgets/pet_card_compact.dart';
 import '../../../shared/widgets/search_bar.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/error_state.dart';
@@ -28,7 +29,22 @@ class ExploreScreen extends ConsumerStatefulWidget {
 
 class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   final _mapController = MapController();
+  late final TextEditingController _searchController;
   bool _isLocating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController(
+      text: ref.read(exploreSearchQueryProvider),
+    );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,34 +52,72 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     final reportsAsync = ref.watch(exploreReportsProvider);
     final selectedReport = ref.watch(selectedReportProvider);
     final filter = ref.watch(exploreFilterProvider);
+    final viewMode = ref.watch(exploreViewModeProvider);
+
+    // Si la búsqueda da 1 resultado exacto, seleccionar y centrar en el mapa
+    ref.listen<AsyncValue<List<PetReport>>>(exploreReportsProvider, (previous, next) {
+      final query = ref.read(exploreSearchQueryProvider).trim();
+      final reports = next.valueOrNull;
+      if (query.isNotEmpty && reports != null && reports.length == 1) {
+        final target = reports.first;
+        ref.read(selectedReportProvider.notifier).state = target;
+        try {
+          _mapController.move(LatLng(target.latitude, target.longitude), 14.5);
+        } catch (_) {}
+      }
+    });
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.navigationExplore)),
+      appBar: AppBar(
+        title: Text(l10n.navigationExplore),
+        actions: [
+          IconButton(
+            tooltip: viewMode == ExploreViewMode.map ? 'Ver en lista' : 'Ver en mapa',
+            icon: Icon(
+              viewMode == ExploreViewMode.map ? Icons.format_list_bulleted : Icons.map_outlined,
+            ),
+            onPressed: () {
+              ref.read(exploreViewModeProvider.notifier).state =
+                  viewMode == ExploreViewMode.map
+                      ? ExploreViewMode.list
+                      : ExploreViewMode.map;
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(PetSpacing.lg),
             child: Column(
               children: [
-                PetSearchBar(hint: l10n.exploreSearchHint),
+                PetSearchBar(
+                  hint: l10n.exploreSearchHint,
+                  controller: _searchController,
+                  onChanged: (value) {
+                    ref.read(exploreSearchQueryProvider.notifier).state = value;
+                  },
+                ),
                 const SizedBox(height: PetSpacing.md),
                 _buildFilters(context, ref, filter),
               ],
             ),
           ),
           Expanded(
-            child: Stack(
-              children: [
-                _buildMapPlaceholder(context, reportsAsync, ref),
-                if (selectedReport != null)
-                  Positioned(
-                    left: PetSpacing.lg,
-                    right: PetSpacing.lg,
-                    bottom: PetSpacing.lg,
-                    child: _buildReportPreview(context, selectedReport, ref),
-                  ),
-              ],
-            ),
+            child: viewMode == ExploreViewMode.map
+                ? Stack(
+                    children: [
+                      _buildMapPlaceholder(context, reportsAsync, ref),
+                      if (selectedReport != null)
+                        Positioned(
+                          left: PetSpacing.lg,
+                          right: PetSpacing.lg,
+                          bottom: PetSpacing.lg,
+                          child: _buildReportPreview(context, selectedReport, ref),
+                        ),
+                    ],
+                  )
+                : _buildListView(context, reportsAsync, ref),
           ),
         ],
       ),
@@ -128,6 +182,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     ExploreFilter currentFilter,
     IconData icon,
   ) {
+    final cs = Theme.of(context).colorScheme;
     final isSelected = value == currentFilter;
 
     return GestureDetector(
@@ -140,10 +195,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             vertical: PetSpacing.md,
           ),
           decoration: BoxDecoration(
-            color: isSelected ? PetColors.primary : PetColors.surface,
+            color: isSelected ? cs.primary : cs.surface,
             borderRadius: PetRadius.xxlAll,
             border: Border.all(
-              color: isSelected ? PetColors.primary : PetColors.border,
+              color: isSelected ? cs.primary : cs.outlineVariant,
             ),
           ),
           child: Row(
@@ -152,7 +207,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
               Icon(
                 icon,
                 size: 16,
-                color: isSelected ? PetColors.surface : PetColors.textSecondary,
+                color: isSelected ? cs.onPrimary : cs.onSurfaceVariant,
               ),
               const SizedBox(width: PetSpacing.xs),
               Text(
@@ -160,7 +215,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                  color: isSelected ? PetColors.surface : PetColors.textPrimary,
+                  color: isSelected ? cs.onPrimary : cs.onSurface,
                 ),
               ),
             ],
@@ -177,7 +232,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   ) {
     final l10n = AppLocalizations.of(context)!;
     return Container(
-      color: PetColors.background,
+      color: Theme.of(context).colorScheme.surface,
       child: reportsAsync.when(
         data: (reports) {
           if (reports.isEmpty) {
@@ -191,10 +246,15 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             children: [
               FlutterMap(
                 mapController: _mapController,
-            options: const MapOptions(
-              initialCenter: LatLng(1.2136, -77.2811),
+            options: MapOptions(
+              initialCenter: const LatLng(1.2136, -77.2811),
               initialZoom: 12,
-              interactionOptions: InteractionOptions(
+              onTap: (_, _) {
+                if (ref.read(selectedReportProvider) != null) {
+                  ref.read(selectedReportProvider.notifier).state = null;
+                }
+              },
+              interactionOptions: const InteractionOptions(
                 flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
               ),
             ),
@@ -278,7 +338,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                   tooltip: l10n.useCurrentLocation,
                   onPressed: _isLocating
                       ? null
-                      : () => _useCurrentLocation(context),
+                      : () => _useCurrentLocation(),
                   icon: _isLocating
                       ? const SizedBox(
                           width: 20,
@@ -302,13 +362,14 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     );
   }
 
-  Future<void> _useCurrentLocation(BuildContext context) async {
+  Future<void> _useCurrentLocation() async {
     final l10n = AppLocalizations.of(context)!;
     setState(() => _isLocating = true);
 
     try {
       if (!await Geolocator.isLocationServiceEnabled()) {
-        _showLocationMessage(context, l10n.locationServiceDisabled);
+        if (!mounted) return;
+        _showLocationMessage(l10n.locationServiceDisabled);
         return;
       }
 
@@ -317,12 +378,13 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
         permission = await Geolocator.requestPermission();
       }
       if (permission == LocationPermission.denied) {
-        _showLocationMessage(context, l10n.locationPermissionDenied);
+        if (!mounted) return;
+        _showLocationMessage(l10n.locationPermissionDenied);
         return;
       }
       if (permission == LocationPermission.deniedForever) {
+        if (!mounted) return;
         _showLocationMessage(
-          context,
           l10n.locationPermissionPermanentlyDenied,
         );
         return;
@@ -334,13 +396,14 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       ref.read(exploreLocationProvider.notifier).state = location;
       _mapController.move(location, 14);
     } catch (_) {
-      if (mounted) _showLocationMessage(context, l10n.locationFetchError);
+      if (mounted) _showLocationMessage(l10n.locationFetchError);
     } finally {
       if (mounted) setState(() => _isLocating = false);
     }
   }
 
-  void _showLocationMessage(BuildContext context, String message) {
+  void _showLocationMessage(String message) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(message)));
@@ -361,11 +424,35 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 Container(
                   width: 64,
                   height: 64,
+                  clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
-                    color: PetColors.primarySoft,
+                    color: Theme.of(context).colorScheme.primaryContainer,
                     borderRadius: PetRadius.mdAll,
                   ),
-                  child: Icon(Icons.pets, color: PetColors.primary, size: 32),
+                  child: report.pet.primaryPhotoUrl != null &&
+                          report.pet.primaryPhotoUrl!.isNotEmpty
+                      ? Image.network(
+                          report.pet.primaryPhotoUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) => Center(
+                            child: Icon(
+                              report.pet.species.toLowerCase() == 'gato'
+                                  ? Icons.pets
+                                  : Icons.pets,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: 28,
+                            ),
+                          ),
+                        )
+                      : Center(
+                          child: Icon(
+                            report.pet.species.toLowerCase() == 'gato'
+                                ? Icons.pets
+                                : Icons.pets,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 28,
+                          ),
+                        ),
                 ),
                 const SizedBox(width: PetSpacing.md),
                 Expanded(
@@ -385,6 +472,21 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                 ? PetStatus.lost
                                 : PetStatus.found,
                           ),
+                          const SizedBox(width: PetSpacing.xs),
+                          InkWell(
+                            borderRadius: BorderRadius.circular(100),
+                            onTap: () {
+                              ref.read(selectedReportProvider.notifier).state = null;
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(PetSpacing.xs),
+                              child: Icon(
+                                Icons.close,
+                                size: 18,
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: PetSpacing.xs),
@@ -398,7 +500,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           Icon(
                             Icons.location_on,
                             size: 14,
-                            color: PetColors.textSecondary,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(width: PetSpacing.xs),
                           Text(
@@ -409,7 +511,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           Icon(
                             Icons.access_time,
                             size: 14,
-                            color: PetColors.textSecondary,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(width: PetSpacing.xs),
                           Text(
@@ -447,10 +549,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     ref.watch(savedReportIdsProvider).contains(report.id)
                         ? Icons.bookmark
                         : Icons.bookmark_border,
-                    color: PetColors.primary,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                   style: IconButton.styleFrom(
-                    backgroundColor: PetColors.primarySoft,
+                    backgroundColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
                     shape: RoundedRectangleBorder(
                       borderRadius: PetRadius.mdAll,
                     ),
@@ -468,9 +570,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       );
                     }
                   },
-                  icon: Icon(Icons.share, color: PetColors.primary),
+                  icon: Icon(Icons.share, color: Theme.of(context).colorScheme.primary),
                   style: IconButton.styleFrom(
-                    backgroundColor: PetColors.primarySoft,
+                    backgroundColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
                     shape: RoundedRectangleBorder(
                       borderRadius: PetRadius.mdAll,
                     ),
@@ -480,6 +582,48 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildListView(
+    BuildContext context,
+    AsyncValue<List<PetReport>> reportsAsync,
+    WidgetRef ref,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    return reportsAsync.when(
+      data: (reports) {
+        if (reports.isEmpty) {
+          return EmptyState(
+            icon: Icons.search_off,
+            title: l10n.exploreNoReports,
+            subtitle: l10n.exploreNoReportsDescription,
+          );
+        }
+        return ListView.separated(
+          padding: const EdgeInsets.symmetric(
+            horizontal: PetSpacing.lg,
+            vertical: PetSpacing.md,
+          ),
+          itemCount: reports.length,
+          separatorBuilder: (_, _) => const SizedBox(height: PetSpacing.md),
+          itemBuilder: (context, index) {
+            final report = reports[index];
+            return PetCardCompact(
+              report: report,
+              onTap: () => context.go('/reports/${report.id}'),
+            );
+          },
+        );
+      },
+      loading: () => Center(
+        child: CircularProgressIndicator(color: PetColors.primary),
+      ),
+      error: (_, _) => ErrorState(
+        title: l10n.exploreMapLoadError,
+        subtitle: l10n.connectionRetryDescription,
+        onRetry: () => ref.invalidate(exploreReportsProvider),
       ),
     );
   }

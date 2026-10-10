@@ -31,19 +31,36 @@ class RadarScreen extends ConsumerWidget {
           ref.invalidate(nearbyReportsProvider);
           ref.invalidate(matchesProvider);
         },
-        child: ListView(
-          padding: const EdgeInsets.all(PetSpacing.lg),
-          children: [
-            _buildHeader(context),
-            const SizedBox(height: PetSpacing.xl),
-            _buildZoneSelector(context),
-            const SizedBox(height: PetSpacing.xl),
-            _buildRadarActiveSection(context, summary),
-            const SizedBox(height: PetSpacing.xl),
-            _buildMatchesSection(context, matchesAsync, ref),
-            const SizedBox(height: PetSpacing.xl),
-            _buildNearbySection(context, nearbyAsync, ref),
-          ],
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: 1),
+          duration: const Duration(milliseconds: 420),
+          curve: Curves.easeOutCubic,
+          builder: (context, value, child) => Opacity(
+            opacity: value,
+            child: Transform.translate(
+              offset: Offset(0, 12 * (1 - value)),
+              child: child,
+            ),
+          ),
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(
+              PetSpacing.lg,
+              PetSpacing.md,
+              PetSpacing.lg,
+              PetSpacing.xxl,
+            ),
+            children: [
+              _buildHeader(context),
+              const SizedBox(height: PetSpacing.lg),
+              _buildZoneSelector(context),
+              const SizedBox(height: PetSpacing.xl),
+              _buildRadarActiveSection(context, summary),
+              const SizedBox(height: PetSpacing.xl),
+              _buildMatchesSection(context, matchesAsync, ref),
+              const SizedBox(height: PetSpacing.xl),
+              _buildNearbySection(context, nearbyAsync, ref),
+            ],
+          ),
         ),
       ),
     );
@@ -54,84 +71,47 @@ class RadarScreen extends ConsumerWidget {
     final cs = Theme.of(context).colorScheme;
     final accent = PetThemeExtension.of(context).accent;
 
-    return Container(
-      padding: const EdgeInsets.all(PetSpacing.xl),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [cs.primary, Color.lerp(cs.primary, accent, 0.46)!],
-        ),
-        borderRadius: PetRadius.xxlAll,
-        boxShadow: [
-          BoxShadow(
-            color: cs.primary.withValues(alpha: 0.18),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.pets, color: cs.onPrimary, size: 20),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: PetSpacing.sm,
-                  vertical: PetSpacing.xs,
-                ),
-                decoration: BoxDecoration(
-                  color: cs.onPrimary.withValues(alpha: 0.14),
-                  borderRadius: PetRadius.xxlAll,
-                  border: Border.all(
-                    color: cs.onPrimary.withValues(alpha: 0.24),
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 7,
-                      height: 7,
-                      decoration: BoxDecoration(
-                        color: accent,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: PetSpacing.xs),
-                    Text(
-                      l10n.radarActive,
-                      style: TextStyle(
-                        color: cs.onPrimary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.pets, color: cs.primary, size: 20),
+            const SizedBox(width: PetSpacing.sm),
+            Text(
+              l10n.radarActive,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: cs.primary,
+                fontWeight: FontWeight.w700,
               ),
-            ],
-          ),
-          const SizedBox(height: PetSpacing.xl),
-          Text(
-            l10n.radarGreeting('David'),
-            style: Theme.of(context).textTheme.displaySmall?.copyWith(
-              color: cs.onPrimary,
-              fontWeight: FontWeight.w700,
             ),
-          ),
-          const SizedBox(height: PetSpacing.sm),
-          Text(
-            l10n.radarNearYou,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: cs.onPrimary.withValues(alpha: 0.82),
+            const Spacer(),
+            Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: accent,
+                shape: BoxShape.circle,
+              ),
             ),
+          ],
+        ),
+        const SizedBox(height: PetSpacing.md),
+        Text(
+          l10n.radarGreeting('David'),
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            color: cs.onSurface,
+            fontWeight: FontWeight.w700,
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: PetSpacing.xs),
+        Text(
+          l10n.radarNearYou,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: cs.onSurfaceVariant,
+          ),
+        ),
+      ],
     );
   }
 
@@ -146,6 +126,7 @@ class RadarScreen extends ConsumerWidget {
         border: Border.all(color: cs.outlineVariant),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.all(PetSpacing.sm),
