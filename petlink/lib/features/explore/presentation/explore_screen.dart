@@ -28,7 +28,22 @@ class ExploreScreen extends ConsumerStatefulWidget {
 
 class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   final _mapController = MapController();
+  late final TextEditingController _searchController;
   bool _isLocating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController(
+      text: ref.read(exploreSearchQueryProvider),
+    );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +60,13 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             padding: const EdgeInsets.all(PetSpacing.lg),
             child: Column(
               children: [
-                PetSearchBar(hint: l10n.exploreSearchHint),
+                PetSearchBar(
+                  hint: l10n.exploreSearchHint,
+                  controller: _searchController,
+                  onChanged: (value) {
+                    ref.read(exploreSearchQueryProvider.notifier).state = value;
+                  },
+                ),
                 const SizedBox(height: PetSpacing.md),
                 _buildFilters(context, ref, filter),
               ],
@@ -278,7 +299,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                   tooltip: l10n.useCurrentLocation,
                   onPressed: _isLocating
                       ? null
-                      : () => _useCurrentLocation(context),
+                      : () => _useCurrentLocation(),
                   icon: _isLocating
                       ? const SizedBox(
                           width: 20,
@@ -302,13 +323,14 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     );
   }
 
-  Future<void> _useCurrentLocation(BuildContext context) async {
+  Future<void> _useCurrentLocation() async {
     final l10n = AppLocalizations.of(context)!;
     setState(() => _isLocating = true);
 
     try {
       if (!await Geolocator.isLocationServiceEnabled()) {
-        _showLocationMessage(context, l10n.locationServiceDisabled);
+        if (!mounted) return;
+        _showLocationMessage(l10n.locationServiceDisabled);
         return;
       }
 
@@ -317,12 +339,13 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
         permission = await Geolocator.requestPermission();
       }
       if (permission == LocationPermission.denied) {
-        _showLocationMessage(context, l10n.locationPermissionDenied);
+        if (!mounted) return;
+        _showLocationMessage(l10n.locationPermissionDenied);
         return;
       }
       if (permission == LocationPermission.deniedForever) {
+        if (!mounted) return;
         _showLocationMessage(
-          context,
           l10n.locationPermissionPermanentlyDenied,
         );
         return;
@@ -334,13 +357,14 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       ref.read(exploreLocationProvider.notifier).state = location;
       _mapController.move(location, 14);
     } catch (_) {
-      if (mounted) _showLocationMessage(context, l10n.locationFetchError);
+      if (mounted) _showLocationMessage(l10n.locationFetchError);
     } finally {
       if (mounted) setState(() => _isLocating = false);
     }
   }
 
-  void _showLocationMessage(BuildContext context, String message) {
+  void _showLocationMessage(String message) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(message)));
