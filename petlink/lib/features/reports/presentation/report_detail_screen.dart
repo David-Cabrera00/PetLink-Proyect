@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_colors.dart';
@@ -120,7 +122,7 @@ class ReportDetailScreen extends ConsumerWidget {
           const SizedBox(height: PetSpacing.lg),
           SectionHeader(title: l10n.reportDetailLastLocation),
           const SizedBox(height: PetSpacing.md),
-          _buildMapPlaceholder(context),
+          _buildMapPlaceholder(context, report),
           const SizedBox(height: PetSpacing.lg),
           _buildCTASection(context, report),
           const SizedBox(height: PetSpacing.xl),
@@ -301,38 +303,83 @@ class ReportDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMapPlaceholder(BuildContext context) {
+  Widget _buildMapPlaceholder(BuildContext context, dynamic report) {
     final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       height: 180,
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: PetColors.background,
         borderRadius: PetRadius.lgAll,
         border: Border.all(color: PetColors.border),
       ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.map,
-              size: 48,
-              color: PetColors.primary.withValues(alpha: 0.3),
+      child: Stack(
+        children: [
+          FlutterMap(
+            options: MapOptions(
+              initialCenter: LatLng(report.latitude, report.longitude),
+              initialZoom: 13,
+              interactionOptions: const InteractionOptions(
+                flags: InteractiveFlag.none,
+              ),
             ),
-            const SizedBox(height: PetSpacing.md),
-            Text(
-              l10n.reportDetailMapTitle,
-              style: Theme.of(context).textTheme.titleMedium,
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.petlink.app',
+              ),
+              MarkerLayer(
+                markers: [
+                  Marker(
+                    point: LatLng(report.latitude, report.longitude),
+                    width: 48,
+                    height: 48,
+                    child: Icon(
+                      Icons.location_on,
+                      size: 42,
+                      color: PetColors.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Positioned(
+            top: PetSpacing.sm,
+            right: PetSpacing.sm,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface.withValues(
+                  alpha: 0.9,
+                ),
+                borderRadius: PetRadius.smAll,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: PetSpacing.sm,
+                  vertical: PetSpacing.xs,
+                ),
+                child: Text(
+                  l10n.reportDetailMapTitle,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
             ),
-            const SizedBox(height: PetSpacing.xs),
-            Text(
-              l10n.reportDetailMapDescription,
-              style: Theme.of(context).textTheme.bodySmall,
-              textAlign: TextAlign.center,
+          ),
+          Positioned(
+            bottom: PetSpacing.xs,
+            right: PetSpacing.sm,
+            child: Text(
+              '\u00A9 OpenStreetMap contributors',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+                backgroundColor: Theme.of(context).colorScheme.surface.withValues(
+                  alpha: 0.85,
+                ),
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
