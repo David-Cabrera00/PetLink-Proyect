@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:petlink/l10n/app_localizations.dart';
@@ -16,11 +17,19 @@ import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/error_state.dart';
 import '../providers/explore_providers.dart';
 
-class ExploreScreen extends ConsumerWidget {
+class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ExploreScreen> createState() => _ExploreScreenState();
+}
+
+class _ExploreScreenState extends ConsumerState<ExploreScreen> {
+  final _mapController = MapController();
+  bool _isLocating = false;
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final reportsAsync = ref.watch(exploreReportsProvider);
     final selectedReport = ref.watch(selectedReportProvider);
@@ -179,6 +188,7 @@ class ExploreScreen extends ConsumerWidget {
           return Stack(
             children: [
               FlutterMap(
+                mapController: _mapController,
             options: const MapOptions(
               initialCenter: LatLng(1.2136, -77.2811),
               initialZoom: 12,
@@ -259,6 +269,23 @@ class ExploreScreen extends ConsumerWidget {
                   ),
                 ),
               ),
+              Positioned(
+                right: PetSpacing.sm,
+                top: PetSpacing.sm,
+                child: IconButton.filled(
+                  tooltip: l10n.useCurrentLocation,
+                  onPressed: _isLocating
+                      ? null
+                      : () => _useCurrentLocation(context),
+                  icon: _isLocating
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.my_location),
+                ),
+              ),
             ],
           );
         },
@@ -271,6 +298,48 @@ class ExploreScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _useCurrentLocation(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    setState(() => _isLocating = true);
+
+    try {
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        _showLocationMessage(context, l10n.locationServiceDisabled);
+        return;
+      }
+
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied) {
+        _showLocationMessage(context, l10n.locationPermissionDenied);
+        return;
+      }
+      if (permission == LocationPermission.deniedForever) {
+        _showLocationMessage(
+          context,
+          l10n.locationPermissionPermanentlyDenied,
+        );
+        return;
+      }
+
+      final position = await Geolocator.getCurrentPosition();
+      if (!mounted) return;
+      _mapController.move(LatLng(position.latitude, position.longitude), 14);
+    } catch (_) {
+      if (mounted) _showLocationMessage(context, l10n.locationFetchError);
+    } finally {
+      if (mounted) setState(() => _isLocating = false);
+    }
+  }
+
+  void _showLocationMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   Widget _buildReportPreview(BuildContext context, report, WidgetRef ref) {
