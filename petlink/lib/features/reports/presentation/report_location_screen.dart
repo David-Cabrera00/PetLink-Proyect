@@ -29,6 +29,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
   late final TextEditingController _addressController;
   static const _defaultLocation = LatLng(1.2136, -77.2811);
   LatLng _selectedLocation = _defaultLocation;
+  bool _isLocating = false;
 
   @override
   void initState() {
@@ -204,7 +205,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
             right: 0,
             child: Center(
               child: GestureDetector(
-                onTap: () => _useCurrentLocation(context),
+                onTap: _isLocating ? null : () => _useCurrentLocation(context),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: PetSpacing.md,
@@ -217,11 +218,21 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.my_location,
-                        size: 16,
-                        color: PetColors.surface,
-                      ),
+                      if (_isLocating)
+                        const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: PetColors.surface,
+                          ),
+                        )
+                      else
+                        const Icon(
+                          Icons.my_location,
+                          size: 16,
+                          color: PetColors.surface,
+                        ),
                       const SizedBox(width: PetSpacing.xs),
                       Text(
                         l10n.useCurrentLocation,
@@ -242,29 +253,33 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
   }
 
   Future<void> _useCurrentLocation(BuildContext context) async {
+    setState(() => _isLocating = true);
     final l10n = AppLocalizations.of(context)!;
 
-    if (!await Geolocator.isLocationServiceEnabled()) {
-      _showLocationMessage(context, l10n.locationServiceDisabled);
-      return;
-    }
-
-    var permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-
-    if (permission == LocationPermission.denied) {
-      _showLocationMessage(context, l10n.locationPermissionDenied);
-      return;
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      _showLocationMessage(context, l10n.locationPermissionPermanentlyDenied);
-      return;
-    }
-
     try {
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        _showLocationMessage(context, l10n.locationServiceDisabled);
+        return;
+      }
+
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.denied) {
+        _showLocationMessage(context, l10n.locationPermissionDenied);
+        return;
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        _showLocationMessage(
+          context,
+          l10n.locationPermissionPermanentlyDenied,
+        );
+        return;
+      }
+
       final position = await Geolocator.getCurrentPosition();
       if (!mounted) return;
 
@@ -275,6 +290,8 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
       if (mounted) {
         _showLocationMessage(context, l10n.locationFetchError);
       }
+    } finally {
+      if (mounted) setState(() => _isLocating = false);
     }
   }
 
