@@ -340,6 +340,11 @@ abstract class AppLocalizations {
 
   /// No description provided for @reportsTitle.
   String get reportsTitle;
+  String get reportsFilterActive;
+  String get reportsFilterRecovered;
+  String get reportsFilterAll;
+  String get reportsLoadError;
+  String get reportsConnectionError;
 
   /// No description provided for @profileTitle.
   ///

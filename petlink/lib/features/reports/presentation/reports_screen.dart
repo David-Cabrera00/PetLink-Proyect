@@ -51,8 +51,8 @@ class ReportsScreen extends ConsumerWidget {
               },
               loading: () => _buildLoadingState(),
               error: (Object _, StackTrace _) => ErrorState(
-                title: 'No pudimos cargar tus reportes',
-                subtitle: 'Verifica tu conexión e intenta nuevamente.',
+                title: l10n.reportsLoadError,
+                subtitle: l10n.reportsConnectionError,
                 onRetry: () => ref.invalidate(myReportsProvider),
               ),
             ),
@@ -75,6 +75,7 @@ class ReportsScreen extends ConsumerWidget {
     WidgetRef ref,
     ReportsFilter currentFilter,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return Wrap(
       spacing: PetSpacing.sm,
       runSpacing: PetSpacing.sm,
@@ -82,21 +83,21 @@ class ReportsScreen extends ConsumerWidget {
         _buildFilterButton(
           context,
           ref,
-          'Activos',
+          l10n.reportsFilterActive,
           ReportsFilter.active,
           currentFilter,
         ),
         _buildFilterButton(
           context,
           ref,
-          'Recuperados',
+          l10n.reportsFilterRecovered,
           ReportsFilter.recovered,
           currentFilter,
         ),
         _buildFilterButton(
           context,
           ref,
-          'Todos',
+          l10n.reportsFilterAll,
           ReportsFilter.all,
           currentFilter,
         ),
