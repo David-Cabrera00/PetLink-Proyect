@@ -24,8 +24,10 @@ class ReportLocationScreen extends ConsumerStatefulWidget {
 
 class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _mapController = MapController();
   late final TextEditingController _addressController;
-  LatLng _selectedLocation = const LatLng(1.2136, -77.2811);
+  static const _defaultLocation = LatLng(1.2136, -77.2811);
+  LatLng _selectedLocation = _defaultLocation;
 
   @override
   void initState() {
@@ -128,6 +130,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
       child: Stack(
         children: [
           FlutterMap(
+            mapController: _mapController,
             options: MapOptions(
               initialCenter: _selectedLocation,
               initialZoom: 13,
@@ -199,28 +202,38 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
             left: 0,
             right: 0,
             child: Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: PetSpacing.md,
-                  vertical: PetSpacing.sm,
-                ),
-                decoration: BoxDecoration(
-                  color: PetColors.primary,
-                  borderRadius: PetRadius.xxlAll,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.my_location, size: 16, color: PetColors.surface),
-                    const SizedBox(width: PetSpacing.xs),
-                    Text(
-                      l10n.useCurrentLocation,
-                      style: TextStyle(
+              child: GestureDetector(
+                onTap: () {
+                  setState(() => _selectedLocation = _defaultLocation);
+                  _mapController.move(_defaultLocation, 13);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: PetSpacing.md,
+                    vertical: PetSpacing.sm,
+                  ),
+                  decoration: BoxDecoration(
+                    color: PetColors.primary,
+                    borderRadius: PetRadius.xxlAll,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.my_location,
+                        size: 16,
                         color: PetColors.surface,
-                        fontWeight: FontWeight.w600,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: PetSpacing.xs),
+                      Text(
+                        l10n.useCurrentLocation,
+                        style: TextStyle(
+                          color: PetColors.surface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
