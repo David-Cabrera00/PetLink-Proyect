@@ -339,11 +339,39 @@ abstract class AppLocalizations {
   String get activityDescription;
 
   /// No description provided for @reportsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Mis reportes'**
   String get reportsTitle;
+
+  /// No description provided for @reportsFilterActive.
+  ///
+  /// In es, this message translates to:
+  /// **'Activos'**
   String get reportsFilterActive;
+
+  /// No description provided for @reportsFilterRecovered.
+  ///
+  /// In es, this message translates to:
+  /// **'Recuperados'**
   String get reportsFilterRecovered;
+
+  /// No description provided for @reportsFilterAll.
+  ///
+  /// In es, this message translates to:
+  /// **'Todos'**
   String get reportsFilterAll;
+
+  /// No description provided for @reportsLoadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No pudimos cargar tus reportes'**
   String get reportsLoadError;
+
+  /// No description provided for @reportsConnectionError.
+  ///
+  /// In es, this message translates to:
+  /// **'Verifica tu conexión e intenta nuevamente.'**
   String get reportsConnectionError;
 
   /// No description provided for @profileTitle.
@@ -1042,6 +1070,10 @@ abstract class AppLocalizations {
   /// **'El permiso está bloqueado. Actívalo desde los ajustes del dispositivo.'**
   String get locationPermissionPermanentlyDenied;
 
+  /// No description provided for @locationOpenSettings.
+  ///
+  /// In es, this message translates to:
+  /// **'Abrir ajustes'**
   String get locationOpenSettings;
 
   /// No description provided for @locationFetchError.
