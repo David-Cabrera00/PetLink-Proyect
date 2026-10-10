@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:petlink/l10n/app_localizations.dart';
@@ -203,10 +204,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
             right: 0,
             child: Center(
               child: GestureDetector(
-                onTap: () {
-                  setState(() => _selectedLocation = _defaultLocation);
-                  _mapController.move(_defaultLocation, 13);
-                },
+                onTap: () => _useCurrentLocation(context),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: PetSpacing.md,
@@ -241,6 +239,49 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _useCurrentLocation(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (!await Geolocator.isLocationServiceEnabled()) {
+      _showLocationMessage(context, l10n.locationServiceDisabled);
+      return;
+    }
+
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.denied) {
+      _showLocationMessage(context, l10n.locationPermissionDenied);
+      return;
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      _showLocationMessage(context, l10n.locationPermissionPermanentlyDenied);
+      return;
+    }
+
+    try {
+      final position = await Geolocator.getCurrentPosition();
+      if (!mounted) return;
+
+      final location = LatLng(position.latitude, position.longitude);
+      setState(() => _selectedLocation = location);
+      _mapController.move(location, 15);
+    } catch (_) {
+      if (mounted) {
+        _showLocationMessage(context, l10n.locationFetchError);
+      }
+    }
+  }
+
+  void _showLocationMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   Widget _buildActionButtons(BuildContext context, WidgetRef ref) {

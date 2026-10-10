@@ -506,6 +506,21 @@ class AppLocalizationsEs extends AppLocalizations {
   String get useCurrentLocation => 'Usar ubicación actual';
 
   @override
+  String get locationServiceDisabled =>
+      'Activa los servicios de ubicación para continuar.';
+
+  @override
+  String get locationPermissionDenied =>
+      'Se necesita permiso de ubicación para continuar.';
+
+  @override
+  String get locationPermissionPermanentlyDenied =>
+      'El permiso está bloqueado. Actívalo desde los ajustes del dispositivo.';
+
+  @override
+  String get locationFetchError => 'No se pudo obtener tu ubicación.';
+
+  @override
   String get reportDetailsTitle => 'Detalles';
 
   @override
