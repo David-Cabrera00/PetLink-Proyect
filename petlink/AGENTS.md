@@ -55,6 +55,7 @@ El análisis usa `package:flutter_lints/flutter.yaml` y excluye `build/`, `andro
 - modo de tema desde `themeModeProvider`;
 - `MaterialApp.router` con `AppRouter.router`;
 - banner de depuración desactivado.
+- locale controlado por `localeProvider`, con español como idioma inicial e inglés disponible.
 
 ## Arquitectura y reglas de organización
 
@@ -116,6 +117,10 @@ La navegación está en `lib/app/router.dart` y usa `GoRouter`. La ruta inicial 
 | `/matches/:id` | `MatchDetailScreen` | Ver el detalle de una coincidencia. |
 | `/activity` | `ActivityScreen` | Actividad/notificaciones; actualmente es una pantalla de base. |
 | `/profile` | `ProfileScreen` | Perfil y selección del tema. |
+| `/welcome` | `WelcomeScreen` | Entrada de usuarios no autenticados. |
+| `/login` | `LoginScreen` | Inicio de sesión mock. |
+| `/register` | `CreateAccountScreen` | Registro local/mock. |
+| `/forgot-password` | `ForgotPasswordScreen` | Recuperación visual/mock. |
 
 ### Flujo de creación de reportes
 
@@ -130,6 +135,8 @@ El botón central de la navegación inferior abre `/report/new`.
 Riverpod es la fuente de coordinación del estado:
 
 - `themeModeProvider`: modo claro, oscuro o sistema mediante `ThemeModeNotifier`.
+- `localeProvider`: idioma actual (`es` o `en`), español por defecto.
+- `authProvider`: estado de autenticación mock, usuario actual y estado de carga.
 - `reportDraftProvider`: borrador inmutable del formulario de creación, administrado por `ReportDraftNotifier`.
 - `reportsFilterProvider` y `myReportsProvider`: filtro y carga de reportes propios.
 - `reportByIdProvider`: carga de un reporte por ID.
@@ -185,7 +192,7 @@ La fuente de verdad visual está en `core/theme/` y `design_system/`.
 
 Componentes existentes del design system:
 
-- `PetButton`: variantes primary, secondary, outline y danger; soporta icono, carga y etiqueta semántica.
+- `PetButton`: variantes primary, secondary, accent, outline, lightOutline y danger; soporta icono, carga y etiqueta semántica.
 - `PetCard`: tarjeta base.
 - `PetChip`: chip seleccionable.
 - `PetInput`: entrada reutilizable con validación, iconos y modo solo lectura.
@@ -194,6 +201,7 @@ Componentes existentes del design system:
 Widgets compartidos:
 
 - `StepIndicator`, `SectionHeader`, `PetSearchBar`, `PetCardCompact`, `MatchCard`, `EmptyState` y `ErrorState`.
+- `AnimalPatternField`: fondo decorativo animado con huellas de baja intensidad.
 
 ## Plataformas y archivos generados
 
@@ -217,12 +225,25 @@ No depender de tiempos artificiales en tests nuevos; inyectar repositorios fake 
 
 - El backend real aún no está conectado.
 - Los datos de reportes y coincidencias son mocks.
-- No hay autenticación ni perfil persistente.
+- La autenticación actual es mock y no persiste la sesión.
 - No hay integración real con mapas, geolocalización, cámara, galería o subida de imágenes; el flujo de fotos usa datos de demostración.
 - No hay persistencia local del borrador o de los reportes.
 - `ActivityScreen` es una pantalla inicial.
 - La URL de API está declarada, pero no existe todavía una capa HTTP funcional.
-- Debe revisarse la codificación de algunos textos de los mocks si se modifica ese contenido: actualmente hay cadenas con caracteres mal decodificados como `aÃ±os`.
+- Mantener la codificación UTF-8 y colocar los nuevos textos visibles en las localizaciones correspondientes.
+
+## Dirección actual de diseño
+
+La interfaz usa una identidad PetLink sobria y reconocible, orientada a personas de 18 a 60 años:
+
+- composición editorial y clara, sin depender de tarjetas excesivas;
+- degradados y acentos usados con moderación;
+- huellas y referencias animales como recurso de marca, no como decoración infantil;
+- contraste revisado en claro y oscuro;
+- botones principales visibles y con áreas táctiles amplias;
+- no usar imágenes decorativas genéricas si un recurso nativo o vectorial resuelve mejor la identidad.
+
+La siguiente pantalla prioritaria es `ExploreScreen`: debe resolver la relación entre mapa, lista, filtros y estados vacío/error sin cambiar primero la lógica de providers.
 
 ## Criterios para cambios
 

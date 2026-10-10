@@ -72,7 +72,7 @@ Resultado esperado: cualquier pantalla nueva puede construirse con componentes y
 Objetivo: que una persona pueda entender y actuar sin entrenamiento.
 
 - [ ] Rediseñar Radar priorizando coincidencias y reportes urgentes.
-- [x] Rediseñar Explorar con lista y mapa claramente diferenciados.
+- [ ] Rediseñar Explorar con lista y mapa claramente diferenciados.
 - [x] Simplificar la navegación inferior y destacar Reportar como acción principal.
 - [x] Mejorar el detalle de reporte: foto, estado, ubicación aproximada, fecha, descripción y acción.
 - [ ] Rediseñar el flujo de reporte con progreso visible y guardado automático del borrador.
@@ -200,3 +200,19 @@ Completar una primera versión sólida de la experiencia móvil del flujo princi
 `Radar → detalle de reporte → iniciar reporte → completar → revisar → publicar`.
 
 La primera entrega debe sentirse coherente, confiable y comprensible aunque todavía utilice datos mock. Después se sustituirán los mocks por infraestructura real.
+
+## Estado de avance actualizado
+
+El prototipo ya cuenta con una base funcional de autenticación mock y un lenguaje visual renovado:
+
+- [x] Bienvenida, inicio de sesión, registro y recuperación de contraseña.
+- [x] Autenticación mock con Riverpod, usuario mock, Google mock y cierre de sesión.
+- [x] Protección de rutas principales mediante GoRouter.
+- [x] Selector de idioma español/inglés conectado al `MaterialApp.router`.
+- [x] Localización de pantallas principales y flujo interno de reportes.
+- [x] Rediseño de autenticación con identidad PetLink, huellas animadas y mejor contraste.
+- [x] Rediseño inicial de Radar con encabezado visual, estado activo y CTA destacado.
+- [ ] Rediseño de Explorar y resolución visual del mapa.
+- [ ] Revisión visual de Reportes, Actividad, Perfil, detalles y coincidencias.
+
+El criterio actual es trabajar en tareas cortas de aproximadamente cinco puntos, validando cada pantalla y conservando la lógica existente mientras se mejora la interfaz.
