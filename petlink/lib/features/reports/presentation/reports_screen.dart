@@ -23,7 +23,19 @@ class ReportsScreen extends ConsumerWidget {
     final filter = ref.watch(reportsFilterProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.reportsTitle)),
+      appBar: AppBar(
+        title: Text(l10n.reportsTitle),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/profile');
+            }
+          },
+        ),
+      ),
       body: Column(
         children: [
           Padding(

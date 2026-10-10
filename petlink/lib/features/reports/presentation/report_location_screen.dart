@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 
-import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
 import '../../../core/theme/pet_radius.dart';
 import '../../../design_system/buttons/pet_button.dart';
@@ -127,7 +126,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: PetRadius.lgAll,
-        border: Border.all(color: PetColors.border),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
       ),
       child: Stack(
         children: [
@@ -136,7 +135,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
             options: MapOptions(
               initialCenter: _selectedLocation,
               initialZoom: 13,
-              interactionOptions: InteractionOptions(
+              interactionOptions: const InteractionOptions(
                 flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
               ),
               onTap: (_, point) {
@@ -157,7 +156,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
                     child: Icon(
                       Icons.location_on,
                       size: 42,
-                      color: PetColors.primary,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                 ],
@@ -205,14 +204,14 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
             right: 0,
             child: Center(
               child: GestureDetector(
-                onTap: _isLocating ? null : () => _useCurrentLocation(context),
+                onTap: _isLocating ? null : () => _useCurrentLocation(),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: PetSpacing.md,
                     vertical: PetSpacing.sm,
                   ),
                   decoration: BoxDecoration(
-                    color: PetColors.primary,
+                    color: Theme.of(context).colorScheme.primary,
                     borderRadius: PetRadius.xxlAll,
                   ),
                   child: Row(
@@ -224,20 +223,20 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
                           height: 16,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: PetColors.surface,
+                            color: Colors.white,
                           ),
                         )
                       else
                         const Icon(
                           Icons.my_location,
                           size: 16,
-                          color: PetColors.surface,
+                          color: Colors.white,
                         ),
                       const SizedBox(width: PetSpacing.xs),
                       Text(
                         l10n.useCurrentLocation,
-                        style: TextStyle(
-                          color: PetColors.surface,
+                        style: const TextStyle(
+                          color: Colors.white,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -252,13 +251,14 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
     );
   }
 
-  Future<void> _useCurrentLocation(BuildContext context) async {
+  Future<void> _useCurrentLocation() async {
     setState(() => _isLocating = true);
     final l10n = AppLocalizations.of(context)!;
 
     try {
       if (!await Geolocator.isLocationServiceEnabled()) {
-        _showLocationMessage(context, l10n.locationServiceDisabled);
+        if (!mounted) return;
+        _showLocationMessage(l10n.locationServiceDisabled);
         return;
       }
 
@@ -268,13 +268,14 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
       }
 
       if (permission == LocationPermission.denied) {
-        _showLocationMessage(context, l10n.locationPermissionDenied);
+        if (!mounted) return;
+        _showLocationMessage(l10n.locationPermissionDenied);
         return;
       }
 
       if (permission == LocationPermission.deniedForever) {
+        if (!mounted) return;
         _showLocationMessage(
-          context,
           l10n.locationPermissionPermanentlyDenied,
           actionLabel: l10n.locationOpenSettings,
           onAction: () {
@@ -292,7 +293,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
       _mapController.move(location, 15);
     } catch (_) {
       if (mounted) {
-        _showLocationMessage(context, l10n.locationFetchError);
+        _showLocationMessage(l10n.locationFetchError);
       }
     } finally {
       if (mounted) setState(() => _isLocating = false);
@@ -300,11 +301,11 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
   }
 
   void _showLocationMessage(
-    BuildContext context,
     String message, {
     String? actionLabel,
     VoidCallback? onAction,
   }) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
