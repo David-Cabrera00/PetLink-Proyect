@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter/services.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 
@@ -24,13 +25,33 @@ class ReportDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final reportAsync = ref.watch(reportByIdProvider(reportId));
+    final isSaved = ref.watch(savedReportIdsProvider).contains(reportId);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.reportDetailTitle),
         actions: [
-          IconButton(icon: const Icon(Icons.bookmark_border), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.share), onPressed: () {}),
+          IconButton(
+            icon: Icon(isSaved ? Icons.bookmark : Icons.bookmark_border),
+            onPressed: () {
+              final saved = {...ref.read(savedReportIdsProvider)};
+              if (!saved.add(reportId)) saved.remove(reportId);
+              ref.read(savedReportIdsProvider.notifier).state = saved;
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: () async {
+              await Clipboard.setData(
+                ClipboardData(text: 'https://petlink.app/reports/$reportId'),
+              );
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.shareAction)),
+                );
+              }
+            },
+          ),
         ],
       ),
       body: reportAsync.when(

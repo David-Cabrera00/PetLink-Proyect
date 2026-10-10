@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
@@ -16,6 +17,7 @@ import '../../../shared/widgets/search_bar.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/error_state.dart';
 import '../providers/explore_providers.dart';
+import '../../reports/providers/reports_providers.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({super.key});
@@ -434,8 +436,19 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 ),
                 const SizedBox(width: PetSpacing.md),
                 IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.bookmark_border, color: PetColors.primary),
+                  onPressed: () {
+                    final saved = {
+                      ...ref.read(savedReportIdsProvider),
+                    };
+                    if (!saved.add(report.id)) saved.remove(report.id);
+                    ref.read(savedReportIdsProvider.notifier).state = saved;
+                  },
+                  icon: Icon(
+                    ref.watch(savedReportIdsProvider).contains(report.id)
+                        ? Icons.bookmark
+                        : Icons.bookmark_border,
+                    color: PetColors.primary,
+                  ),
                   style: IconButton.styleFrom(
                     backgroundColor: PetColors.primarySoft,
                     shape: RoundedRectangleBorder(
@@ -445,7 +458,16 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 ),
                 const SizedBox(width: PetSpacing.sm),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    await Clipboard.setData(
+                      ClipboardData(text: 'https://petlink.app/reports/${report.id}'),
+                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(l10n.shareAction)),
+                      );
+                    }
+                  },
                   icon: Icon(Icons.share, color: PetColors.primary),
                   style: IconButton.styleFrom(
                     backgroundColor: PetColors.primarySoft,
