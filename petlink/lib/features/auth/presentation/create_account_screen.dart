@@ -36,8 +36,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
           email: _emailController.text,
           password: _passwordController.text,
         );
-
-    if (mounted) context.go('/radar');
   }
 
   @override

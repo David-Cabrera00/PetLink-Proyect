@@ -26,18 +26,22 @@ import '../features/auth/providers/auth_provider.dart';
 class AppRouter {
   AppRouter._();
 
+  static final _rootNavigatorKey = GlobalKey<NavigatorState>();
+  static final _shellNavigatorKey = GlobalKey<NavigatorState>();
+
   static GoRouter createRouter(Ref ref) {
-    final refresh = _AuthRouterRefresh();
-    ref.onDispose(refresh.dispose);
-    ref.listen<AuthState>(authProvider, (_, __) => refresh.notify());
+    final refresh = _AuthRouterRefresh(ref);
 
     return GoRouter(
-      navigatorKey: GlobalKey<NavigatorState>(),
+      navigatorKey: _rootNavigatorKey,
       initialLocation: '/radar',
       refreshListenable: refresh,
-      redirect: (context, state) {
-        final isAuthenticated = ref.read(authProvider).isAuthenticated;
+      redirect: (_, state) {
+        final authState = ref.read(authProvider);
+        if (authState.isLoading) return null;
+
         final path = state.uri.path;
+        final isAuthenticated = authState.isAuthenticated;
         final isProtected =
             path == '/radar' ||
             path == '/explore' ||
@@ -98,7 +102,7 @@ class AppRouter {
           builder: (context, state) => const ReportPublishedScreen(),
         ),
         ShellRoute(
-          navigatorKey: GlobalKey<NavigatorState>(),
+          navigatorKey: _shellNavigatorKey,
           builder: (context, state, child) {
             return ScaffoldWithNav(child: child);
           },
@@ -143,7 +147,24 @@ class AppRouter {
 final appRouterProvider = Provider<GoRouter>(AppRouter.createRouter);
 
 class _AuthRouterRefresh extends ChangeNotifier {
-  void notify() => notifyListeners();
+  _AuthRouterRefresh(Ref ref) {
+    ref.listen<AuthState>(authProvider, (previous, next) {
+      _scheduleRefresh();
+    });
+    ref.onDispose(dispose);
+  }
+
+  bool _refreshScheduled = false;
+
+  void _scheduleRefresh() {
+    if (_refreshScheduled) return;
+    _refreshScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _refreshScheduled = false;
+      if (!hasListeners) return;
+      notifyListeners();
+    });
+  }
 }
 
 class ScaffoldWithNav extends StatelessWidget {
