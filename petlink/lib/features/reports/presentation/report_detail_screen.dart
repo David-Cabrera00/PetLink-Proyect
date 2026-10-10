@@ -417,7 +417,11 @@ class ReportDetailScreen extends ConsumerWidget {
         const SizedBox(height: PetSpacing.md),
         PetButton(
           label: l10n.reportDetailReportSighting,
-          onPressed: () {},
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.reportDetailReportSighting)),
+            );
+          },
           icon: Icons.add_location,
         ),
       ],
@@ -433,7 +437,16 @@ class ReportDetailScreen extends ConsumerWidget {
           children: [
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: () {},
+                onPressed: () async {
+                  await Clipboard.setData(
+                    ClipboardData(text: 'https://petlink.app/reports/$reportId'),
+                  );
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.shareAction)),
+                    );
+                  }
+                },
                 icon: const Icon(Icons.share),
                 label: Text(l10n.shareAction),
                 style: OutlinedButton.styleFrom(
@@ -445,7 +458,11 @@ class ReportDetailScreen extends ConsumerWidget {
             Expanded(
               child: PetButton(
                 label: l10n.contactAction,
-                onPressed: () {},
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.contactAction)),
+                  );
+                },
                 icon: Icons.phone,
               ),
             ),
