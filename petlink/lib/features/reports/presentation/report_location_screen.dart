@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_colors.dart';
@@ -117,34 +119,62 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
     return Container(
       width: double.infinity,
       height: 200,
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: PetColors.background,
         borderRadius: PetRadius.lgAll,
         border: Border.all(color: PetColors.border),
       ),
       child: Stack(
         children: [
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.map,
-                  size: 48,
-                  color: PetColors.primary.withValues(alpha: 0.3),
+          FlutterMap(
+            options: const MapOptions(
+              initialCenter: LatLng(1.2136, -77.2811),
+              initialZoom: 13,
+              interactionOptions: InteractionOptions(
+                flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+              ),
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.petlink.app',
+              ),
+              MarkerLayer(
+                markers: [
+                  Marker(
+                    point: const LatLng(1.2136, -77.2811),
+                    width: 48,
+                    height: 48,
+                    child: Icon(
+                      Icons.location_on,
+                      size: 42,
+                      color: PetColors.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Positioned(
+            top: PetSpacing.sm,
+            right: PetSpacing.sm,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface.withValues(
+                  alpha: 0.9,
                 ),
-                const SizedBox(height: PetSpacing.md),
-                Text(
+                borderRadius: PetRadius.smAll,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: PetSpacing.sm,
+                  vertical: PetSpacing.xs,
+                ),
+                child: Text(
                   l10n.reportLocationMapTitle,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: PetSpacing.xs),
-                Text(
-                  l10n.reportLocationMapDescription,
                   style: Theme.of(context).textTheme.bodySmall,
-                  textAlign: TextAlign.center,
                 ),
-              ],
+              ),
             ),
           ),
           Positioned(

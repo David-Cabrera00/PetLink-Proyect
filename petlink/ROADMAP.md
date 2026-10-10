@@ -42,10 +42,10 @@ Las mayores limitaciones actuales son la ausencia de backend real, persistencia,
 Objetivo: eliminar ambigüedades antes de rediseñar.
 
 - [ ] Corregir la codificación de todos los textos visibles.
-- [ ] Definir el tono de voz: cercano, claro, urgente sin alarmismo.
-- [ ] Definir las acciones principales por tipo de usuario.
-- [ ] Confirmar la estructura de navegación móvil.
-- [ ] Crear inventario de pantallas, estados y acciones.
+- [x] Definir el tono de voz: cercano, claro, urgente sin alarmismo.
+- [x] Definir las acciones principales por tipo de usuario.
+- [x] Confirmar la estructura de navegación móvil.
+- [x] Crear inventario de pantallas, estados y acciones.
 - [ ] Definir métricas iniciales: reportes publicados, reportes completos, coincidencias abiertas y contactos iniciados.
 - [ ] Establecer reglas de privacidad para dirección, teléfono, fotos y ubicación.
 
@@ -56,11 +56,11 @@ Resultado esperado: alcance funcional y criterios de éxito documentados.
 Objetivo: convertir el sistema visual inicial en un sistema consistente.
 
 - [ ] Revisar la paleta para contraste en claro y oscuro.
-- [ ] Consolidar tokens de color, tipografía, espaciado, radios y elevación.
-- [ ] Definir jerarquía tipográfica para móvil.
-- [ ] Unificar `PetButton`, `PetInput`, `PetCard`, `PetChip` y `StatusBadge`.
+- [x] Consolidar tokens de color, tipografía, espaciado, radios y elevación.
+- [x] Definir jerarquía tipográfica para móvil.
+- [x] Unificar `PetButton`, `PetInput`, `PetCard`, `PetChip` y `StatusBadge`.
 - [ ] Definir estados de componentes: normal, presionado, foco, deshabilitado, carga y error.
-- [ ] Crear placeholders y reglas para imágenes.
+- [x] Crear placeholders y reglas para imágenes.
 - [ ] Definir iconografía para perdido, encontrado, coincidencia, ubicación y contacto.
 - [ ] Revisar tamaños táctiles y accesibilidad.
 - [ ] Eliminar estilos repetidos directamente escritos en las pantallas.
@@ -73,10 +73,10 @@ Objetivo: que una persona pueda entender y actuar sin entrenamiento.
 
 - [ ] Rediseñar Radar priorizando coincidencias y reportes urgentes.
 - [ ] Rediseñar Explorar con lista y mapa claramente diferenciados.
-- [ ] Simplificar la navegación inferior y destacar Reportar como acción principal.
-- [ ] Mejorar el detalle de reporte: foto, estado, ubicación aproximada, fecha, descripción y acción.
+- [x] Simplificar la navegación inferior y destacar Reportar como acción principal.
+- [x] Mejorar el detalle de reporte: foto, estado, ubicación aproximada, fecha, descripción y acción.
 - [ ] Rediseñar el flujo de reporte con progreso visible y guardado automático del borrador.
-- [ ] Definir qué campos son obligatorios y cuáles pueden completarse después.
+- [x] Definir qué campos son obligatorios y cuáles pueden completarse después.
 - [ ] Diseñar estados loading, vacío, error, sin permisos, sin conexión y éxito.
 - [ ] Diseñar mensajes de confirmación y prevención de dobles envíos.
 - [ ] Validar las pantallas en tamaños de smartphone pequeños y grandes.
@@ -89,10 +89,10 @@ Objetivo: corregir los problemas que afectan la percepción y la demostración.
 
 - [ ] Corregir todos los textos con caracteres dañados.
 - [ ] Reemplazar botones vacíos o esconder temporalmente acciones no disponibles.
-- [ ] Añadir fallback para imágenes fallidas.
+- [x] Añadir fallback para imágenes fallidas.
 - [ ] Corregir el flujo posterior a publicar para que el nuevo reporte aparezca en las listas.
-- [ ] Hacer deterministas los datos mock.
-- [ ] Evitar `ProviderScope` duplicado.
+- [x] Hacer deterministas los datos mock.
+- [x] Evitar `ProviderScope` duplicado.
 - [ ] Añadir pruebas de rutas, filtros, validación y publicación.
 - [ ] Confirmar que `flutter analyze` y `flutter test` terminen correctamente.
 
@@ -117,7 +117,7 @@ Resultado esperado: la aplicación conserva información y consume datos reales 
 
 Objetivo: completar el ciclo de ayuda entre quien pierde y quien encuentra.
 
-- [ ] Registro e inicio de sesión.
+- [x] Registro e inicio de sesión (mock; backend pendiente).
 - [ ] Crear, editar, cerrar y marcar como recuperado un reporte.
 - [ ] Subir, eliminar y ordenar fotografías.
 - [ ] Integrar cámara y galería.

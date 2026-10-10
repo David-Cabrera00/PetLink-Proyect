@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:petlink/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -174,40 +176,44 @@ class ExploreScreen extends ConsumerWidget {
               subtitle: l10n.exploreNoReportsDescription,
             );
           }
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              final maxW = constraints.maxWidth;
-              final maxH = constraints.maxHeight;
-              return Stack(
-                children: [
-                  Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.map,
-                          size: 64,
-                          color: PetColors.primary.withValues(alpha: 0.3),
+          return FlutterMap(
+            options: const MapOptions(
+              initialCenter: LatLng(1.2136, -77.2811),
+              initialZoom: 12,
+              interactionOptions: InteractionOptions(
+                flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+              ),
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.petlink.app',
+              ),
+              MarkerLayer(
+                markers: [
+                  for (final report in reports)
+                    Marker(
+                      point: LatLng(report.latitude, report.longitude),
+                      width: 48,
+                      height: 48,
+                      child: GestureDetector(
+                        onTap: () => ref
+                            .read(selectedReportProvider.notifier)
+                            .state = report,
+                        child: Icon(
+                          report.type == ReportType.lost
+                              ? Icons.location_on
+                              : Icons.location_on_outlined,
+                          size: 42,
+                          color: report.type == ReportType.lost
+                              ? PetColors.lost
+                              : PetColors.found,
                         ),
-                        const SizedBox(height: PetSpacing.md),
-                        Text(
-                          l10n.exploreMapTitle,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: PetSpacing.xs),
-                        Text(
-                          l10n.exploreMapDescription,
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                  ...reports.map(
-                    (report) => _buildMarker(context, report, ref, maxW, maxH),
-                  ),
                 ],
-              );
-            },
+              ),
+            ],
           );
         },
         loading: () =>
@@ -216,67 +222,6 @@ class ExploreScreen extends ConsumerWidget {
           title: l10n.exploreMapLoadError,
           subtitle: l10n.connectionRetryDescription,
           onRetry: () => ref.invalidate(exploreReportsProvider),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMarker(
-    BuildContext context,
-    report,
-    WidgetRef ref,
-    double maxW,
-    double maxH,
-  ) {
-    final isLost = report.type == ReportType.lost;
-    final color = isLost ? PetColors.lost : PetColors.found;
-    final icon = isLost ? Icons.priority_high : Icons.check_circle;
-
-    final safeLeft = (maxW * 0.1).clamp(16.0, maxW * 0.3);
-    final safeTop = (maxH * 0.15).clamp(24.0, maxH * 0.3);
-    final rangeX = (maxW * 0.7).clamp(100.0, 300.0);
-    final rangeY = (maxH * 0.5).clamp(80.0, 250.0);
-
-    final normalizedDist = (report.distanceKm / 10.0).clamp(0.0, 1.0);
-    final left = safeLeft + (normalizedDist * rangeX);
-    final top = safeTop + (normalizedDist * rangeY * 0.6);
-
-    return Positioned(
-      left: left.clamp(0.0, maxW - 80),
-      top: top.clamp(0.0, maxH - 40),
-      child: GestureDetector(
-        onTap: () => ref.read(selectedReportProvider.notifier).state = report,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: PetSpacing.sm,
-            vertical: PetSpacing.xs,
-          ),
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: PetRadius.smAll,
-            boxShadow: [
-              BoxShadow(
-                color: color.withValues(alpha: 0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 14, color: PetColors.surface),
-              const SizedBox(width: PetSpacing.xs),
-              Text(
-                report.pet.name,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: PetColors.surface,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
