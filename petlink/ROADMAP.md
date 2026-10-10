@@ -121,7 +121,7 @@ Objetivo: completar el ciclo de ayuda entre quien pierde y quien encuentra.
 - [ ] Crear, editar, cerrar y marcar como recuperado un reporte.
 - [ ] Subir, eliminar y ordenar fotografías.
 - [ ] Integrar cámara y galería.
-- [x] Integrar mapa base y selección manual en mapa (GPS real pendiente).
+- [x] Integrar ubicación actual, permisos y selección manual en mapa.
 - [ ] Aplicar radio de búsqueda real.
 - [ ] Implementar coincidencias con criterios explicables.
 - [ ] Implementar compartir un reporte.
