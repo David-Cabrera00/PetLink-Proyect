@@ -12,7 +12,7 @@ import 'package:petlink/features/radar/providers/radar_providers.dart';
 void main() {
   final reports = [
     _report('near', ReportType.lost, 1.2136, -77.2811, 8),
-    _report('far', ReportType.found, 1.3000, -77.2811, 1),
+    _report('far', ReportType.found, 1.4000, -77.2811, 20),
   ];
 
   test('filtra por tipo de reporte', () async {
@@ -32,6 +32,17 @@ void main() {
 
     container.read(exploreLocationProvider.notifier).state =
         const LatLng(1.2136, -77.2811);
+    container.read(exploreFilterProvider.notifier).state = ExploreFilter.nearby;
+
+    final result = await container.read(exploreReportsProvider.future);
+
+    expect(result.map((report) => report.id), ['near']);
+  });
+
+  test('filtra Cerca con distancia mock cuando no hay GPS', () async {
+    final container = _createContainer(reports);
+    addTearDown(container.dispose);
+
     container.read(exploreFilterProvider.notifier).state = ExploreFilter.nearby;
 
     final result = await container.read(exploreReportsProvider.future);
