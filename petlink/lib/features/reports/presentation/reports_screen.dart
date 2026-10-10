@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -17,11 +18,12 @@ class ReportsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final reportsAsync = ref.watch(myReportsProvider);
     final filter = ref.watch(reportsFilterProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mis reportes')),
+      appBar: AppBar(title: Text(l10n.reportsTitle)),
       body: Column(
         children: [
           Padding(
@@ -49,8 +51,8 @@ class ReportsScreen extends ConsumerWidget {
               },
               loading: () => _buildLoadingState(),
               error: (Object _, StackTrace _) => ErrorState(
-                title: 'No pudimos cargar tus reportes',
-                subtitle: 'Verifica tu conexión e intenta nuevamente.',
+                title: l10n.reportsLoadError,
+                subtitle: l10n.reportsConnectionError,
                 onRetry: () => ref.invalidate(myReportsProvider),
               ),
             ),
@@ -58,8 +60,8 @@ class ReportsScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.all(PetSpacing.lg),
             child: PetButton(
-              label: 'Crear reporte',
-              onPressed: () {},
+              label: l10n.reportCreate,
+              onPressed: () => context.go('/report/new'),
               icon: Icons.add,
             ),
           ),
@@ -73,6 +75,7 @@ class ReportsScreen extends ConsumerWidget {
     WidgetRef ref,
     ReportsFilter currentFilter,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return Wrap(
       spacing: PetSpacing.sm,
       runSpacing: PetSpacing.sm,
@@ -80,21 +83,21 @@ class ReportsScreen extends ConsumerWidget {
         _buildFilterButton(
           context,
           ref,
-          'Activos',
+          l10n.reportsFilterActive,
           ReportsFilter.active,
           currentFilter,
         ),
         _buildFilterButton(
           context,
           ref,
-          'Recuperados',
+          l10n.reportsFilterRecovered,
           ReportsFilter.recovered,
           currentFilter,
         ),
         _buildFilterButton(
           context,
           ref,
-          'Todos',
+          l10n.reportsFilterAll,
           ReportsFilter.all,
           currentFilter,
         ),
@@ -250,8 +253,8 @@ class ReportsScreen extends ConsumerWidget {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
-                  onPressed: () {},
-                  child: const Text('Ver actividad'),
+                  onPressed: () => context.go('/activity'),
+                  child: Text(l10n.navigationActivity),
                 ),
               ),
             ],

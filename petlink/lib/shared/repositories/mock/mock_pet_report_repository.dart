@@ -4,11 +4,13 @@ import '../../models/report_draft.dart';
 import '../pet_report_repository.dart';
 
 class MockPetReportRepository implements PetReportRepository {
+  final _createdReports = <PetReport>[];
+
   @override
   Future<List<PetReport>> getNearbyReports() async {
     await Future.delayed(const Duration(milliseconds: 800));
 
-    return [
+    final reports = [
       PetReport(
         id: '1',
         pet: const Pet(
@@ -106,6 +108,8 @@ class MockPetReportRepository implements PetReportRepository {
         sightingsCount: 0,
       ),
     ];
+
+    return [...reports, ..._createdReports];
   }
 
   @override
@@ -137,6 +141,7 @@ class MockPetReportRepository implements PetReportRepository {
         distanceKm: 0.8,
         sightingsCount: 3,
       ),
+      ..._createdReports,
     ];
   }
 
@@ -180,6 +185,7 @@ class MockPetReportRepository implements PetReportRepository {
       sightingsCount: 0,
     );
 
+    _createdReports.add(newReport);
     return newReport;
   }
 }

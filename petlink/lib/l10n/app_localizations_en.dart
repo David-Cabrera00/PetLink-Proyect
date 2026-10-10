@@ -143,6 +143,19 @@ class AppLocalizationsEn extends AppLocalizations {
       'Receive notifications about matches and updates.';
 
   @override
+  String get reportsTitle => 'My reports';
+  @override
+  String get reportsFilterActive => 'Active';
+  @override
+  String get reportsFilterRecovered => 'Recovered';
+  @override
+  String get reportsFilterAll => 'All';
+  @override
+  String get reportsLoadError => 'We couldn\'t load your reports';
+  @override
+  String get reportsConnectionError => 'Check your connection and try again.';
+
+  @override
   String get profileTitle => 'My Profile';
 
   @override

@@ -626,12 +626,20 @@ class MatchDetailScreen extends ConsumerWidget {
       children: [
         PetButton(
           label: l10n.matchDetailContactFinder,
-          onPressed: () {},
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.matchDetailContactFinder)),
+            );
+          },
           icon: Icons.phone,
         ),
         const SizedBox(height: PetSpacing.md),
         OutlinedButton(
-          onPressed: () {},
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.matchDetailDismiss)),
+            );
+          },
           style: OutlinedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: PetSpacing.md),
             foregroundColor: PetColors.lost,

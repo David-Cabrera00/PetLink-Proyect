@@ -41,7 +41,7 @@ Las mayores limitaciones actuales son la ausencia de backend real, persistencia,
 
 Objetivo: eliminar ambigüedades antes de rediseñar.
 
-- [ ] Corregir la codificación de todos los textos visibles.
+- [x] Corregir la codificación de todos los textos visibles.
 - [x] Definir el tono de voz: cercano, claro, urgente sin alarmismo.
 - [x] Definir las acciones principales por tipo de usuario.
 - [x] Confirmar la estructura de navegación móvil.
@@ -87,10 +87,10 @@ Resultado esperado: prototipo navegable y visualmente coherente para los princip
 
 Objetivo: corregir los problemas que afectan la percepción y la demostración.
 
-- [ ] Corregir todos los textos con caracteres dañados.
+- [x] Corregir todos los textos con caracteres dañados.
 - [ ] Reemplazar botones vacíos o esconder temporalmente acciones no disponibles.
 - [x] Añadir fallback para imágenes fallidas.
-- [ ] Corregir el flujo posterior a publicar para que el nuevo reporte aparezca en las listas.
+- [x] Corregir el flujo posterior a publicar para que el nuevo reporte aparezca en las listas.
 - [x] Hacer deterministas los datos mock.
 - [x] Evitar `ProviderScope` duplicado.
 - [ ] Añadir pruebas de rutas, filtros, validación y publicación.
@@ -122,7 +122,7 @@ Objetivo: completar el ciclo de ayuda entre quien pierde y quien encuentra.
 - [ ] Subir, eliminar y ordenar fotografías.
 - [ ] Integrar cámara y galería.
 - [x] Integrar ubicación actual, permisos y selección manual en mapa.
-- [ ] Aplicar radio de búsqueda real.
+- [x] Aplicar radio de búsqueda real.
 - [ ] Implementar coincidencias con criterios explicables.
 - [ ] Implementar compartir un reporte.
 - [ ] Implementar guardar/favoritos si se confirma como necesidad.

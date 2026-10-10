@@ -9,6 +9,8 @@ final reportsFilterProvider = StateProvider<ReportsFilter>(
   (ref) => ReportsFilter.active,
 );
 
+final savedReportIdsProvider = StateProvider<Set<String>>((ref) => <String>{});
+
 final myReportsProvider = FutureProvider<List<PetReport>>((ref) async {
   final repository = ref.watch(petReportRepositoryProvider);
   final filter = ref.watch(reportsFilterProvider);

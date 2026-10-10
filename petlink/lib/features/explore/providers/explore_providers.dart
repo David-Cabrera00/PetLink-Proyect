@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../../core/constants/app_constants.dart';
 import '../../../shared/models/pet_report.dart';
 import '../../radar/providers/radar_providers.dart';
 
@@ -35,9 +36,9 @@ final exploreReportsProvider = FutureProvider<List<PetReport>>((ref) async {
             currentLocation,
             reportLocation,
           );
-          return distance <= 5.0;
+          return distance <= AppConstants.searchRadiusKm;
         }
-        return report.distanceKm <= 5.0;
+        return report.distanceKm <= AppConstants.searchRadiusKm;
     }
   }).toList();
 });

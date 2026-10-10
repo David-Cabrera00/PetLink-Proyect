@@ -144,6 +144,20 @@ class AppLocalizationsEs extends AppLocalizations {
       'Recibe notificaciones sobre coincidencias y actualizaciones.';
 
   @override
+  String get reportsTitle => 'Mis reportes';
+  @override
+  String get reportsFilterActive => 'Activos';
+  @override
+  String get reportsFilterRecovered => 'Recuperados';
+  @override
+  String get reportsFilterAll => 'Todos';
+  @override
+  String get reportsLoadError => 'No pudimos cargar tus reportes';
+  @override
+  String get reportsConnectionError =>
+      'Verifica tu conexión e intenta nuevamente.';
+
+  @override
   String get profileTitle => 'Mi Perfil';
 
   @override
