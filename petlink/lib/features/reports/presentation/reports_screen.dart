@@ -146,6 +146,7 @@ class ReportsScreen extends ConsumerWidget {
   }
 
   Widget _buildReportCard(BuildContext context, report) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       margin: EdgeInsets.zero,
       child: InkWell(
