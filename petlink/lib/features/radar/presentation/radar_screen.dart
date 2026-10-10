@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/pet_spacing.dart';
+import '../../../core/theme/pet_radius.dart';
+import '../../../core/theme/pet_theme_extension.dart';
 import '../../../design_system/buttons/pet_button.dart';
 import '../../../shared/widgets/match_card.dart';
 import '../../../shared/widgets/pet_card_compact.dart';
@@ -49,16 +51,87 @@ class RadarScreen extends ConsumerWidget {
 
   Widget _buildHeader(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          l10n.radarGreeting('David'),
-          style: Theme.of(context).textTheme.headlineMedium,
+    final cs = Theme.of(context).colorScheme;
+    final accent = PetThemeExtension.of(context).accent;
+
+    return Container(
+      padding: const EdgeInsets.all(PetSpacing.xl),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [cs.primary, Color.lerp(cs.primary, accent, 0.46)!],
         ),
-        const SizedBox(height: PetSpacing.xs),
-        Text(l10n.radarNearYou, style: Theme.of(context).textTheme.bodyMedium),
-      ],
+        borderRadius: PetRadius.xxlAll,
+        boxShadow: [
+          BoxShadow(
+            color: cs.primary.withValues(alpha: 0.18),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.pets, color: cs.onPrimary, size: 20),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: PetSpacing.sm,
+                  vertical: PetSpacing.xs,
+                ),
+                decoration: BoxDecoration(
+                  color: cs.onPrimary.withValues(alpha: 0.14),
+                  borderRadius: PetRadius.xxlAll,
+                  border: Border.all(
+                    color: cs.onPrimary.withValues(alpha: 0.24),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 7,
+                      height: 7,
+                      decoration: BoxDecoration(
+                        color: accent,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: PetSpacing.xs),
+                    Text(
+                      l10n.radarActive,
+                      style: TextStyle(
+                        color: cs.onPrimary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: PetSpacing.xl),
+          Text(
+            l10n.radarGreeting('David'),
+            style: Theme.of(context).textTheme.displaySmall?.copyWith(
+              color: cs.onPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: PetSpacing.sm),
+          Text(
+            l10n.radarNearYou,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: cs.onPrimary.withValues(alpha: 0.82),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -66,19 +139,19 @@ class RadarScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.all(PetSpacing.lg),
+      padding: const EdgeInsets.all(PetSpacing.md),
       decoration: BoxDecoration(
         color: cs.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).dividerColor),
+        borderRadius: PetRadius.xlAll,
+        border: Border.all(color: cs.outlineVariant),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(PetSpacing.md),
+            padding: const EdgeInsets.all(PetSpacing.sm),
             decoration: BoxDecoration(
               color: cs.primaryContainer,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: PetRadius.lgAll,
             ),
             child: Icon(Icons.location_on, color: cs.primary),
           ),
@@ -135,20 +208,17 @@ class RadarScreen extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(PetSpacing.lg),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Theme.of(context).dividerColor),
+            color: cs.primaryContainer.withValues(alpha: 0.55),
+            borderRadius: PetRadius.xlAll,
+            border: Border.all(color: cs.outlineVariant),
           ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(
-                    Icons.pets,
-                    color: Theme.of(context).colorScheme.primary,
-                    size: 24,
-                  ),
-                  const SizedBox(width: PetSpacing.md),
+                  Icon(Icons.radar, color: cs.primary),
+                  const SizedBox(width: PetSpacing.sm),
                   Expanded(
                     child: Text(
                       l10n.radarReportsWithinRadius(summary.totalReports),
@@ -157,28 +227,20 @@ class RadarScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: PetSpacing.md),
-              Row(
-                children: [
-                  Icon(
-                    Icons.access_time,
-                    color: Theme.of(context).colorScheme.tertiary,
-                    size: 24,
-                  ),
-                  const SizedBox(width: PetSpacing.md),
-                  Expanded(
-                    child: Text(
-                      l10n.radarPublishedLast24Hours(summary.recentReports),
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                  ),
-                ],
+              const SizedBox(height: PetSpacing.sm),
+              Text(
+                l10n.radarPublishedLast24Hours(summary.recentReports),
+                style: Theme.of(context).textTheme.bodySmall,
               ),
               const SizedBox(height: PetSpacing.lg),
-              PetButton(
-                label: l10n.radarExplore,
-                onPressed: () => context.go('/explore'),
-                icon: Icons.explore,
+              Align(
+                alignment: Alignment.centerLeft,
+                child: PetButton(
+                  label: l10n.radarExplore,
+                  variant: PetButtonVariant.accent,
+                  onPressed: () => context.go('/explore'),
+                  icon: Icons.arrow_forward,
+                ),
               ),
             ],
           ),

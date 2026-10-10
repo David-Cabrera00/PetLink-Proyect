@@ -28,7 +28,7 @@ class PetThemeExtension extends ThemeExtension<PetThemeExtension> {
     foundSoft: Color(0xFFE8F3ED),
     match: Color(0xFF6257B8),
     matchSoft: Color(0xFFEAE7FA),
-    accent: Color(0xFFF4A261),
+    accent: Color(0xFFE9825B),
     surfaceVariant: Color(0xFFEEF3F1),
   );
 
@@ -39,7 +39,7 @@ class PetThemeExtension extends ThemeExtension<PetThemeExtension> {
     foundSoft: Color(0xFF19382D),
     match: Color(0xFF9C92E8),
     matchSoft: Color(0xFF2E294B),
-    accent: Color(0xFFF5B375),
+    accent: Color(0xFFD1B07A),
     surfaceVariant: Color(0xFF1D2A2A),
   );
 

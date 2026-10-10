@@ -111,7 +111,7 @@ class PetTheme {
       useMaterial3: true,
       extensions: [extension],
       colorScheme: ColorScheme.dark(
-        primary: Color(0xFF54B8B5),
+        primary: Color(0xFF75B6B5),
         onPrimary: PetColors.surfaceDark,
         primaryContainer: PetColors.primarySoftDark,
         onPrimaryContainer: PetColors.primarySoftLight,

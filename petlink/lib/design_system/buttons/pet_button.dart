@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 
+import '../../core/theme/pet_radius.dart';
 import '../../core/theme/pet_theme_extension.dart';
 
-enum PetButtonVariant { primary, secondary, outline, danger }
+enum PetButtonVariant {
+  primary,
+  secondary,
+  accent,
+  outline,
+  lightOutline,
+  danger,
+}
 
 class PetButton extends StatelessWidget {
   final String label;
@@ -25,19 +33,22 @@ class PetButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final accentForeground = Theme.of(context).brightness == Brightness.dark
+        ? cs.surface
+        : cs.onSurface;
     final extension = PetThemeExtension.of(context);
 
     final buttonStyle = ElevatedButton.styleFrom(
       minimumSize: const Size(double.infinity, 52),
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: PetRadius.lgAll),
     );
 
     final outlineStyle = OutlinedButton.styleFrom(
       minimumSize: const Size(double.infinity, 52),
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: PetRadius.lgAll,
         side: BorderSide(color: cs.primary, width: 1.5),
       ),
     );
@@ -56,10 +67,28 @@ class PetButton extends StatelessWidget {
         ),
         child: _buildContent(cs.onPrimaryContainer),
       ),
+      PetButtonVariant.accent => ElevatedButton(
+        onPressed: isLoading ? null : onPressed,
+        style: buttonStyle.copyWith(
+          backgroundColor: WidgetStatePropertyAll(extension.accent),
+          foregroundColor: WidgetStatePropertyAll(accentForeground),
+        ),
+        child: _buildContent(accentForeground),
+      ),
       PetButtonVariant.outline => OutlinedButton(
         onPressed: isLoading ? null : onPressed,
         style: outlineStyle,
         child: _buildContent(cs.primary),
+      ),
+      PetButtonVariant.lightOutline => OutlinedButton(
+        onPressed: isLoading ? null : onPressed,
+        style: outlineStyle.copyWith(
+          foregroundColor: WidgetStatePropertyAll(cs.onPrimary),
+          side: WidgetStatePropertyAll(
+            BorderSide(color: cs.onPrimary.withValues(alpha: 0.72), width: 1.2),
+          ),
+        ),
+        child: _buildContent(cs.onPrimary),
       ),
       PetButtonVariant.danger => ElevatedButton(
         onPressed: isLoading ? null : onPressed,

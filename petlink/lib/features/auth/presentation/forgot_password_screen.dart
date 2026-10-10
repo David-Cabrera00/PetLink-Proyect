@@ -5,6 +5,7 @@ import 'package:petlink/l10n/app_localizations.dart';
 import '../../../core/theme/pet_spacing.dart';
 import '../../../design_system/buttons/pet_button.dart';
 import '../../../design_system/inputs/pet_input.dart';
+import 'widgets/petlink_brand_mark.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -43,6 +44,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/login'),
         ),
+        title: const Text('PetLink'),
+        centerTitle: false,
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
       ),
       body: SafeArea(
         child: LayoutBuilder(
@@ -54,7 +59,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             return SingleChildScrollView(
               padding: EdgeInsets.fromLTRB(
                 horizontalPadding,
-                PetSpacing.lg,
+                PetSpacing.xl,
                 horizontalPadding,
                 PetSpacing.xxl,
               ),
@@ -66,16 +71,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        const PetLinkBrandMark(),
+                        const SizedBox(height: PetSpacing.md),
                         Text(
                           l10n.authForgotPasswordTitle,
-                          style: theme.textTheme.displaySmall,
+                          style: theme.textTheme.headlineMedium,
                         ),
                         const SizedBox(height: PetSpacing.xs),
                         Text(
                           l10n.authForgotPasswordDescription,
                           style: theme.textTheme.bodyMedium,
                         ),
-                        const SizedBox(height: PetSpacing.xl),
+                        const SizedBox(height: PetSpacing.xxl),
                         PetInput(
                           label: l10n.authEmail,
                           hint: l10n.authEmailHint,
