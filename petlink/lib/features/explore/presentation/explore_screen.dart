@@ -423,11 +423,35 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 Container(
                   width: 64,
                   height: 64,
+                  clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
-                    color: PetColors.primarySoft,
+                    color: Theme.of(context).colorScheme.primaryContainer,
                     borderRadius: PetRadius.mdAll,
                   ),
-                  child: Icon(Icons.pets, color: PetColors.primary, size: 32),
+                  child: report.pet.primaryPhotoUrl != null &&
+                          report.pet.primaryPhotoUrl!.isNotEmpty
+                      ? Image.network(
+                          report.pet.primaryPhotoUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) => Center(
+                            child: Icon(
+                              report.pet.species.toLowerCase() == 'gato'
+                                  ? Icons.pets
+                                  : Icons.pets,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: 28,
+                            ),
+                          ),
+                        )
+                      : Center(
+                          child: Icon(
+                            report.pet.species.toLowerCase() == 'gato'
+                                ? Icons.pets
+                                : Icons.pets,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 28,
+                          ),
+                        ),
                 ),
                 const SizedBox(width: PetSpacing.md),
                 Expanded(
