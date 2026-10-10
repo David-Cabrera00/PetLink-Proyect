@@ -182,6 +182,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     ExploreFilter currentFilter,
     IconData icon,
   ) {
+    final cs = Theme.of(context).colorScheme;
     final isSelected = value == currentFilter;
 
     return GestureDetector(
@@ -194,10 +195,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             vertical: PetSpacing.md,
           ),
           decoration: BoxDecoration(
-            color: isSelected ? PetColors.primary : PetColors.surface,
+            color: isSelected ? cs.primary : cs.surface,
             borderRadius: PetRadius.xxlAll,
             border: Border.all(
-              color: isSelected ? PetColors.primary : PetColors.border,
+              color: isSelected ? cs.primary : cs.outlineVariant,
             ),
           ),
           child: Row(
@@ -206,7 +207,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
               Icon(
                 icon,
                 size: 16,
-                color: isSelected ? PetColors.surface : PetColors.textSecondary,
+                color: isSelected ? cs.onPrimary : cs.onSurfaceVariant,
               ),
               const SizedBox(width: PetSpacing.xs),
               Text(
@@ -214,7 +215,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                  color: isSelected ? PetColors.surface : PetColors.textPrimary,
+                  color: isSelected ? cs.onPrimary : cs.onSurface,
                 ),
               ),
             ],
@@ -231,7 +232,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   ) {
     final l10n = AppLocalizations.of(context)!;
     return Container(
-      color: PetColors.background,
+      color: Theme.of(context).colorScheme.surface,
       child: reportsAsync.when(
         data: (reports) {
           if (reports.isEmpty) {
@@ -499,7 +500,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           Icon(
                             Icons.location_on,
                             size: 14,
-                            color: PetColors.textSecondary,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(width: PetSpacing.xs),
                           Text(
@@ -510,7 +511,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           Icon(
                             Icons.access_time,
                             size: 14,
-                            color: PetColors.textSecondary,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(width: PetSpacing.xs),
                           Text(
@@ -548,10 +549,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     ref.watch(savedReportIdsProvider).contains(report.id)
                         ? Icons.bookmark
                         : Icons.bookmark_border,
-                    color: PetColors.primary,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                   style: IconButton.styleFrom(
-                    backgroundColor: PetColors.primarySoft,
+                    backgroundColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
                     shape: RoundedRectangleBorder(
                       borderRadius: PetRadius.mdAll,
                     ),
@@ -569,9 +570,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       );
                     }
                   },
-                  icon: Icon(Icons.share, color: PetColors.primary),
+                  icon: Icon(Icons.share, color: Theme.of(context).colorScheme.primary),
                   style: IconButton.styleFrom(
-                    backgroundColor: PetColors.primarySoft,
+                    backgroundColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
                     shape: RoundedRectangleBorder(
                       borderRadius: PetRadius.mdAll,
                     ),
