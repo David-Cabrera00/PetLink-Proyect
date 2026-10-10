@@ -1034,6 +1034,8 @@ abstract class AppLocalizations {
   /// **'El permiso está bloqueado. Actívalo desde los ajustes del dispositivo.'**
   String get locationPermissionPermanentlyDenied;
 
+  String get locationOpenSettings;
+
   /// No description provided for @locationFetchError.
   ///
   /// In es, this message translates to:

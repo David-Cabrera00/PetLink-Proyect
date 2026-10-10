@@ -206,6 +206,7 @@
   "locationServiceDisabled": "Activa los servicios de ubicación para continuar.",
   "locationPermissionDenied": "Se necesita permiso de ubicación para continuar.",
   "locationPermissionPermanentlyDenied": "El permiso está bloqueado. Actívalo desde los ajustes del dispositivo.",
+  "locationOpenSettings": "Abrir ajustes",
   "locationFetchError": "No se pudo obtener tu ubicación.",
   "reportDetailsTitle": "Detalles",
   "reportDetailsHeading": "Detalles adicionales",

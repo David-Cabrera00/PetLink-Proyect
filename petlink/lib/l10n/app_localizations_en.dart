@@ -517,6 +517,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Location permission is blocked. Enable it in device settings.';
 
   @override
+  String get locationOpenSettings => 'Open settings';
+
+  @override
   String get locationFetchError => 'Could not get your location.';
 
   @override

@@ -276,6 +276,10 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
         _showLocationMessage(
           context,
           l10n.locationPermissionPermanentlyDenied,
+          actionLabel: l10n.locationOpenSettings,
+          onAction: () {
+            Geolocator.openAppSettings();
+          },
         );
         return;
       }
@@ -295,10 +299,22 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
     }
   }
 
-  void _showLocationMessage(BuildContext context, String message) {
+  void _showLocationMessage(
+    BuildContext context,
+    String message, {
+    String? actionLabel,
+    VoidCallback? onAction,
+  }) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(message)));
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          action: actionLabel != null && onAction != null
+              ? SnackBarAction(label: actionLabel, onPressed: onAction)
+              : null,
+        ),
+      );
   }
 
   Widget _buildActionButtons(BuildContext context, WidgetRef ref) {

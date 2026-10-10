@@ -206,6 +206,7 @@
   "locationServiceDisabled": "Turn on location services to continue.",
   "locationPermissionDenied": "Location permission is required to continue.",
   "locationPermissionPermanentlyDenied": "Location permission is blocked. Enable it in device settings.",
+  "locationOpenSettings": "Open settings",
   "locationFetchError": "Could not get your location.",
   "reportDetailsTitle": "Details",
   "reportDetailsHeading": "Additional details",

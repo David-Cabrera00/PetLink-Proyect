@@ -518,6 +518,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'El permiso está bloqueado. Actívalo desde los ajustes del dispositivo.';
 
   @override
+  String get locationOpenSettings => 'Abrir ajustes';
+
+  @override
   String get locationFetchError => 'No se pudo obtener tu ubicación.';
 
   @override
