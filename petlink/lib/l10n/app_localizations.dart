@@ -338,6 +338,9 @@ abstract class AppLocalizations {
   /// **'Recibe notificaciones sobre coincidencias y actualizaciones.'**
   String get activityDescription;
 
+  /// No description provided for @reportsTitle.
+  String get reportsTitle;
+
   /// No description provided for @profileTitle.
   ///
   /// In es, this message translates to:

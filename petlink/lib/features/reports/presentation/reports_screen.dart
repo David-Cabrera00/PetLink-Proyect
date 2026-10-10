@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -17,11 +18,12 @@ class ReportsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final reportsAsync = ref.watch(myReportsProvider);
     final filter = ref.watch(reportsFilterProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mis reportes')),
+      appBar: AppBar(title: Text(l10n.reportsTitle)),
       body: Column(
         children: [
           Padding(
@@ -58,7 +60,7 @@ class ReportsScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.all(PetSpacing.lg),
             child: PetButton(
-              label: 'Crear reporte',
+              label: l10n.reportCreate,
               onPressed: () => context.go('/report/new'),
               icon: Icons.add,
             ),
@@ -251,7 +253,7 @@ class ReportsScreen extends ConsumerWidget {
                 width: double.infinity,
                 child: OutlinedButton(
                   onPressed: () => context.go('/activity'),
-                  child: const Text('Ver actividad'),
+                  child: Text(l10n.navigationActivity),
                 ),
               ),
             ],

@@ -144,6 +144,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'Recibe notificaciones sobre coincidencias y actualizaciones.';
 
   @override
+  String get reportsTitle => 'Mis reportes';
+
+  @override
   String get profileTitle => 'Mi Perfil';
 
   @override
