@@ -505,6 +505,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get useCurrentLocation => 'Use current location';
 
   @override
+  String get locationServiceDisabled =>
+      'Turn on location services to continue.';
+
+  @override
+  String get locationPermissionDenied =>
+      'Location permission is required to continue.';
+
+  @override
+  String get locationPermissionPermanentlyDenied =>
+      'Location permission is blocked. Enable it in device settings.';
+
+  @override
+  String get locationOpenSettings => 'Open settings';
+
+  @override
+  String get locationFetchError => 'Could not get your location.';
+
+  @override
   String get reportDetailsTitle => 'Details';
 
   @override

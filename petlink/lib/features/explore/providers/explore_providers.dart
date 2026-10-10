@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../../../shared/models/pet_report.dart';
 import '../../radar/providers/radar_providers.dart';
@@ -9,9 +10,12 @@ final exploreFilterProvider = StateProvider<ExploreFilter>(
   (ref) => ExploreFilter.all,
 );
 
+final exploreLocationProvider = StateProvider<LatLng?>((ref) => null);
+
 final exploreReportsProvider = FutureProvider<List<PetReport>>((ref) async {
   final repository = ref.watch(petReportRepositoryProvider);
   final filter = ref.watch(exploreFilterProvider);
+  final currentLocation = ref.watch(exploreLocationProvider);
 
   final reports = await repository.getNearbyReports();
 
@@ -24,6 +28,15 @@ final exploreReportsProvider = FutureProvider<List<PetReport>>((ref) async {
       case ExploreFilter.found:
         return report.type == ReportType.found;
       case ExploreFilter.nearby:
+        if (currentLocation != null) {
+          final reportLocation = LatLng(report.latitude, report.longitude);
+          final distance = Distance().as(
+            LengthUnit.Kilometer,
+            currentLocation,
+            reportLocation,
+          );
+          return distance <= 5.0;
+        }
         return report.distanceKm <= 5.0;
     }
   }).toList();

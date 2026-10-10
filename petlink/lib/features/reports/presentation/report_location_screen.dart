@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_colors.dart';
@@ -22,7 +25,11 @@ class ReportLocationScreen extends ConsumerStatefulWidget {
 
 class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _mapController = MapController();
   late final TextEditingController _addressController;
+  static const _defaultLocation = LatLng(1.2136, -77.2811);
+  LatLng _selectedLocation = _defaultLocation;
+  bool _isLocating = false;
 
   @override
   void initState() {
@@ -117,34 +124,79 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
     return Container(
       width: double.infinity,
       height: 200,
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: PetColors.background,
         borderRadius: PetRadius.lgAll,
         border: Border.all(color: PetColors.border),
       ),
       child: Stack(
         children: [
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.map,
-                  size: 48,
-                  color: PetColors.primary.withValues(alpha: 0.3),
+          FlutterMap(
+            mapController: _mapController,
+            options: MapOptions(
+              initialCenter: _selectedLocation,
+              initialZoom: 13,
+              interactionOptions: InteractionOptions(
+                flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+              ),
+              onTap: (_, point) {
+                setState(() => _selectedLocation = point);
+              },
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.petlink.app',
+              ),
+              MarkerLayer(
+                markers: [
+                  Marker(
+                    point: _selectedLocation,
+                    width: 48,
+                    height: 48,
+                    child: Icon(
+                      Icons.location_on,
+                      size: 42,
+                      color: PetColors.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Positioned(
+            top: PetSpacing.sm,
+            right: PetSpacing.sm,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface.withValues(
+                  alpha: 0.9,
                 ),
-                const SizedBox(height: PetSpacing.md),
-                Text(
+                borderRadius: PetRadius.smAll,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: PetSpacing.sm,
+                  vertical: PetSpacing.xs,
+                ),
+                child: Text(
                   l10n.reportLocationMapTitle,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: PetSpacing.xs),
-                Text(
-                  l10n.reportLocationMapDescription,
                   style: Theme.of(context).textTheme.bodySmall,
-                  textAlign: TextAlign.center,
                 ),
-              ],
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: PetSpacing.xs,
+            right: PetSpacing.sm,
+            child: Text(
+              '\u00A9 OpenStreetMap contributors',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+                backgroundColor: Theme.of(context).colorScheme.surface.withValues(
+                  alpha: 0.85,
+                ),
+              ),
             ),
           ),
           Positioned(
@@ -152,28 +204,45 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
             left: 0,
             right: 0,
             child: Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: PetSpacing.md,
-                  vertical: PetSpacing.sm,
-                ),
-                decoration: BoxDecoration(
-                  color: PetColors.primary,
-                  borderRadius: PetRadius.xxlAll,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.my_location, size: 16, color: PetColors.surface),
-                    const SizedBox(width: PetSpacing.xs),
-                    Text(
-                      l10n.useCurrentLocation,
-                      style: TextStyle(
-                        color: PetColors.surface,
-                        fontWeight: FontWeight.w600,
+              child: GestureDetector(
+                onTap: _isLocating ? null : () => _useCurrentLocation(context),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: PetSpacing.md,
+                    vertical: PetSpacing.sm,
+                  ),
+                  decoration: BoxDecoration(
+                    color: PetColors.primary,
+                    borderRadius: PetRadius.xxlAll,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (_isLocating)
+                        const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: PetColors.surface,
+                          ),
+                        )
+                      else
+                        const Icon(
+                          Icons.my_location,
+                          size: 16,
+                          color: PetColors.surface,
+                        ),
+                      const SizedBox(width: PetSpacing.xs),
+                      Text(
+                        l10n.useCurrentLocation,
+                        style: TextStyle(
+                          color: PetColors.surface,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -181,6 +250,71 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _useCurrentLocation(BuildContext context) async {
+    setState(() => _isLocating = true);
+    final l10n = AppLocalizations.of(context)!;
+
+    try {
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        _showLocationMessage(context, l10n.locationServiceDisabled);
+        return;
+      }
+
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.denied) {
+        _showLocationMessage(context, l10n.locationPermissionDenied);
+        return;
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        _showLocationMessage(
+          context,
+          l10n.locationPermissionPermanentlyDenied,
+          actionLabel: l10n.locationOpenSettings,
+          onAction: () {
+            Geolocator.openAppSettings();
+          },
+        );
+        return;
+      }
+
+      final position = await Geolocator.getCurrentPosition();
+      if (!mounted) return;
+
+      final location = LatLng(position.latitude, position.longitude);
+      setState(() => _selectedLocation = location);
+      _mapController.move(location, 15);
+    } catch (_) {
+      if (mounted) {
+        _showLocationMessage(context, l10n.locationFetchError);
+      }
+    } finally {
+      if (mounted) setState(() => _isLocating = false);
+    }
+  }
+
+  void _showLocationMessage(
+    BuildContext context,
+    String message, {
+    String? actionLabel,
+    VoidCallback? onAction,
+  }) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          action: actionLabel != null && onAction != null
+              ? SnackBarAction(label: actionLabel, onPressed: onAction)
+              : null,
+        ),
+      );
   }
 
   Widget _buildActionButtons(BuildContext context, WidgetRef ref) {
@@ -216,8 +350,8 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
   void _saveLocation(WidgetRef ref) {
     final notifier = ref.read(reportDraftProvider.notifier);
     notifier.setLocation(
-      latitude: 1.2136, // Mock coordinates for Pasto
-      longitude: -77.2811,
+      latitude: _selectedLocation.latitude,
+      longitude: _selectedLocation.longitude,
       address: _addressController.text.trim(),
     );
   }

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:petlink/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -14,11 +17,19 @@ import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/error_state.dart';
 import '../providers/explore_providers.dart';
 
-class ExploreScreen extends ConsumerWidget {
+class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ExploreScreen> createState() => _ExploreScreenState();
+}
+
+class _ExploreScreenState extends ConsumerState<ExploreScreen> {
+  final _mapController = MapController();
+  bool _isLocating = false;
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final reportsAsync = ref.watch(exploreReportsProvider);
     final selectedReport = ref.watch(selectedReportProvider);
@@ -174,40 +185,108 @@ class ExploreScreen extends ConsumerWidget {
               subtitle: l10n.exploreNoReportsDescription,
             );
           }
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              final maxW = constraints.maxWidth;
-              final maxH = constraints.maxHeight;
-              return Stack(
-                children: [
-                  Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.map,
-                          size: 64,
-                          color: PetColors.primary.withValues(alpha: 0.3),
+          return Stack(
+            children: [
+              FlutterMap(
+                mapController: _mapController,
+            options: const MapOptions(
+              initialCenter: LatLng(1.2136, -77.2811),
+              initialZoom: 12,
+              interactionOptions: InteractionOptions(
+                flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+              ),
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.petlink.app',
+              ),
+              MarkerLayer(
+                markers: [
+                  for (final report in reports)
+                    Marker(
+                      point: LatLng(report.latitude, report.longitude),
+                      width: 44,
+                      height: 44,
+                      child: Tooltip(
+                        message: report.pet.name,
+                        child: GestureDetector(
+                          onTap: () => ref
+                              .read(selectedReportProvider.notifier)
+                              .state = report,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: report.type == ReportType.lost
+                                  ? PetColors.lost
+                                  : PetColors.found,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: PetColors.surface,
+                                width: 3,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.2),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              report.type == ReportType.lost
+                                  ? Icons.pets
+                                  : Icons.pets_outlined,
+                              size: 22,
+                              color: PetColors.surface,
+                            ),
+                          ),
                         ),
-                        const SizedBox(height: PetSpacing.md),
-                        Text(
-                          l10n.exploreMapTitle,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: PetSpacing.xs),
-                        Text(
-                          l10n.exploreMapDescription,
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
+                      ),
+                    ),
+                ],
+              ),
+            ],
+              ),
+              Positioned(
+                left: PetSpacing.sm,
+                top: PetSpacing.sm,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface.withValues(
+                      alpha: 0.85,
+                    ),
+                    borderRadius: PetRadius.smAll,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: PetSpacing.sm,
+                      vertical: PetSpacing.xs,
+                    ),
+                    child: Text(
+                      '\u00A9 OpenStreetMap contributors',
+                      style: Theme.of(context).textTheme.labelSmall,
                     ),
                   ),
-                  ...reports.map(
-                    (report) => _buildMarker(context, report, ref, maxW, maxH),
-                  ),
-                ],
-              );
-            },
+                ),
+              ),
+              Positioned(
+                right: PetSpacing.sm,
+                top: PetSpacing.sm,
+                child: IconButton.filled(
+                  tooltip: l10n.useCurrentLocation,
+                  onPressed: _isLocating
+                      ? null
+                      : () => _useCurrentLocation(context),
+                  icon: _isLocating
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.my_location),
+                ),
+              ),
+            ],
           );
         },
         loading: () =>
@@ -221,65 +300,48 @@ class ExploreScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMarker(
-    BuildContext context,
-    report,
-    WidgetRef ref,
-    double maxW,
-    double maxH,
-  ) {
-    final isLost = report.type == ReportType.lost;
-    final color = isLost ? PetColors.lost : PetColors.found;
-    final icon = isLost ? Icons.priority_high : Icons.check_circle;
+  Future<void> _useCurrentLocation(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    setState(() => _isLocating = true);
 
-    final safeLeft = (maxW * 0.1).clamp(16.0, maxW * 0.3);
-    final safeTop = (maxH * 0.15).clamp(24.0, maxH * 0.3);
-    final rangeX = (maxW * 0.7).clamp(100.0, 300.0);
-    final rangeY = (maxH * 0.5).clamp(80.0, 250.0);
+    try {
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        _showLocationMessage(context, l10n.locationServiceDisabled);
+        return;
+      }
 
-    final normalizedDist = (report.distanceKm / 10.0).clamp(0.0, 1.0);
-    final left = safeLeft + (normalizedDist * rangeX);
-    final top = safeTop + (normalizedDist * rangeY * 0.6);
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied) {
+        _showLocationMessage(context, l10n.locationPermissionDenied);
+        return;
+      }
+      if (permission == LocationPermission.deniedForever) {
+        _showLocationMessage(
+          context,
+          l10n.locationPermissionPermanentlyDenied,
+        );
+        return;
+      }
 
-    return Positioned(
-      left: left.clamp(0.0, maxW - 80),
-      top: top.clamp(0.0, maxH - 40),
-      child: GestureDetector(
-        onTap: () => ref.read(selectedReportProvider.notifier).state = report,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: PetSpacing.sm,
-            vertical: PetSpacing.xs,
-          ),
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: PetRadius.smAll,
-            boxShadow: [
-              BoxShadow(
-                color: color.withValues(alpha: 0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 14, color: PetColors.surface),
-              const SizedBox(width: PetSpacing.xs),
-              Text(
-                report.pet.name,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: PetColors.surface,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+      final position = await Geolocator.getCurrentPosition();
+      if (!mounted) return;
+      final location = LatLng(position.latitude, position.longitude);
+      ref.read(exploreLocationProvider.notifier).state = location;
+      _mapController.move(location, 14);
+    } catch (_) {
+      if (mounted) _showLocationMessage(context, l10n.locationFetchError);
+    } finally {
+      if (mounted) setState(() => _isLocating = false);
+    }
+  }
+
+  void _showLocationMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   Widget _buildReportPreview(BuildContext context, report, WidgetRef ref) {

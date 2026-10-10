@@ -1016,6 +1016,32 @@ abstract class AppLocalizations {
   /// **'Usar ubicación actual'**
   String get useCurrentLocation;
 
+  /// No description provided for @locationServiceDisabled.
+  ///
+  /// In es, this message translates to:
+  /// **'Activa los servicios de ubicación para continuar.'**
+  String get locationServiceDisabled;
+
+  /// No description provided for @locationPermissionDenied.
+  ///
+  /// In es, this message translates to:
+  /// **'Se necesita permiso de ubicación para continuar.'**
+  String get locationPermissionDenied;
+
+  /// No description provided for @locationPermissionPermanentlyDenied.
+  ///
+  /// In es, this message translates to:
+  /// **'El permiso está bloqueado. Actívalo desde los ajustes del dispositivo.'**
+  String get locationPermissionPermanentlyDenied;
+
+  String get locationOpenSettings;
+
+  /// No description provided for @locationFetchError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo obtener tu ubicación.'**
+  String get locationFetchError;
+
   /// No description provided for @reportDetailsTitle.
   ///
   /// In es, this message translates to:
