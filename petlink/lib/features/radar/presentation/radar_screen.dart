@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/pet_spacing.dart';
+import '../../../core/theme/pet_radius.dart';
 import '../../../design_system/buttons/pet_button.dart';
 import '../../../shared/widgets/match_card.dart';
 import '../../../shared/widgets/pet_card_compact.dart';
@@ -49,15 +50,56 @@ class RadarScreen extends ConsumerWidget {
 
   Widget _buildHeader(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final cs = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          l10n.radarGreeting('David'),
-          style: Theme.of(context).textTheme.headlineMedium,
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(PetSpacing.lg),
+          decoration: BoxDecoration(
+            color: cs.primaryContainer,
+            borderRadius: PetRadius.xxlAll,
+            border: Border.all(
+              color: cs.primary.withValues(alpha: 0.12),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: cs.primary,
+                  borderRadius: PetRadius.lgAll,
+                ),
+                child: Icon(Icons.radar, color: cs.onPrimary, size: 26),
+              ),
+              const SizedBox(width: PetSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.radarGreeting('David'),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: cs.onPrimaryContainer,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: PetSpacing.xs),
+                    Text(
+                      l10n.radarNearYou,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: cs.onPrimaryContainer.withValues(alpha: 0.82),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: PetSpacing.xs),
-        Text(l10n.radarNearYou, style: Theme.of(context).textTheme.bodyMedium),
       ],
     );
   }
@@ -69,7 +111,7 @@ class RadarScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(PetSpacing.lg),
       decoration: BoxDecoration(
         color: cs.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: PetRadius.xlAll,
         border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
@@ -135,9 +177,9 @@ class RadarScreen extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(PetSpacing.lg),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Theme.of(context).dividerColor),
+            color: cs.surfaceContainerHighest,
+            borderRadius: PetRadius.xlAll,
+            border: Border.all(color: cs.outlineVariant),
           ),
           child: Column(
             children: [
