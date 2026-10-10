@@ -328,7 +328,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
 
       final position = await Geolocator.getCurrentPosition();
       if (!mounted) return;
-      _mapController.move(LatLng(position.latitude, position.longitude), 14);
+      final location = LatLng(position.latitude, position.longitude);
+      ref.read(exploreLocationProvider.notifier).state = location;
+      _mapController.move(location, 14);
     } catch (_) {
       if (mounted) _showLocationMessage(context, l10n.locationFetchError);
     } finally {
