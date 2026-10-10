@@ -27,7 +27,7 @@ class PetColors {
 
   // Accent
   static const Color accentLight = Color(0xFFE9825B);
-  static const Color accentDark = Color(0xFFF2A07A);
+  static const Color accentDark = Color(0xFFD1B07A);
 
   // Lost
   static const Color lostLight = Color(0xFFC2414B);

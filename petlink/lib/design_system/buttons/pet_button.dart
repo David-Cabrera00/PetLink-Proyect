@@ -33,6 +33,9 @@ class PetButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final accentForeground = Theme.of(context).brightness == Brightness.dark
+        ? cs.surface
+        : cs.onSurface;
     final extension = PetThemeExtension.of(context);
 
     final buttonStyle = ElevatedButton.styleFrom(
@@ -68,9 +71,9 @@ class PetButton extends StatelessWidget {
         onPressed: isLoading ? null : onPressed,
         style: buttonStyle.copyWith(
           backgroundColor: WidgetStatePropertyAll(extension.accent),
-          foregroundColor: WidgetStatePropertyAll(cs.onSurface),
+          foregroundColor: WidgetStatePropertyAll(accentForeground),
         ),
-        child: _buildContent(cs.onSurface),
+        child: _buildContent(accentForeground),
       ),
       PetButtonVariant.outline => OutlinedButton(
         onPressed: isLoading ? null : onPressed,

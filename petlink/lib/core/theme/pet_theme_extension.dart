@@ -39,7 +39,7 @@ class PetThemeExtension extends ThemeExtension<PetThemeExtension> {
     foundSoft: Color(0xFF19382D),
     match: Color(0xFF9C92E8),
     matchSoft: Color(0xFF2E294B),
-    accent: Color(0xFFF2A07A),
+    accent: Color(0xFFD1B07A),
     surfaceVariant: Color(0xFF1D2A2A),
   );
 
