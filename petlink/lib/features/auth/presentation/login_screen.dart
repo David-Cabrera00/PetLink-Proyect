@@ -8,6 +8,7 @@ import '../../../core/theme/pet_typography.dart';
 import '../../../design_system/buttons/pet_button.dart';
 import '../../../design_system/inputs/pet_input.dart';
 import '../providers/auth_provider.dart';
+import 'widgets/petlink_brand_mark.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -56,6 +57,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/welcome'),
         ),
+        title: const Text('PetLink'),
+        centerTitle: false,
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
       ),
       body: SafeArea(
         child: LayoutBuilder(
@@ -67,7 +72,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             return SingleChildScrollView(
               padding: EdgeInsets.fromLTRB(
                 horizontalPadding,
-                PetSpacing.lg,
+                PetSpacing.xl,
                 horizontalPadding,
                 PetSpacing.xxl,
               ),
@@ -81,9 +86,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          const PetLinkBrandMark(),
+                          const SizedBox(height: PetSpacing.md),
                           Text(
                             l10n.authLoginTitle,
-                            style: PetTypography.display.copyWith(
+                            style: PetTypography.heading.copyWith(
                               color: theme.colorScheme.onSurface,
                             ),
                           ),
@@ -94,7 +101,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
-                          const SizedBox(height: PetSpacing.xl),
+                          const SizedBox(height: PetSpacing.xxl),
                           PetInput(
                             label: l10n.authEmail,
                             hint: l10n.authEmailHint,

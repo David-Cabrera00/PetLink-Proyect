@@ -4,30 +4,30 @@ class PetColors {
   PetColors._();
 
   // Light Theme
-  static const Color backgroundLight = Color(0xFFF6F8F7);
-  static const Color surfaceLight = Color(0xFFFFFFFF);
-  static const Color surfaceVariantLight = Color(0xFFEEF3F1);
-  static const Color textPrimaryLight = Color(0xFF152323);
-  static const Color textSecondaryLight = Color(0xFF5F6F70);
-  static const Color borderLight = Color(0xFFD9E0DF);
+  static const Color backgroundLight = Color(0xFFF4F1EB);
+  static const Color surfaceLight = Color(0xFFFFFDFA);
+  static const Color surfaceVariantLight = Color(0xFFE9E4DA);
+  static const Color textPrimaryLight = Color(0xFF172B32);
+  static const Color textSecondaryLight = Color(0xFF637176);
+  static const Color borderLight = Color(0xFFD8D4CC);
 
   // Dark Theme
-  static const Color backgroundDark = Color(0xFF0E1515);
-  static const Color surfaceDark = Color(0xFF162020);
-  static const Color surfaceContainerHighestDark = Color(0xFF1D2A2A);
-  static const Color textPrimaryDark = Color(0xFFF2F6F5);
-  static const Color textSecondaryDark = Color(0xFFAAB8B7);
-  static const Color borderDark = Color(0xFF30403F);
+  static const Color backgroundDark = Color(0xFF101A1D);
+  static const Color surfaceDark = Color(0xFF17262A);
+  static const Color surfaceContainerHighestDark = Color(0xFF223438);
+  static const Color textPrimaryDark = Color(0xFFF5F0E8);
+  static const Color textSecondaryDark = Color(0xFFB8C0BF);
+  static const Color borderDark = Color(0xFF3A4B4F);
 
   // Primary (same for both, adjust if needed)
-  static const Color primary = Color(0xFF0F6B6F);
-  static const Color primaryDark = Color(0xFF0B5558);
-  static const Color primarySoftLight = Color(0xFFD8EFEA);
-  static const Color primarySoftDark = Color(0xFF173C3D);
+  static const Color primary = Color(0xFF164D59);
+  static const Color primaryDark = Color(0xFF103943);
+  static const Color primarySoftLight = Color(0xFFD8E8E6);
+  static const Color primarySoftDark = Color(0xFF1E4148);
 
   // Accent
-  static const Color accentLight = Color(0xFFF4A261);
-  static const Color accentDark = Color(0xFFF5B375);
+  static const Color accentLight = Color(0xFFE9825B);
+  static const Color accentDark = Color(0xFFF2A07A);
 
   // Lost
   static const Color lostLight = Color(0xFFC2414B);
