@@ -31,14 +31,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           email: _emailController.text,
           password: _passwordController.text,
         );
-
-    if (mounted) context.go('/radar');
   }
 
   Future<void> _continueWithGoogle() async {
     await ref.read(authProvider.notifier).loginWithGoogle();
-
-    if (mounted) context.go('/radar');
   }
 
   @override

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../core/theme/pet_colors.dart';
@@ -59,7 +58,6 @@ class ProfileScreen extends ConsumerWidget {
               icon: Icons.logout,
               onPressed: () {
                 ref.read(authProvider.notifier).logout();
-                context.go('/welcome');
               },
             ),
           ],
@@ -134,15 +132,53 @@ class ProfileScreen extends ConsumerWidget {
           child: Column(
             children: [
               for (var index = 0; index < options.length; index++) ...[
-                RadioListTile<Locale>(
-                  value: options[index].$1,
-                  groupValue: currentLocale,
-                  title: Text(options[index].$2),
-                  onChanged: (locale) {
-                    if (locale != null) {
-                      ref.read(localeProvider.notifier).setLocale(locale);
-                    }
-                  },
+                InkWell(
+                  onTap: () => ref
+                      .read(localeProvider.notifier)
+                      .setLocale(options[index].$1),
+                  borderRadius: PetRadius.lgAll,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: PetSpacing.lg,
+                      vertical: PetSpacing.md,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            options[index].$2,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 150),
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: currentLocale == options[index].$1
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context).colorScheme.outline,
+                              width: 2,
+                            ),
+                            color: currentLocale == options[index].$1
+                                ? Theme.of(context).colorScheme.primary
+                                : Colors.transparent,
+                          ),
+                          child: currentLocale == options[index].$1
+                              ? Icon(
+                                  Icons.check,
+                                  size: 16,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onPrimary,
+                                )
+                              : null,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 if (index < options.length - 1) _buildDivider(context),
               ],
