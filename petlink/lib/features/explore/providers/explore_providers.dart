@@ -7,8 +7,14 @@ import '../../radar/providers/radar_providers.dart';
 
 enum ExploreFilter { all, lost, found, nearby }
 
+enum ExploreViewMode { map, list }
+
 final exploreFilterProvider = StateProvider<ExploreFilter>(
   (ref) => ExploreFilter.all,
+);
+
+final exploreViewModeProvider = StateProvider<ExploreViewMode>(
+  (ref) => ExploreViewMode.map,
 );
 
 final exploreLocationProvider = StateProvider<LatLng?>((ref) => null);

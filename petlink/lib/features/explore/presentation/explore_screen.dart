@@ -13,6 +13,7 @@ import '../../../core/theme/pet_radius.dart';
 import '../../../design_system/badges/status_badge.dart';
 import '../../../design_system/buttons/pet_button.dart';
 import '../../../shared/models/pet_report.dart';
+import '../../../shared/widgets/pet_card_compact.dart';
 import '../../../shared/widgets/search_bar.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/error_state.dart';
@@ -51,9 +52,39 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     final reportsAsync = ref.watch(exploreReportsProvider);
     final selectedReport = ref.watch(selectedReportProvider);
     final filter = ref.watch(exploreFilterProvider);
+    final viewMode = ref.watch(exploreViewModeProvider);
+
+    // Si la búsqueda da 1 resultado exacto, seleccionar y centrar en el mapa
+    ref.listen<AsyncValue<List<PetReport>>>(exploreReportsProvider, (previous, next) {
+      final query = ref.read(exploreSearchQueryProvider).trim();
+      final reports = next.valueOrNull;
+      if (query.isNotEmpty && reports != null && reports.length == 1) {
+        final target = reports.first;
+        ref.read(selectedReportProvider.notifier).state = target;
+        try {
+          _mapController.move(LatLng(target.latitude, target.longitude), 14.5);
+        } catch (_) {}
+      }
+    });
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.navigationExplore)),
+      appBar: AppBar(
+        title: Text(l10n.navigationExplore),
+        actions: [
+          IconButton(
+            tooltip: viewMode == ExploreViewMode.map ? 'Ver en lista' : 'Ver en mapa',
+            icon: Icon(
+              viewMode == ExploreViewMode.map ? Icons.format_list_bulleted : Icons.map_outlined,
+            ),
+            onPressed: () {
+              ref.read(exploreViewModeProvider.notifier).state =
+                  viewMode == ExploreViewMode.map
+                      ? ExploreViewMode.list
+                      : ExploreViewMode.map;
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Padding(
@@ -73,18 +104,20 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             ),
           ),
           Expanded(
-            child: Stack(
-              children: [
-                _buildMapPlaceholder(context, reportsAsync, ref),
-                if (selectedReport != null)
-                  Positioned(
-                    left: PetSpacing.lg,
-                    right: PetSpacing.lg,
-                    bottom: PetSpacing.lg,
-                    child: _buildReportPreview(context, selectedReport, ref),
-                  ),
-              ],
-            ),
+            child: viewMode == ExploreViewMode.map
+                ? Stack(
+                    children: [
+                      _buildMapPlaceholder(context, reportsAsync, ref),
+                      if (selectedReport != null)
+                        Positioned(
+                          left: PetSpacing.lg,
+                          right: PetSpacing.lg,
+                          bottom: PetSpacing.lg,
+                          child: _buildReportPreview(context, selectedReport, ref),
+                        ),
+                    ],
+                  )
+                : _buildListView(context, reportsAsync, ref),
           ),
         ],
       ),
@@ -212,10 +245,15 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             children: [
               FlutterMap(
                 mapController: _mapController,
-            options: const MapOptions(
-              initialCenter: LatLng(1.2136, -77.2811),
+            options: MapOptions(
+              initialCenter: const LatLng(1.2136, -77.2811),
               initialZoom: 12,
-              interactionOptions: InteractionOptions(
+              onTap: (_, _) {
+                if (ref.read(selectedReportProvider) != null) {
+                  ref.read(selectedReportProvider.notifier).state = null;
+                }
+              },
+              interactionOptions: const InteractionOptions(
                 flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
               ),
             ),
@@ -409,6 +447,21 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                 ? PetStatus.lost
                                 : PetStatus.found,
                           ),
+                          const SizedBox(width: PetSpacing.xs),
+                          InkWell(
+                            borderRadius: BorderRadius.circular(100),
+                            onTap: () {
+                              ref.read(selectedReportProvider.notifier).state = null;
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(PetSpacing.xs),
+                              child: Icon(
+                                Icons.close,
+                                size: 18,
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: PetSpacing.xs),
@@ -504,6 +557,48 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildListView(
+    BuildContext context,
+    AsyncValue<List<PetReport>> reportsAsync,
+    WidgetRef ref,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    return reportsAsync.when(
+      data: (reports) {
+        if (reports.isEmpty) {
+          return EmptyState(
+            icon: Icons.search_off,
+            title: l10n.exploreNoReports,
+            subtitle: l10n.exploreNoReportsDescription,
+          );
+        }
+        return ListView.separated(
+          padding: const EdgeInsets.symmetric(
+            horizontal: PetSpacing.lg,
+            vertical: PetSpacing.md,
+          ),
+          itemCount: reports.length,
+          separatorBuilder: (_, _) => const SizedBox(height: PetSpacing.md),
+          itemBuilder: (context, index) {
+            final report = reports[index];
+            return PetCardCompact(
+              report: report,
+              onTap: () => context.go('/reports/${report.id}'),
+            );
+          },
+        );
+      },
+      loading: () => Center(
+        child: CircularProgressIndicator(color: PetColors.primary),
+      ),
+      error: (_, _) => ErrorState(
+        title: l10n.exploreMapLoadError,
+        subtitle: l10n.connectionRetryDescription,
+        onRetry: () => ref.invalidate(exploreReportsProvider),
       ),
     );
   }
