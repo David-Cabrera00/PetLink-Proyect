@@ -59,7 +59,7 @@ class ReportsScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(PetSpacing.lg),
             child: PetButton(
               label: 'Crear reporte',
-              onPressed: () {},
+              onPressed: () => context.go('/report/new'),
               icon: Icons.add,
             ),
           ),
@@ -250,7 +250,7 @@ class ReportsScreen extends ConsumerWidget {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () => context.go('/activity'),
                   child: const Text('Ver actividad'),
                 ),
               ),

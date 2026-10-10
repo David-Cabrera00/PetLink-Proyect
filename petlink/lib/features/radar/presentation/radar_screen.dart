@@ -177,7 +177,7 @@ class RadarScreen extends ConsumerWidget {
               const SizedBox(height: PetSpacing.lg),
               PetButton(
                 label: l10n.radarExplore,
-                onPressed: () {},
+                onPressed: () => context.go('/explore'),
                 icon: Icons.explore,
               ),
             ],
