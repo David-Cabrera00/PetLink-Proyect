@@ -72,7 +72,7 @@ Resultado esperado: cualquier pantalla nueva puede construirse con componentes y
 Objetivo: que una persona pueda entender y actuar sin entrenamiento.
 
 - [ ] Rediseñar Radar priorizando coincidencias y reportes urgentes.
-- [ ] Rediseñar Explorar con lista y mapa claramente diferenciados.
+- [x] Rediseñar Explorar con lista y mapa claramente diferenciados.
 - [x] Simplificar la navegación inferior y destacar Reportar como acción principal.
 - [x] Mejorar el detalle de reporte: foto, estado, ubicación aproximada, fecha, descripción y acción.
 - [ ] Rediseñar el flujo de reporte con progreso visible y guardado automático del borrador.
@@ -121,7 +121,7 @@ Objetivo: completar el ciclo de ayuda entre quien pierde y quien encuentra.
 - [ ] Crear, editar, cerrar y marcar como recuperado un reporte.
 - [ ] Subir, eliminar y ordenar fotografías.
 - [ ] Integrar cámara y galería.
-- [ ] Integrar ubicación actual y selección manual en mapa.
+- [x] Integrar mapa base y selección manual en mapa (GPS real pendiente).
 - [ ] Aplicar radio de búsqueda real.
 - [ ] Implementar coincidencias con criterios explicables.
 - [ ] Implementar compartir un reporte.
