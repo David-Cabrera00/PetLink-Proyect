@@ -25,6 +25,7 @@ class ReportLocationScreen extends ConsumerStatefulWidget {
 class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _addressController;
+  LatLng _selectedLocation = const LatLng(1.2136, -77.2811);
 
   @override
   void initState() {
@@ -127,12 +128,15 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
       child: Stack(
         children: [
           FlutterMap(
-            options: const MapOptions(
-              initialCenter: LatLng(1.2136, -77.2811),
+            options: MapOptions(
+              initialCenter: _selectedLocation,
               initialZoom: 13,
               interactionOptions: InteractionOptions(
                 flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
               ),
+              onTap: (_, point) {
+                setState(() => _selectedLocation = point);
+              },
             ),
             children: [
               TileLayer(
@@ -142,7 +146,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
               MarkerLayer(
                 markers: [
                   Marker(
-                    point: const LatLng(1.2136, -77.2811),
+                    point: _selectedLocation,
                     width: 48,
                     height: 48,
                     child: Icon(
@@ -259,8 +263,8 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
   void _saveLocation(WidgetRef ref) {
     final notifier = ref.read(reportDraftProvider.notifier);
     notifier.setLocation(
-      latitude: 1.2136, // Mock coordinates for Pasto
-      longitude: -77.2811,
+      latitude: _selectedLocation.latitude,
+      longitude: _selectedLocation.longitude,
       address: _addressController.text.trim(),
     );
   }
