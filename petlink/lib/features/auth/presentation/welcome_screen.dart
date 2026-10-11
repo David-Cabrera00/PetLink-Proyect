@@ -65,7 +65,23 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final cs = theme.colorScheme;
+
+    // Paleta adaptativa para el fondo según modo claro / oscuro
+    final gradientColors = isDark
+        ? [cs.primary.withValues(alpha: 0.78), cs.primary]
+        : [
+            const Color(0xFFE0F2F1),
+            const Color(0xFFB2DFDB),
+          ]; // Teal muy claro / aqua suave
+
+    final overlayColors = isDark
+        ? [cs.primary.withValues(alpha: 0.28), cs.scrim.withValues(alpha: 0.78)]
+        : [
+            Colors.white.withValues(alpha: 0.40),
+            const Color(0xFF80CBC4).withValues(alpha: 0.25),
+          ];
 
     return Scaffold(
       body: Stack(
@@ -76,7 +92,7 @@ class WelcomeScreen extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [cs.primary.withValues(alpha: 0.78), cs.primary],
+                colors: gradientColors,
               ),
             ),
           ),
@@ -85,14 +101,11 @@ class WelcomeScreen extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  cs.primary.withValues(alpha: 0.28),
-                  cs.scrim.withValues(alpha: 0.78),
-                ],
+                colors: overlayColors,
               ),
             ),
           ),
-          Positioned.fill(child: _buildDecorations()),
+          Positioned.fill(child: _buildDecorations(isDark)),
           SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -119,9 +132,9 @@ class WelcomeScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildWordmark(context),
+                        _buildWordmark(context, isDark),
                         SizedBox(height: constraints.maxHeight * 0.28),
-                        _buildGlassContent(context, l10n),
+                        _buildGlassContent(context, l10n, isDark),
                       ],
                     ),
                   ),
@@ -134,9 +147,8 @@ class WelcomeScreen extends StatelessWidget {
     );
   }
 
-  /// Huellas y pins pequeños y sutiles, ubicados en la zona superior/lateral
-  /// (por encima del card) con posiciones fraccionales irregulares.
-  Widget _buildDecorations() {
+  /// Huellas y pins con posiciones fraccionales orgánicas.
+  Widget _buildDecorations(bool isDark) {
     return IgnorePointer(
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -149,7 +161,9 @@ class WelcomeScreen extends StatelessWidget {
                   left: width * item.dx - item.size / 2,
                   top: height * item.dy,
                   child: Opacity(
-                    opacity: item.opacity,
+                    opacity: isDark
+                        ? item.opacity
+                        : (item.opacity * 1.35).clamp(0.0, 0.45),
                     child: Transform.rotate(
                       angle: item.angle,
                       child: Image.asset(
@@ -170,7 +184,7 @@ class WelcomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildWordmark(BuildContext context) {
+  Widget _buildWordmark(BuildContext context, bool isDark) {
     final cs = Theme.of(context).colorScheme;
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -179,8 +193,17 @@ class WelcomeScreen extends StatelessWidget {
           width: 34,
           height: 34,
           decoration: BoxDecoration(
-            color: cs.surface.withValues(alpha: 0.88),
+            color: isDark ? cs.surface.withValues(alpha: 0.88) : Colors.white,
             borderRadius: PetRadius.mdAll,
+            boxShadow: isDark
+                ? null
+                : [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.06),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
           ),
           child: Icon(Icons.pets, color: cs.primary, size: 19),
         ),
@@ -188,7 +211,7 @@ class WelcomeScreen extends StatelessWidget {
         Text(
           'PetLink',
           style: PetTypography.title.copyWith(
-            color: Colors.white,
+            color: isDark ? Colors.white : cs.primary,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -196,8 +219,26 @@ class WelcomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGlassContent(BuildContext context, AppLocalizations l10n) {
+  Widget _buildGlassContent(
+    BuildContext context,
+    AppLocalizations l10n,
+    bool isDark,
+  ) {
     final cs = Theme.of(context).colorScheme;
+
+    final cardBg = isDark
+        ? cs.surface.withValues(alpha: 0.18)
+        : Colors.white.withValues(alpha: 0.82);
+
+    final cardBorder = isDark
+        ? Border.all(color: Colors.white.withValues(alpha: 0.42))
+        : Border.all(color: Colors.white.withValues(alpha: 0.90), width: 1.5);
+
+    final titleColor = isDark ? Colors.white : const Color(0xFF103943);
+    final descColor = isDark
+        ? Colors.white.withValues(alpha: 0.86)
+        : const Color(0xFF37474F);
+
     return ClipRRect(
       borderRadius: PetRadius.xxlAll,
       child: BackdropFilter(
@@ -206,9 +247,18 @@ class WelcomeScreen extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(PetSpacing.xl),
           decoration: BoxDecoration(
-            color: cs.surface.withValues(alpha: 0.18),
+            color: cardBg,
             borderRadius: PetRadius.xxlAll,
-            border: Border.all(color: Colors.white.withValues(alpha: 0.42)),
+            border: cardBorder,
+            boxShadow: isDark
+                ? null
+                : [
+                    BoxShadow(
+                      color: const Color(0xFF004D40).withValues(alpha: 0.08),
+                      blurRadius: 24,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,7 +266,7 @@ class WelcomeScreen extends StatelessWidget {
               Text(
                 l10n.authWelcomeTitle,
                 style: PetTypography.display.copyWith(
-                  color: Colors.white,
+                  color: titleColor,
                   fontSize: 34,
                   height: 1.08,
                   letterSpacing: -1.1,
@@ -226,20 +276,22 @@ class WelcomeScreen extends StatelessWidget {
               Text(
                 l10n.authWelcomeDescription,
                 style: PetTypography.body.copyWith(
-                  color: Colors.white.withValues(alpha: 0.86),
+                  color: descColor,
                   height: 1.5,
                 ),
               ),
               const SizedBox(height: PetSpacing.xl),
               PetButton(
                 label: l10n.authLogin,
-                variant: PetButtonVariant.accent,
+                variant: PetButtonVariant.primary,
                 onPressed: () => context.go('/login'),
               ),
               const SizedBox(height: PetSpacing.sm),
               PetButton(
                 label: l10n.authCreateAccount,
-                variant: PetButtonVariant.secondary,
+                variant: isDark
+                    ? PetButtonVariant.secondary
+                    : PetButtonVariant.outline,
                 onPressed: () => context.go('/register'),
               ),
             ],
