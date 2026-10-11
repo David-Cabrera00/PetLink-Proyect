@@ -91,15 +91,13 @@ class ProfileScreen extends ConsumerWidget {
         ),
         title: Text(
           l10n.reportsTitle,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+          style: Theme.of(context).textTheme.titleMedium
+              ?.copyWith(fontWeight: FontWeight.w600),
         ),
         subtitle: Text(
           'Administra y consulta tus mascotas reportadas',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: cs.onSurfaceVariant,
-              ),
+          style: Theme.of(context).textTheme.bodySmall
+              ?.copyWith(color: cs.onSurfaceVariant),
         ),
         trailing: Icon(Icons.chevron_right, color: cs.onSurfaceVariant),
         onTap: () => context.go('/reports'),

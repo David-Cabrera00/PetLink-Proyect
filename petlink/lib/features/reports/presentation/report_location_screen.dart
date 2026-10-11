@@ -168,9 +168,8 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
             right: PetSpacing.sm,
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface.withValues(
-                  alpha: 0.9,
-                ),
+                color: Theme.of(context).colorScheme.surface
+                    .withValues(alpha: 0.9),
                 borderRadius: PetRadius.smAll,
               ),
               child: Padding(
@@ -192,9 +191,8 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
               '\u00A9 OpenStreetMap contributors',
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
-                backgroundColor: Theme.of(context).colorScheme.surface.withValues(
-                  alpha: 0.85,
-                ),
+                backgroundColor: Theme.of(context).colorScheme.surface
+                    .withValues(alpha: 0.85),
               ),
             ),
           ),

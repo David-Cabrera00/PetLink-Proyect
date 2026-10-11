@@ -7,7 +7,7 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const ProviderScope(child: PetLinkApp()));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.text('PetLink'), findsOneWidget);
     expect(find.text('Iniciar sesión'), findsOneWidget);

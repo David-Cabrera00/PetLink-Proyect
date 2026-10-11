@@ -41,16 +41,16 @@ class ReportTypeScreen extends ConsumerWidget {
               Text(
                 l10n.reportCreate,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
+                  fontWeight: FontWeight.w700,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               const SizedBox(height: PetSpacing.xs),
               Text(
                 l10n.reportWhatHappened,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: PetSpacing.xl),
               Expanded(
@@ -159,16 +159,15 @@ class ReportTypeScreen extends ConsumerWidget {
                   Text(
                     title,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: isSelected ? color : cs.onSurface,
-                        ),
+                      fontWeight: FontWeight.w700,
+                      color: isSelected ? color : cs.onSurface,
+                    ),
                   ),
                   const SizedBox(height: PetSpacing.xs),
                   Text(
                     subtitle,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: cs.onSurfaceVariant,
-                        ),
+                    style: Theme.of(context).textTheme.bodySmall
+                        ?.copyWith(color: cs.onSurfaceVariant),
                   ),
                 ],
               ),
@@ -186,11 +185,7 @@ class ReportTypeScreen extends ConsumerWidget {
                 ),
               ),
               child: isSelected
-                  ? const Icon(
-                      Icons.check,
-                      size: 16,
-                      color: Colors.white,
-                    )
+                  ? const Icon(Icons.check, size: 16, color: Colors.white)
                   : null,
             ),
           ],

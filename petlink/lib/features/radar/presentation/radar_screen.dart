@@ -80,36 +80,28 @@ class RadarScreen extends ConsumerWidget {
             const SizedBox(width: PetSpacing.sm),
             Text(
               l10n.radarActive,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: cs.primary,
-                fontWeight: FontWeight.w700,
-              ),
+              style: Theme.of(context).textTheme.labelLarge
+                  ?.copyWith(color: cs.primary, fontWeight: FontWeight.w700),
             ),
             const Spacer(),
             Container(
               width: 8,
               height: 8,
-              decoration: BoxDecoration(
-                color: accent,
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
             ),
           ],
         ),
         const SizedBox(height: PetSpacing.md),
         Text(
           l10n.radarGreeting('David'),
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            color: cs.onSurface,
-            fontWeight: FontWeight.w700,
-          ),
+          style: Theme.of(context).textTheme.headlineMedium
+              ?.copyWith(color: cs.onSurface, fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: PetSpacing.xs),
         Text(
           l10n.radarNearYou,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: cs.onSurfaceVariant,
-          ),
+          style: Theme.of(context).textTheme.bodyMedium
+              ?.copyWith(color: cs.onSurfaceVariant),
         ),
       ],
     );

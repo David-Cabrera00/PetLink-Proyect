@@ -107,25 +107,19 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
               color: cs.primaryContainer.withValues(alpha: 0.5),
               borderRadius: PetRadius.xlAll,
             ),
-            child: Icon(
-              Icons.camera_alt_outlined,
-              size: 44,
-              color: cs.primary,
-            ),
+            child: Icon(Icons.camera_alt_outlined, size: 44, color: cs.primary),
           ),
           const SizedBox(height: PetSpacing.lg),
           Text(
             l10n.reportPhotosAddPrompt,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+            style: Theme.of(context).textTheme.titleMedium
+                ?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: PetSpacing.xs),
           Text(
             l10n.reportPhotosLimit,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: cs.onSurfaceVariant,
-                ),
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: cs.onSurfaceVariant),
           ),
           const SizedBox(height: PetSpacing.xl),
           PetButton(
@@ -221,19 +215,13 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                 color: cs.primaryContainer.withValues(alpha: 0.5),
                 borderRadius: PetRadius.lgAll,
               ),
-              child: Icon(
-                Icons.add_a_photo,
-                size: 28,
-                color: cs.primary,
-              ),
+              child: Icon(Icons.add_a_photo, size: 28, color: cs.primary),
             ),
             const SizedBox(height: PetSpacing.sm),
             Text(
               AppLocalizations.of(context)!.addPhoto,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: cs.primary,
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(context).textTheme.bodyMedium
+                  ?.copyWith(color: cs.primary, fontWeight: FontWeight.w600),
             ),
           ],
         ),

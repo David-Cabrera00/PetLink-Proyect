@@ -636,9 +636,8 @@ class MatchDetailScreen extends ConsumerWidget {
         const SizedBox(height: PetSpacing.md),
         OutlinedButton(
           onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(l10n.matchDetailDismiss)),
-            );
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(l10n.matchDetailDismiss)));
           },
           style: OutlinedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: PetSpacing.md),

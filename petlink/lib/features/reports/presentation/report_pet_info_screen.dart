@@ -107,9 +107,8 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                         // 2. Especie con selector rápido
                         Text(
                           l10n.reportPetInfoSpecies,
-                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: Theme.of(context).textTheme.labelLarge
+                              ?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: PetSpacing.xs),
                         Row(
@@ -117,15 +116,23 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                             _buildChoiceChip(
                               label: 'Perro',
                               icon: Icons.pets,
-                              isSelected: _speciesController.text.toLowerCase() == 'perro',
-                              onSelected: () => setState(() => _speciesController.text = 'Perro'),
+                              isSelected:
+                                  _speciesController.text.toLowerCase() ==
+                                  'perro',
+                              onSelected: () => setState(
+                                () => _speciesController.text = 'Perro',
+                              ),
                             ),
                             const SizedBox(width: PetSpacing.sm),
                             _buildChoiceChip(
                               label: 'Gato',
                               icon: Icons.pets_outlined,
-                              isSelected: _speciesController.text.toLowerCase() == 'gato',
-                              onSelected: () => setState(() => _speciesController.text = 'Gato'),
+                              isSelected:
+                                  _speciesController.text.toLowerCase() ==
+                                  'gato',
+                              onSelected: () => setState(
+                                () => _speciesController.text = 'Gato',
+                              ),
                             ),
                           ],
                         ),
@@ -148,9 +155,8 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                         // 4. Sexo con selector rápido
                         Text(
                           l10n.reportPetInfoSex,
-                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: Theme.of(context).textTheme.labelLarge
+                              ?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: PetSpacing.xs),
                         Row(
@@ -158,15 +164,20 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                             _buildChoiceChip(
                               label: 'Macho',
                               icon: Icons.male,
-                              isSelected: _sexController.text.toLowerCase() == 'macho',
-                              onSelected: () => setState(() => _sexController.text = 'Macho'),
+                              isSelected:
+                                  _sexController.text.toLowerCase() == 'macho',
+                              onSelected: () =>
+                                  setState(() => _sexController.text = 'Macho'),
                             ),
                             const SizedBox(width: PetSpacing.sm),
                             _buildChoiceChip(
                               label: 'Hembra',
                               icon: Icons.female,
-                              isSelected: _sexController.text.toLowerCase() == 'hembra',
-                              onSelected: () => setState(() => _sexController.text = 'Hembra'),
+                              isSelected:
+                                  _sexController.text.toLowerCase() == 'hembra',
+                              onSelected: () => setState(
+                                () => _sexController.text = 'Hembra',
+                              ),
                             ),
                           ],
                         ),
@@ -175,9 +186,8 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                         // 5. Tamaño con selector rápido
                         Text(
                           l10n.reportPetInfoSize,
-                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: Theme.of(context).textTheme.labelLarge
+                              ?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: PetSpacing.xs),
                         SingleChildScrollView(
@@ -186,20 +196,32 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                             children: [
                               _buildChoiceChip(
                                 label: 'Pequeño',
-                                isSelected: _sizeController.text.toLowerCase() == 'pequeño',
-                                onSelected: () => setState(() => _sizeController.text = 'Pequeño'),
+                                isSelected:
+                                    _sizeController.text.toLowerCase() ==
+                                    'pequeño',
+                                onSelected: () => setState(
+                                  () => _sizeController.text = 'Pequeño',
+                                ),
                               ),
                               const SizedBox(width: PetSpacing.sm),
                               _buildChoiceChip(
                                 label: 'Mediano',
-                                isSelected: _sizeController.text.toLowerCase() == 'mediano',
-                                onSelected: () => setState(() => _sizeController.text = 'Mediano'),
+                                isSelected:
+                                    _sizeController.text.toLowerCase() ==
+                                    'mediano',
+                                onSelected: () => setState(
+                                  () => _sizeController.text = 'Mediano',
+                                ),
                               ),
                               const SizedBox(width: PetSpacing.sm),
                               _buildChoiceChip(
                                 label: 'Grande',
-                                isSelected: _sizeController.text.toLowerCase() == 'grande',
-                                onSelected: () => setState(() => _sizeController.text = 'Grande'),
+                                isSelected:
+                                    _sizeController.text.toLowerCase() ==
+                                    'grande',
+                                onSelected: () => setState(
+                                  () => _sizeController.text = 'Grande',
+                                ),
                               ),
                             ],
                           ),
