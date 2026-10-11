@@ -20,6 +20,7 @@ import '../features/profile/profile_screen.dart';
 import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/create_account_screen.dart';
 import '../features/auth/presentation/forgot_password_screen.dart';
+import '../features/auth/presentation/intro_screen.dart';
 import '../features/auth/presentation/welcome_screen.dart';
 import '../features/auth/providers/auth_provider.dart';
 
@@ -34,7 +35,7 @@ class AppRouter {
 
     return GoRouter(
       navigatorKey: _rootNavigatorKey,
-      initialLocation: '/radar',
+      initialLocation: '/intro',
       refreshListenable: refresh,
       redirect: (_, state) {
         final authState = ref.read(authProvider);
@@ -50,13 +51,20 @@ class AppRouter {
             path == '/report/new' ||
             path.startsWith('/report/new/');
         final isAuthRoute =
-            path == '/welcome' || path == '/login' || path == '/register';
+            path == '/intro' ||
+            path == '/welcome' ||
+            path == '/login' ||
+            path == '/register';
 
         if (!isAuthenticated && isProtected) return '/welcome';
         if (isAuthenticated && isAuthRoute) return '/radar';
         return null;
       },
       routes: [
+        GoRoute(
+          path: '/intro',
+          builder: (context, state) => const IntroScreen(),
+        ),
         GoRoute(
           path: '/welcome',
           builder: (context, state) => const WelcomeScreen(),

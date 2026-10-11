@@ -31,12 +31,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       vsync: this,
       duration: const Duration(milliseconds: 3600),
     )..repeat(reverse: true);
-
     _horizontalAnim = CurvedAnimation(
       parent: _animController,
       curve: Curves.easeInOutCubic,
     );
-
   }
 
   @override
@@ -110,7 +108,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       children: [
                         _buildWordmark(context),
                         SizedBox(height: topSpacing),
-                        _buildHeroIllustration(context),
+                        SizedBox(height: topSpacing * 1.5),
                         SizedBox(height: topSpacing),
                         _buildGlassContent(context, l10n),
                       ],
