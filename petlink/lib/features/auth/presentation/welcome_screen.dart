@@ -7,41 +7,12 @@ import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_radius.dart';
 import '../../../core/theme/pet_spacing.dart';
-import '../../../core/theme/pet_theme_extension.dart';
 import '../../../core/theme/pet_typography.dart';
 import '../../../design_system/buttons/pet_button.dart';
 import '../../../shared/widgets/animal_pattern_field.dart';
 
-class WelcomeScreen extends StatefulWidget {
+class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
-
-  @override
-  State<WelcomeScreen> createState() => _WelcomeScreenState();
-}
-
-class _WelcomeScreenState extends State<WelcomeScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _animController;
-  late final Animation<double> _horizontalAnim;
-
-  @override
-  void initState() {
-    super.initState();
-    _animController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 3600),
-    )..repeat(reverse: true);
-    _horizontalAnim = CurvedAnimation(
-      parent: _animController,
-      curve: Curves.easeInOutCubic,
-    );
-  }
-
-  @override
-  void dispose() {
-    _animController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,10 +57,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     ? PetSpacing.lg
                     : PetSpacing.xxl;
 
-                final topSpacing = (constraints.maxHeight * 0.05).clamp(
-                  PetSpacing.md,
-                  PetSpacing.xl,
-                );
+                final minHeight = constraints.maxHeight.isFinite
+                    ? math.max(0.0, constraints.maxHeight - (PetSpacing.lg * 2))
+                    : 0.0;
 
                 return SingleChildScrollView(
                   padding: EdgeInsets.fromLTRB(
@@ -100,16 +70,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   ),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight - PetSpacing.xl,
+                      minHeight: minHeight,
                       maxWidth: 520,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildWordmark(context),
-                        SizedBox(height: topSpacing),
-                        SizedBox(height: topSpacing * 1.5),
-                        SizedBox(height: topSpacing),
+                        SizedBox(height: constraints.maxHeight * 0.28),
                         _buildGlassContent(context, l10n),
                       ],
                     ),
@@ -146,58 +114,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           ),
         ),
       ],
-    );
-  }
-
-  /// Placeholder abstracto preparado para sustituirse por una ilustración real.
-  Widget _buildHeroIllustration(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final accent = PetThemeExtension.of(context).accent;
-    return SizedBox(
-      height: 168,
-      width: double.infinity,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: cs.surface.withValues(alpha: 0.12),
-          borderRadius: PetRadius.xxlAll,
-          border: Border.all(color: cs.onPrimary.withValues(alpha: 0.24)),
-        ),
-        child: ClipRRect(
-          borderRadius: PetRadius.xxlAll,
-          child: AnimatedBuilder(
-            animation: _animController,
-            builder: (context, child) => Transform.translate(
-              offset: Offset(
-                0,
-                math.sin(_horizontalAnim.value * math.pi * 2) * 2,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: PetSpacing.lg,
-                  vertical: PetSpacing.sm,
-                ),
-                child: Semantics(
-                  image: true,
-                  label: 'Ilustración de PetLink',
-                  child: Image.asset(
-                    'assets/illustrations/petlink_welcome.png',
-                    fit: BoxFit.contain,
-                    alignment: Alignment.center,
-                    errorBuilder: (context, error, stackTrace) => CustomPaint(
-                      painter: _WelcomeHeroPainter(
-                        progress: _horizontalAnim.value,
-                        routeColor: cs.onPrimary.withValues(alpha: 0.42),
-                        accentColor: accent,
-                        markerColor: cs.onPrimary,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -244,7 +160,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               const SizedBox(height: PetSpacing.sm),
               PetButton(
                 label: l10n.authCreateAccount,
-                variant: PetButtonVariant.lightOutline,
+                variant: PetButtonVariant.secondary,
                 onPressed: () => context.go('/register'),
               ),
             ],
@@ -253,117 +169,4 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       ),
     );
   }
-}
-
-class _WelcomeHeroPainter extends CustomPainter {
-  const _WelcomeHeroPainter({
-    required this.progress,
-    required this.routeColor,
-    required this.accentColor,
-    required this.markerColor,
-  });
-
-  final double progress;
-  final Color routeColor;
-  final Color accentColor;
-  final Color markerColor;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final routePaint = Paint()
-      ..color = routeColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.4
-      ..strokeCap = StrokeCap.round;
-
-    final route = Path()
-      ..moveTo(size.width * 0.10, size.height * 0.72)
-      ..cubicTo(
-        size.width * 0.28,
-        size.height * 0.42,
-        size.width * 0.48,
-        size.height * 0.92,
-        size.width * 0.76,
-        size.height * 0.32,
-      );
-    canvas.drawPath(route, routePaint);
-
-    final animatedPoint = Offset(
-      size.width * (0.20 + progress * 0.45),
-      size.height * (0.64 - math.sin(progress * math.pi) * 0.16),
-    );
-    _drawPaw(canvas, animatedPoint, accentColor.withValues(alpha: 0.88), 11);
-    _drawPaw(
-      canvas,
-      Offset(size.width * 0.38, size.height * 0.68),
-      markerColor.withValues(alpha: 0.56),
-      9,
-    );
-    _drawPaw(
-      canvas,
-      Offset(size.width * 0.56, size.height * 0.47),
-      markerColor.withValues(alpha: 0.42),
-      8,
-    );
-    _drawPin(
-      canvas,
-      Offset(size.width * 0.79, size.height * 0.25),
-      accentColor,
-    );
-  }
-
-  void _drawPaw(Canvas canvas, Offset center, Color color, double size) {
-    final paint = Paint()..color = color;
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: center,
-        width: size * 0.85,
-        height: size * 0.64,
-      ),
-      paint,
-    );
-
-    for (var index = 0; index < 3; index++) {
-      final angle = -0.95 + index * 0.95;
-      canvas.drawCircle(
-        center + Offset(math.cos(angle) * size * 0.34, math.sin(angle) * size * 0.34),
-        size * 0.14,
-        paint,
-      );
-    }
-  }
-
-  void _drawPin(Canvas canvas, Offset center, Color color) {
-    final pinPath = Path()
-      ..moveTo(center.dx, center.dy + 17)
-      ..cubicTo(
-        center.dx - 14,
-        center.dy + 2,
-        center.dx - 12,
-        center.dy - 11,
-        center.dx,
-        center.dy - 11,
-      )
-      ..cubicTo(
-        center.dx + 12,
-        center.dy - 11,
-        center.dx + 14,
-        center.dy + 2,
-        center.dx,
-        center.dy + 17,
-      );
-    canvas.drawPath(pinPath, Paint()..color = color.withValues(alpha: 0.9));
-    canvas.drawCircle(
-      Offset(center.dx, center.dy - 2),
-      4,
-      Paint()..color = markerColor,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _WelcomeHeroPainter oldDelegate) =>
-      oldDelegate.progress != progress ||
-      oldDelegate.routeColor != routeColor ||
-      oldDelegate.accentColor != accentColor ||
-      oldDelegate.markerColor != markerColor;
 }

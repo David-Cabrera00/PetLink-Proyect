@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:petlink/app/app.dart';
@@ -14,6 +15,7 @@ void main() {
 
     await tester.pump(const Duration(milliseconds: 2500));
     await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
 
     expect(find.text('PetLink'), findsOneWidget);
     expect(find.text('Encuentra el camino de vuelta a casa'), findsOneWidget);

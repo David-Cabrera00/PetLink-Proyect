@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -47,15 +49,13 @@ class _IntroScreenState extends ConsumerState<IntroScreen>
       parent: _controller,
       curve: const Interval(0.32, 0.84, curve: Curves.easeOut),
     );
-    _textOffset = Tween<Offset>(
-      begin: const Offset(0, 0.14),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.32, 0.9, curve: Curves.easeOutCubic),
-      ),
-    );
+    _textOffset = Tween<Offset>(begin: const Offset(0, 0.14), end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.32, 0.9, curve: Curves.easeOutCubic),
+          ),
+        );
 
     _controller.forward();
   }
@@ -97,15 +97,18 @@ class _IntroScreenState extends ConsumerState<IntroScreen>
         body: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final imageSize =
-                  (constraints.maxWidth * 0.72).clamp(210.0, 330.0).toDouble();
+              final imageSize = (constraints.maxWidth * 0.72)
+                  .clamp(210.0, 330.0)
+                  .toDouble();
+
+              final minHeight = constraints.maxHeight.isFinite
+                  ? math.max(0.0, constraints.maxHeight - PetSpacing.lg * 2)
+                  : 0.0;
 
               return SingleChildScrollView(
                 padding: const EdgeInsets.all(PetSpacing.lg),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight - PetSpacing.xl,
-                  ),
+                  constraints: BoxConstraints(minHeight: minHeight),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -118,7 +121,9 @@ class _IntroScreenState extends ConsumerState<IntroScreen>
                             height: imageSize,
                             padding: const EdgeInsets.all(PetSpacing.md),
                             decoration: BoxDecoration(
-                              color: cs.primaryContainer.withValues(alpha: 0.42),
+                              color: cs.primaryContainer.withValues(
+                                alpha: 0.42,
+                              ),
                               borderRadius: PetRadius.xxlAll,
                               border: Border.all(
                                 color: extension.accent.withValues(alpha: 0.38),
@@ -127,11 +132,12 @@ class _IntroScreenState extends ConsumerState<IntroScreen>
                             child: Image.asset(
                               'assets/illustrations/petlink_welcome.png',
                               fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) => Icon(
-                                Icons.route_outlined,
-                                size: imageSize * 0.28,
-                                color: cs.primary,
-                              ),
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Icon(
+                                    Icons.route_outlined,
+                                    size: imageSize * 0.28,
+                                    color: cs.primary,
+                                  ),
                             ),
                           ),
                         ),
