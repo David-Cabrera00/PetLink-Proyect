@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 
-import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
 import '../../../core/theme/pet_radius.dart';
 import '../../../design_system/buttons/pet_button.dart';
@@ -95,32 +94,32 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
 
   Widget _buildEmptyPhotosPlaceholder(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final cs = Theme.of(context).colorScheme;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 120,
-            height: 120,
+            width: 104,
+            height: 104,
             decoration: BoxDecoration(
-              color: PetColors.primarySoft,
+              color: cs.primaryContainer.withValues(alpha: 0.5),
               borderRadius: PetRadius.xlAll,
             ),
-            child: Icon(
-              Icons.camera_alt_outlined,
-              size: 48,
-              color: PetColors.primary,
-            ),
+            child: Icon(Icons.camera_alt_outlined, size: 44, color: cs.primary),
           ),
           const SizedBox(height: PetSpacing.lg),
           Text(
             l10n.reportPhotosAddPrompt,
-            style: Theme.of(context).textTheme.titleMedium,
+            style: Theme.of(context).textTheme.titleMedium
+                ?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: PetSpacing.xs),
           Text(
             l10n.reportPhotosLimit,
-            style: Theme.of(context).textTheme.bodySmall,
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: cs.onSurfaceVariant),
           ),
           const SizedBox(height: PetSpacing.xl),
           PetButton(
@@ -134,13 +133,15 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
   }
 
   Widget _buildPhotoCard(BuildContext context, WidgetRef ref, int index) {
+    final cs = Theme.of(context).colorScheme;
     final photo = ref.read(reportDraftProvider).photos[index];
+
     return Stack(
       children: [
         Container(
           decoration: BoxDecoration(
             borderRadius: PetRadius.lgAll,
-            border: Border.all(color: PetColors.border),
+            border: Border.all(color: cs.outlineVariant),
           ),
           child: ClipRRect(
             borderRadius: PetRadius.lgAll,
@@ -151,9 +152,9 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                     width: double.infinity,
                     height: double.infinity,
                     errorBuilder: (context, error, stackTrace) =>
-                        _buildPlaceholder(),
+                        _buildPlaceholder(context),
                   )
-                : _buildPlaceholder(),
+                : _buildPlaceholder(context),
           ),
         ),
         Positioned(
@@ -165,10 +166,10 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
             child: Container(
               padding: const EdgeInsets.all(PetSpacing.xs),
               decoration: BoxDecoration(
-                color: PetColors.lost,
-                borderRadius: PetRadius.smAll,
+                color: Colors.black.withValues(alpha: 0.65),
+                borderRadius: BorderRadius.circular(100),
               ),
-              child: Icon(Icons.close, size: 16, color: PetColors.surface),
+              child: const Icon(Icons.close, size: 16, color: Colors.white),
             ),
           ),
         ),
@@ -176,29 +177,33 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
     );
   }
 
-  Widget _buildPlaceholder() {
+  Widget _buildPlaceholder(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
-      color: PetColors.background,
+      color: cs.surfaceContainerHighest,
       child: Center(
         child: Icon(
           Icons.image_outlined,
           size: 32,
-          color: PetColors.textSecondary.withValues(alpha: 0.5),
+          color: cs.onSurfaceVariant.withValues(alpha: 0.5),
         ),
       ),
     );
   }
 
   Widget _buildAddPhotoCard(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
+
     return GestureDetector(
       onTap: () => _showPhotoOptions(context, ref),
       child: Container(
         decoration: BoxDecoration(
+          color: cs.surface,
           borderRadius: PetRadius.lgAll,
           border: Border.all(
-            color: PetColors.primary,
+            color: cs.primary,
             style: BorderStyle.solid,
-            width: 2,
+            width: 1.5,
           ),
         ),
         child: Column(
@@ -207,22 +212,16 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
             Container(
               padding: const EdgeInsets.all(PetSpacing.md),
               decoration: BoxDecoration(
-                color: PetColors.primarySoft,
+                color: cs.primaryContainer.withValues(alpha: 0.5),
                 borderRadius: PetRadius.lgAll,
               ),
-              child: Icon(
-                Icons.add_a_photo,
-                size: 32,
-                color: PetColors.primary,
-              ),
+              child: Icon(Icons.add_a_photo, size: 28, color: cs.primary),
             ),
             const SizedBox(height: PetSpacing.sm),
             Text(
               AppLocalizations.of(context)!.addPhoto,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: PetColors.primary,
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(context).textTheme.bodyMedium
+                  ?.copyWith(color: cs.primary, fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -291,24 +290,26 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
     String label,
     VoidCallback onTap,
   ) {
+    final cs = Theme.of(context).colorScheme;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(PetSpacing.lg),
         decoration: BoxDecoration(
-          color: PetColors.surface,
+          color: cs.surface,
           borderRadius: PetRadius.lgAll,
-          border: Border.all(color: PetColors.border),
+          border: Border.all(color: cs.outlineVariant),
         ),
         child: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(PetSpacing.md),
               decoration: BoxDecoration(
-                color: PetColors.primarySoft,
+                color: cs.primaryContainer.withValues(alpha: 0.5),
                 borderRadius: PetRadius.lgAll,
               ),
-              child: Icon(icon, size: 28, color: PetColors.primary),
+              child: Icon(icon, size: 28, color: cs.primary),
             ),
             const SizedBox(height: PetSpacing.sm),
             Text(label, style: Theme.of(context).textTheme.bodyMedium),

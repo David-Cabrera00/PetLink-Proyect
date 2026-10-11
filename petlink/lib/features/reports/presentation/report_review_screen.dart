@@ -9,6 +9,7 @@ import '../../../core/theme/pet_radius.dart';
 import '../../../design_system/badges/status_badge.dart';
 import '../../../design_system/buttons/pet_button.dart';
 import '../../../shared/models/pet_report.dart';
+import '../../../shared/widgets/step_indicator.dart';
 import '../../radar/providers/radar_providers.dart';
 import '../providers/report_draft_provider.dart';
 
@@ -34,16 +35,21 @@ class ReportReviewScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(PetSpacing.lg),
           child: Column(
             children: [
-              _buildStepIndicator(context, 6, 6),
+              const StepIndicator(current: 6, total: 6),
               const SizedBox(height: PetSpacing.xl),
               Text(
                 l10n.reportReviewTitle,
-                style: Theme.of(context).textTheme.displaySmall,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               const SizedBox(height: PetSpacing.xs),
               Text(
                 l10n.reportReviewDescription,
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: PetSpacing.xl),
               Expanded(
@@ -210,7 +216,7 @@ class ReportReviewScreen extends ConsumerWidget {
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
             fontWeight: FontWeight.w600,
-            color: PetColors.textSecondary,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
         const SizedBox(height: PetSpacing.xs),
@@ -221,12 +227,14 @@ class ReportReviewScreen extends ConsumerWidget {
   }
 
   Widget _buildPhotoThumb(BuildContext context, String url) {
+    final cs = Theme.of(context).colorScheme;
+
     return Container(
       width: 60,
       height: 60,
       decoration: BoxDecoration(
         borderRadius: PetRadius.mdAll,
-        border: Border.all(color: PetColors.border),
+        border: Border.all(color: cs.outlineVariant),
       ),
       child: ClipRRect(
         borderRadius: PetRadius.mdAll,
@@ -237,49 +245,24 @@ class ReportReviewScreen extends ConsumerWidget {
                 width: 60,
                 height: 60,
                 errorBuilder: (context, error, stackTrace) =>
-                    _buildPlaceholder(),
+                    _buildPlaceholder(context),
               )
-            : _buildPlaceholder(),
+            : _buildPlaceholder(context),
       ),
     );
   }
 
-  Widget _buildPlaceholder() {
+  Widget _buildPlaceholder(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
-      color: PetColors.background,
+      color: cs.surfaceContainerHighest,
       child: Center(
         child: Icon(
           Icons.image_outlined,
           size: 24,
-          color: PetColors.textSecondary.withValues(alpha: 0.5),
+          color: cs.onSurfaceVariant.withValues(alpha: 0.5),
         ),
       ),
-    );
-  }
-
-  Widget _buildStepIndicator(BuildContext context, int current, int total) {
-    return Row(
-      children: List.generate(total, (index) {
-        final isActive = index < current;
-        final isCurrent = index == current - 1;
-        final children = <Widget>[
-          Expanded(
-            child: Container(
-              height: 4,
-              decoration: BoxDecoration(
-                color: isActive || isCurrent
-                    ? PetColors.primary
-                    : PetColors.border,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-        ];
-        if (index < total - 1) {
-          children.add(const SizedBox(width: PetSpacing.sm));
-        }
-        return Expanded(child: Row(children: children));
-      }),
     );
   }
 

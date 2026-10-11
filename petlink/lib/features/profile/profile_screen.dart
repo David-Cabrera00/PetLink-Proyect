@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../core/theme/pet_colors.dart';
@@ -47,6 +48,8 @@ class ProfileScreen extends ConsumerWidget {
             _buildUserSection(context, user),
             const SizedBox(height: PetSpacing.xl),
           ],
+          _buildMyReportsTile(context),
+          const SizedBox(height: PetSpacing.xl),
           _buildAppearanceSection(context, ref, themeMode),
           const SizedBox(height: PetSpacing.xl),
           _buildLanguageSection(context, ref, locale),
@@ -62,6 +65,42 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ],
         ],
+      ),
+    );
+  }
+
+  Widget _buildMyReportsTile(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final cs = Theme.of(context).colorScheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: PetRadius.lgAll,
+        border: Border.all(color: cs.outlineVariant),
+      ),
+      child: ListTile(
+        shape: RoundedRectangleBorder(borderRadius: PetRadius.lgAll),
+        leading: Container(
+          padding: const EdgeInsets.all(PetSpacing.sm),
+          decoration: BoxDecoration(
+            color: cs.primaryContainer,
+            borderRadius: PetRadius.mdAll,
+          ),
+          child: Icon(Icons.pets, color: cs.primary),
+        ),
+        title: Text(
+          l10n.reportsTitle,
+          style: Theme.of(context).textTheme.titleMedium
+              ?.copyWith(fontWeight: FontWeight.w600),
+        ),
+        subtitle: Text(
+          'Administra y consulta tus mascotas reportadas',
+          style: Theme.of(context).textTheme.bodySmall
+              ?.copyWith(color: cs.onSurfaceVariant),
+        ),
+        trailing: Icon(Icons.chevron_right, color: cs.onSurfaceVariant),
+        onTap: () => context.go('/reports'),
       ),
     );
   }

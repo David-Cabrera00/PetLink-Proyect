@@ -46,9 +46,8 @@ class ReportDetailScreen extends ConsumerWidget {
                 ClipboardData(text: 'https://petlink.app/reports/$reportId'),
               );
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.shareAction)),
-                );
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text(l10n.shareAction)));
               }
             },
           ),
@@ -370,9 +369,8 @@ class ReportDetailScreen extends ConsumerWidget {
             right: PetSpacing.sm,
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface.withValues(
-                  alpha: 0.9,
-                ),
+                color: Theme.of(context).colorScheme.surface
+                    .withValues(alpha: 0.9),
                 borderRadius: PetRadius.smAll,
               ),
               child: Padding(
@@ -394,9 +392,8 @@ class ReportDetailScreen extends ConsumerWidget {
               '\u00A9 OpenStreetMap contributors',
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
-                backgroundColor: Theme.of(context).colorScheme.surface.withValues(
-                  alpha: 0.85,
-                ),
+                backgroundColor: Theme.of(context).colorScheme.surface
+                    .withValues(alpha: 0.85),
               ),
             ),
           ),
@@ -439,12 +436,14 @@ class ReportDetailScreen extends ConsumerWidget {
               child: OutlinedButton.icon(
                 onPressed: () async {
                   await Clipboard.setData(
-                    ClipboardData(text: 'https://petlink.app/reports/$reportId'),
+                    ClipboardData(
+                      text: 'https://petlink.app/reports/$reportId',
+                    ),
                   );
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(l10n.shareAction)),
-                    );
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(l10n.shareAction)));
                   }
                 },
                 icon: const Icon(Icons.share),
@@ -459,9 +458,9 @@ class ReportDetailScreen extends ConsumerWidget {
               child: PetButton(
                 label: l10n.contactAction,
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.contactAction)),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(l10n.contactAction)));
                 },
                 icon: Icons.phone,
               ),

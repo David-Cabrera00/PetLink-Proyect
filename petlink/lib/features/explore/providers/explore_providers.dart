@@ -25,7 +25,10 @@ final exploreReportsProvider = FutureProvider<List<PetReport>>((ref) async {
   final repository = ref.watch(petReportRepositoryProvider);
   final filter = ref.watch(exploreFilterProvider);
   final currentLocation = ref.watch(exploreLocationProvider);
-  final searchQuery = ref.watch(exploreSearchQueryProvider).trim().toLowerCase();
+  final searchQuery = ref
+      .watch(exploreSearchQueryProvider)
+      .trim()
+      .toLowerCase();
 
   final reports = await repository.getNearbyReports();
 
@@ -59,7 +62,8 @@ final exploreReportsProvider = FutureProvider<List<PetReport>>((ref) async {
       final address = report.address.toLowerCase();
       final description = report.description.toLowerCase();
 
-      final matchesQuery = name.contains(searchQuery) ||
+      final matchesQuery =
+          name.contains(searchQuery) ||
           breed.contains(searchQuery) ||
           species.contains(searchQuery) ||
           address.contains(searchQuery) ||

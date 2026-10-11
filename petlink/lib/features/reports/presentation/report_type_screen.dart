@@ -40,12 +40,17 @@ class ReportTypeScreen extends ConsumerWidget {
               const SizedBox(height: PetSpacing.xl),
               Text(
                 l10n.reportCreate,
-                style: Theme.of(context).textTheme.displaySmall,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               const SizedBox(height: PetSpacing.xs),
               Text(
                 l10n.reportWhatHappened,
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: PetSpacing.xl),
               Expanded(
@@ -107,31 +112,43 @@ class ReportTypeScreen extends ConsumerWidget {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
+    final cs = Theme.of(context).colorScheme;
+
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeInOut,
         padding: const EdgeInsets.all(PetSpacing.lg),
         decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.08) : PetColors.surface,
+          color: isSelected ? color.withValues(alpha: 0.08) : cs.surface,
           borderRadius: PetRadius.xlAll,
           border: Border.all(
-            color: isSelected ? color : PetColors.border,
+            color: isSelected ? color : cs.outlineVariant,
             width: isSelected ? 2 : 1,
           ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: color.withValues(alpha: 0.12),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(PetSpacing.md),
               decoration: BoxDecoration(
-                color: isSelected ? color : color.withValues(alpha: 0.15),
+                color: isSelected ? color : color.withValues(alpha: 0.12),
                 borderRadius: PetRadius.lgAll,
               ),
               child: Icon(
                 icon,
-                color: isSelected ? PetColors.surface : color,
-                size: 28,
+                color: isSelected ? Colors.white : color,
+                size: 26,
               ),
             ),
             const SizedBox(width: PetSpacing.md),
@@ -142,20 +159,35 @@ class ReportTypeScreen extends ConsumerWidget {
                   Text(
                     title,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: isSelected ? color : PetColors.textPrimary,
+                      fontWeight: FontWeight.w700,
+                      color: isSelected ? color : cs.onSurface,
                     ),
                   ),
                   const SizedBox(height: PetSpacing.xs),
                   Text(
                     subtitle,
                     style: Theme.of(context).textTheme.bodySmall
-                        ?.copyWith(color: PetColors.textSecondary),
+                        ?.copyWith(color: cs.onSurfaceVariant),
                   ),
                 ],
               ),
             ),
-            if (isSelected) Icon(Icons.check_circle, color: color, size: 24),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isSelected ? color : Colors.transparent,
+                border: Border.all(
+                  color: isSelected ? color : cs.outlineVariant,
+                  width: 2,
+                ),
+              ),
+              child: isSelected
+                  ? const Icon(Icons.check, size: 16, color: Colors.white)
+                  : null,
+            ),
           ],
         ),
       ),

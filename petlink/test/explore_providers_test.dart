@@ -30,8 +30,10 @@ void main() {
     final container = _createContainer(reports);
     addTearDown(container.dispose);
 
-    container.read(exploreLocationProvider.notifier).state =
-        const LatLng(1.2136, -77.2811);
+    container.read(exploreLocationProvider.notifier).state = const LatLng(
+      1.2136,
+      -77.2811,
+    );
     container.read(exploreFilterProvider.notifier).state = ExploreFilter.nearby;
 
     final result = await container.read(exploreReportsProvider.future);

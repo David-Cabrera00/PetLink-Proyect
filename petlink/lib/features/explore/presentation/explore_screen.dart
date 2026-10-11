@@ -55,7 +55,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     final viewMode = ref.watch(exploreViewModeProvider);
 
     // Si la búsqueda da 1 resultado exacto, seleccionar y centrar en el mapa
-    ref.listen<AsyncValue<List<PetReport>>>(exploreReportsProvider, (previous, next) {
+    ref.listen<AsyncValue<List<PetReport>>>(exploreReportsProvider, (
+      previous,
+      next,
+    ) {
       final query = ref.read(exploreSearchQueryProvider).trim();
       final reports = next.valueOrNull;
       if (query.isNotEmpty && reports != null && reports.length == 1) {
@@ -72,15 +75,20 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
         title: Text(l10n.navigationExplore),
         actions: [
           IconButton(
-            tooltip: viewMode == ExploreViewMode.map ? 'Ver en lista' : 'Ver en mapa',
+            tooltip: viewMode == ExploreViewMode.map
+                ? 'Ver en lista'
+                : 'Ver en mapa',
             icon: Icon(
-              viewMode == ExploreViewMode.map ? Icons.format_list_bulleted : Icons.map_outlined,
+              viewMode == ExploreViewMode.map
+                  ? Icons.format_list_bulleted
+                  : Icons.map_outlined,
             ),
             onPressed: () {
-              ref.read(exploreViewModeProvider.notifier).state =
-                  viewMode == ExploreViewMode.map
-                      ? ExploreViewMode.list
-                      : ExploreViewMode.map;
+              ref
+                  .read(exploreViewModeProvider.notifier)
+                  .state = viewMode == ExploreViewMode.map
+                  ? ExploreViewMode.list
+                  : ExploreViewMode.map;
             },
           ),
         ],
@@ -113,7 +121,11 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           left: PetSpacing.lg,
                           right: PetSpacing.lg,
                           bottom: PetSpacing.lg,
-                          child: _buildReportPreview(context, selectedReport, ref),
+                          child: _buildReportPreview(
+                            context,
+                            selectedReport,
+                            ref,
+                          ),
                         ),
                     ],
                   )
@@ -246,77 +258,81 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             children: [
               FlutterMap(
                 mapController: _mapController,
-            options: MapOptions(
-              initialCenter: const LatLng(1.2136, -77.2811),
-              initialZoom: 12,
-              onTap: (_, _) {
-                if (ref.read(selectedReportProvider) != null) {
-                  ref.read(selectedReportProvider.notifier).state = null;
-                }
-              },
-              interactionOptions: const InteractionOptions(
-                flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
-              ),
-            ),
-            children: [
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.petlink.app',
-              ),
-              MarkerLayer(
-                markers: [
-                  for (final report in reports)
-                    Marker(
-                      point: LatLng(report.latitude, report.longitude),
-                      width: 44,
-                      height: 44,
-                      child: Tooltip(
-                        message: report.pet.name,
-                        child: GestureDetector(
-                          onTap: () => ref
-                              .read(selectedReportProvider.notifier)
-                              .state = report,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: report.type == ReportType.lost
-                                  ? PetColors.lost
-                                  : PetColors.found,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: PetColors.surface,
-                                width: 3,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.2),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 2),
+                options: MapOptions(
+                  initialCenter: const LatLng(1.2136, -77.2811),
+                  initialZoom: 12,
+                  onTap: (_, _) {
+                    if (ref.read(selectedReportProvider) != null) {
+                      ref.read(selectedReportProvider.notifier).state = null;
+                    }
+                  },
+                  interactionOptions: const InteractionOptions(
+                    flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+                  ),
+                ),
+                children: [
+                  TileLayer(
+                    urlTemplate:
+                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    userAgentPackageName: 'com.petlink.app',
+                  ),
+                  MarkerLayer(
+                    markers: [
+                      for (final report in reports)
+                        Marker(
+                          point: LatLng(report.latitude, report.longitude),
+                          width: 44,
+                          height: 44,
+                          child: Tooltip(
+                            message: report.pet.name,
+                            child: GestureDetector(
+                              onTap: () =>
+                                  ref
+                                          .read(selectedReportProvider.notifier)
+                                          .state =
+                                      report,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: report.type == ReportType.lost
+                                      ? PetColors.lost
+                                      : PetColors.found,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: PetColors.surface,
+                                    width: 3,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.2,
+                                      ),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                            child: Icon(
-                              report.type == ReportType.lost
-                                  ? Icons.pets
-                                  : Icons.pets_outlined,
-                              size: 22,
-                              color: PetColors.surface,
+                                child: Icon(
+                                  report.type == ReportType.lost
+                                      ? Icons.pets
+                                      : Icons.pets_outlined,
+                                  size: 22,
+                                  color: PetColors.surface,
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
+                    ],
+                  ),
                 ],
-              ),
-            ],
               ),
               Positioned(
                 left: PetSpacing.sm,
                 top: PetSpacing.sm,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface.withValues(
-                      alpha: 0.85,
-                    ),
+                    color: Theme.of(context).colorScheme.surface
+                        .withValues(alpha: 0.85),
                     borderRadius: PetRadius.smAll,
                   ),
                   child: Padding(
@@ -336,9 +352,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 top: PetSpacing.sm,
                 child: IconButton.filled(
                   tooltip: l10n.useCurrentLocation,
-                  onPressed: _isLocating
-                      ? null
-                      : () => _useCurrentLocation(),
+                  onPressed: _isLocating ? null : () => _useCurrentLocation(),
                   icon: _isLocating
                       ? const SizedBox(
                           width: 20,
@@ -384,9 +398,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       }
       if (permission == LocationPermission.deniedForever) {
         if (!mounted) return;
-        _showLocationMessage(
-          l10n.locationPermissionPermanentlyDenied,
-        );
+        _showLocationMessage(l10n.locationPermissionPermanentlyDenied);
         return;
       }
 
@@ -429,7 +441,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     color: Theme.of(context).colorScheme.primaryContainer,
                     borderRadius: PetRadius.mdAll,
                   ),
-                  child: report.pet.primaryPhotoUrl != null &&
+                  child:
+                      report.pet.primaryPhotoUrl != null &&
                           report.pet.primaryPhotoUrl!.isNotEmpty
                       ? Image.network(
                           report.pet.primaryPhotoUrl!,
@@ -476,14 +489,17 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           InkWell(
                             borderRadius: BorderRadius.circular(100),
                             onTap: () {
-                              ref.read(selectedReportProvider.notifier).state = null;
+                              ref.read(selectedReportProvider.notifier).state =
+                                  null;
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(PetSpacing.xs),
                               child: Icon(
                                 Icons.close,
                                 size: 18,
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
                               ),
                             ),
                           ),
@@ -500,7 +516,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           Icon(
                             Icons.location_on,
                             size: 14,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant,
                           ),
                           const SizedBox(width: PetSpacing.xs),
                           Text(
@@ -511,7 +529,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           Icon(
                             Icons.access_time,
                             size: 14,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant,
                           ),
                           const SizedBox(width: PetSpacing.xs),
                           Text(
@@ -539,9 +559,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 const SizedBox(width: PetSpacing.md),
                 IconButton(
                   onPressed: () {
-                    final saved = {
-                      ...ref.read(savedReportIdsProvider),
-                    };
+                    final saved = {...ref.read(savedReportIdsProvider)};
                     if (!saved.add(report.id)) saved.remove(report.id);
                     ref.read(savedReportIdsProvider.notifier).state = saved;
                   },
@@ -552,7 +570,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     color: Theme.of(context).colorScheme.primary,
                   ),
                   style: IconButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
+                    backgroundColor: Theme.of(context)
+                        .colorScheme
+                        .primaryContainer
+                        .withValues(alpha: 0.5),
                     shape: RoundedRectangleBorder(
                       borderRadius: PetRadius.mdAll,
                     ),
@@ -562,17 +583,25 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 IconButton(
                   onPressed: () async {
                     await Clipboard.setData(
-                      ClipboardData(text: 'https://petlink.app/reports/${report.id}'),
+                      ClipboardData(
+                        text: 'https://petlink.app/reports/${report.id}',
+                      ),
                     );
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.shareAction)),
-                      );
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(SnackBar(content: Text(l10n.shareAction)));
                     }
                   },
-                  icon: Icon(Icons.share, color: Theme.of(context).colorScheme.primary),
+                  icon: Icon(
+                    Icons.share,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                   style: IconButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
+                    backgroundColor: Theme.of(context)
+                        .colorScheme
+                        .primaryContainer
+                        .withValues(alpha: 0.5),
                     shape: RoundedRectangleBorder(
                       borderRadius: PetRadius.mdAll,
                     ),
@@ -617,9 +646,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
           },
         );
       },
-      loading: () => Center(
-        child: CircularProgressIndicator(color: PetColors.primary),
-      ),
+      loading: () =>
+          Center(child: CircularProgressIndicator(color: PetColors.primary)),
       error: (_, _) => ErrorState(
         title: l10n.exploreMapLoadError,
         subtitle: l10n.connectionRetryDescription,

@@ -81,6 +81,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // 1. Nombre
                         if (!isFound) ...[
                           PetInput(
                             label: l10n.reportPetInfoName,
@@ -94,27 +95,50 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                             },
                           ),
                           const SizedBox(height: PetSpacing.md),
+                        ] else ...[
+                          PetInput(
+                            label: l10n.reportPetInfoNameOptional,
+                            hint: l10n.reportPetInfoNameHint,
+                            controller: _nameController,
+                          ),
+                          const SizedBox(height: PetSpacing.md),
                         ],
-                        PetInput(
-                          label: isFound
-                              ? l10n.reportPetInfoNameOptional
-                              : l10n.reportPetInfoSpecies,
-                          hint: isFound
-                              ? l10n.reportPetInfoNameHint
-                              : l10n.reportPetInfoSpeciesHint,
-                          controller: isFound
-                              ? _nameController
-                              : _speciesController,
-                          validator: isFound
-                              ? null
-                              : (value) {
-                                  if (value == null || value.trim().isEmpty) {
-                                    return l10n.requiredSpecies;
-                                  }
-                                  return null;
-                                },
+
+                        // 2. Especie con selector rápido
+                        Text(
+                          l10n.reportPetInfoSpecies,
+                          style: Theme.of(context).textTheme.labelLarge
+                              ?.copyWith(fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: PetSpacing.xs),
+                        Row(
+                          children: [
+                            _buildChoiceChip(
+                              label: 'Perro',
+                              icon: Icons.pets,
+                              isSelected:
+                                  _speciesController.text.toLowerCase() ==
+                                  'perro',
+                              onSelected: () => setState(
+                                () => _speciesController.text = 'Perro',
+                              ),
+                            ),
+                            const SizedBox(width: PetSpacing.sm),
+                            _buildChoiceChip(
+                              label: 'Gato',
+                              icon: Icons.pets_outlined,
+                              isSelected:
+                                  _speciesController.text.toLowerCase() ==
+                                  'gato',
+                              onSelected: () => setState(
+                                () => _speciesController.text = 'Gato',
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: PetSpacing.md),
+
+                        // 3. Raza
                         PetInput(
                           label: l10n.reportPetInfoBreed,
                           hint: l10n.reportPetInfoBreedHint,
@@ -127,45 +151,91 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                           },
                         ),
                         const SizedBox(height: PetSpacing.md),
+
+                        // 4. Sexo con selector rápido
+                        Text(
+                          l10n.reportPetInfoSex,
+                          style: Theme.of(context).textTheme.labelLarge
+                              ?.copyWith(fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: PetSpacing.xs),
                         Row(
                           children: [
-                            Expanded(
-                              child: PetInput(
-                                label: l10n.reportPetInfoSex,
-                                hint: l10n.reportPetInfoSexHint,
-                                controller: _sexController,
-                                validator: (value) {
-                                  if (value == null || value.trim().isEmpty) {
-                                    return l10n.requiredField;
-                                  }
-                                  return null;
-                                },
-                              ),
+                            _buildChoiceChip(
+                              label: 'Macho',
+                              icon: Icons.male,
+                              isSelected:
+                                  _sexController.text.toLowerCase() == 'macho',
+                              onSelected: () =>
+                                  setState(() => _sexController.text = 'Macho'),
                             ),
-                            const SizedBox(width: PetSpacing.md),
-                            Expanded(
-                              child: PetInput(
-                                label: l10n.reportPetInfoAge,
-                                hint: l10n.reportPetInfoAgeHint,
-                                controller: _ageController,
-                                validator: (value) {
-                                  if (value == null || value.trim().isEmpty) {
-                                    return l10n.requiredField;
-                                  }
-                                  return null;
-                                },
+                            const SizedBox(width: PetSpacing.sm),
+                            _buildChoiceChip(
+                              label: 'Hembra',
+                              icon: Icons.female,
+                              isSelected:
+                                  _sexController.text.toLowerCase() == 'hembra',
+                              onSelected: () => setState(
+                                () => _sexController.text = 'Hembra',
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: PetSpacing.md),
+
+                        // 5. Tamaño con selector rápido
+                        Text(
+                          l10n.reportPetInfoSize,
+                          style: Theme.of(context).textTheme.labelLarge
+                              ?.copyWith(fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: PetSpacing.xs),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              _buildChoiceChip(
+                                label: 'Pequeño',
+                                isSelected:
+                                    _sizeController.text.toLowerCase() ==
+                                    'pequeño',
+                                onSelected: () => setState(
+                                  () => _sizeController.text = 'Pequeño',
+                                ),
+                              ),
+                              const SizedBox(width: PetSpacing.sm),
+                              _buildChoiceChip(
+                                label: 'Mediano',
+                                isSelected:
+                                    _sizeController.text.toLowerCase() ==
+                                    'mediano',
+                                onSelected: () => setState(
+                                  () => _sizeController.text = 'Mediano',
+                                ),
+                              ),
+                              const SizedBox(width: PetSpacing.sm),
+                              _buildChoiceChip(
+                                label: 'Grande',
+                                isSelected:
+                                    _sizeController.text.toLowerCase() ==
+                                    'grande',
+                                onSelected: () => setState(
+                                  () => _sizeController.text = 'Grande',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: PetSpacing.md),
+
+                        // 6. Edad y Color
                         Row(
                           children: [
                             Expanded(
                               child: PetInput(
-                                label: l10n.reportPetInfoSize,
-                                hint: l10n.reportPetInfoSizeHint,
-                                controller: _sizeController,
+                                label: l10n.reportPetInfoAge,
+                                hint: l10n.reportPetInfoAgeHint,
+                                controller: _ageController,
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
                                     return l10n.requiredField;
@@ -199,6 +269,55 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
               _buildActionButtons(context, ref),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChoiceChip({
+    required String label,
+    IconData? icon,
+    required bool isSelected,
+    required VoidCallback onSelected,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+
+    return GestureDetector(
+      onTap: onSelected,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(
+          horizontal: PetSpacing.md,
+          vertical: PetSpacing.sm + 2,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected ? cs.primary : cs.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? cs.primary : cs.outlineVariant,
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(
+                icon,
+                size: 16,
+                color: isSelected ? cs.onPrimary : cs.onSurfaceVariant,
+              ),
+              const SizedBox(width: PetSpacing.xs),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected ? cs.onPrimary : cs.onSurface,
+              ),
+            ),
+          ],
         ),
       ),
     );
