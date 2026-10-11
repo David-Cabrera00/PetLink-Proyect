@@ -7,47 +7,81 @@ import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_radius.dart';
 import '../../../core/theme/pet_spacing.dart';
-import '../../../core/theme/pet_theme_extension.dart';
 import '../../../core/theme/pet_typography.dart';
 import '../../../design_system/buttons/pet_button.dart';
-import '../../../shared/widgets/animal_pattern_field.dart';
 
-class WelcomeScreen extends StatefulWidget {
-  const WelcomeScreen({super.key});
+class _Decoration {
+  const _Decoration(
+    this.asset,
+    this.dx,
+    this.dy,
+    this.size,
+    this.angle,
+    this.opacity,
+  );
 
-  @override
-  State<WelcomeScreen> createState() => _WelcomeScreenState();
+  final String asset;
+
+  /// Posición horizontal (centro) y vertical (borde superior) como fracción.
+  final double dx;
+  final double dy;
+  final double size;
+  final double angle;
+  final double opacity;
 }
 
-class _WelcomeScreenState extends State<WelcomeScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _animController;
-  late final Animation<double> _horizontalAnim;
+const _paw = 'assets/decorations/paw_prints.png';
+const _pin = 'assets/decorations/location_pin.png';
 
-  @override
-  void initState() {
-    super.initState();
-    _animController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 3600),
-    )..repeat(reverse: true);
-    _horizontalAnim = CurvedAnimation(
-      parent: _animController,
-      curve: Curves.easeInOutCubic,
-    );
-  }
+// Distribución orgánica por toda la pantalla (superior, media y baja/lateral)
+// evitando el wordmark y no compitiendo con el card.
+const _decorations = <_Decoration>[
+  // --- Zona Superior (arriba del card, laterales y centro-alto) ---
+  _Decoration(_paw, 0.88, 0.06, 26, 0.4, 0.22),
+  _Decoration(_paw, 0.52, 0.10, 24, -0.3, 0.20),
+  _Decoration(_paw, 0.12, 0.16, 28, -0.4, 0.24),
+  _Decoration(_pin, 0.76, 0.14, 22, 0, 0.22),
+  _Decoration(_paw, 0.40, 0.20, 20, 0.5, 0.18),
+  _Decoration(_pin, 0.89, 0.25, 20, 0, 0.20),
+  _Decoration(_paw, 0.18, 0.28, 30, 0.6, 0.22),
 
-  @override
-  void dispose() {
-    _animController.dispose();
-    super.dispose();
-  }
+  // --- Zona Media / Laterales (afuera del card en pantallas más anchas o bordes) ---
+  _Decoration(_paw, 0.93, 0.45, 26, -0.35, 0.20),
+  _Decoration(_pin, 0.06, 0.48, 22, 0, 0.20),
+  _Decoration(_paw, 0.90, 0.62, 28, 0.3, 0.22),
+  _Decoration(_paw, 0.08, 0.68, 24, 0.5, 0.20),
+
+  // --- Zona Inferior (debajo y en esquinas inferiores) ---
+  _Decoration(_pin, 0.15, 0.84, 24, 0, 0.20),
+  _Decoration(_paw, 0.84, 0.86, 28, -0.4, 0.22),
+  _Decoration(_paw, 0.48, 0.93, 24, 0.25, 0.18),
+  _Decoration(_paw, 0.12, 0.95, 26, -0.2, 0.20),
+];
+
+class WelcomeScreen extends StatelessWidget {
+  const WelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final cs = theme.colorScheme;
+
+    // Paleta adaptativa para el fondo según modo claro / oscuro
+    final gradientColors = isDark
+        ? [cs.primary.withValues(alpha: 0.78), cs.primary]
+        : [
+            const Color(0xFFE0F2F1),
+            const Color(0xFFB2DFDB),
+          ]; // Teal muy claro / aqua suave
+
+    final overlayColors = isDark
+        ? [cs.primary.withValues(alpha: 0.28), cs.scrim.withValues(alpha: 0.78)]
+        : [
+            Colors.white.withValues(alpha: 0.40),
+            const Color(0xFF80CBC4).withValues(alpha: 0.25),
+          ];
 
     return Scaffold(
       body: Stack(
@@ -58,13 +92,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [cs.primary.withValues(alpha: 0.78), cs.primary],
+                colors: gradientColors,
               ),
-            ),
-          ),
-          Positioned.fill(
-            child: AnimalPatternField(
-              colors: [cs.tertiary, cs.secondary, cs.onPrimary],
             ),
           ),
           DecoratedBox(
@@ -72,13 +101,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  cs.primary.withValues(alpha: 0.28),
-                  cs.scrim.withValues(alpha: 0.78),
-                ],
+                colors: overlayColors,
               ),
             ),
           ),
+          Positioned.fill(child: _buildDecorations(isDark)),
           SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -86,10 +113,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     ? PetSpacing.lg
                     : PetSpacing.xxl;
 
-                final topSpacing = (constraints.maxHeight * 0.05).clamp(
-                  PetSpacing.md,
-                  PetSpacing.xl,
-                );
+                final minHeight = constraints.maxHeight.isFinite
+                    ? math.max(0.0, constraints.maxHeight - (PetSpacing.lg * 2))
+                    : 0.0;
 
                 return SingleChildScrollView(
                   padding: EdgeInsets.fromLTRB(
@@ -100,17 +126,15 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   ),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight - PetSpacing.xl,
+                      minHeight: minHeight,
                       maxWidth: 520,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildWordmark(context),
-                        SizedBox(height: topSpacing),
-                        SizedBox(height: topSpacing * 1.5),
-                        SizedBox(height: topSpacing),
-                        _buildGlassContent(context, l10n),
+                        _buildWordmark(context, isDark),
+                        SizedBox(height: constraints.maxHeight * 0.28),
+                        _buildGlassContent(context, l10n, isDark),
                       ],
                     ),
                   ),
@@ -123,7 +147,44 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 
-  Widget _buildWordmark(BuildContext context) {
+  /// Huellas y pins con posiciones fraccionales orgánicas.
+  Widget _buildDecorations(bool isDark) {
+    return IgnorePointer(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth;
+          final height = constraints.maxHeight;
+          return Stack(
+            children: [
+              for (final item in _decorations)
+                Positioned(
+                  left: width * item.dx - item.size / 2,
+                  top: height * item.dy,
+                  child: Opacity(
+                    opacity: isDark
+                        ? item.opacity
+                        : (item.opacity * 1.35).clamp(0.0, 0.45),
+                    child: Transform.rotate(
+                      angle: item.angle,
+                      child: Image.asset(
+                        item.asset,
+                        width: item.size,
+                        height: item.size,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const SizedBox.shrink(),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildWordmark(BuildContext context, bool isDark) {
     final cs = Theme.of(context).colorScheme;
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -132,8 +193,17 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           width: 34,
           height: 34,
           decoration: BoxDecoration(
-            color: cs.surface.withValues(alpha: 0.88),
+            color: isDark ? cs.surface.withValues(alpha: 0.88) : Colors.white,
             borderRadius: PetRadius.mdAll,
+            boxShadow: isDark
+                ? null
+                : [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.06),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
           ),
           child: Icon(Icons.pets, color: cs.primary, size: 19),
         ),
@@ -141,7 +211,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         Text(
           'PetLink',
           style: PetTypography.title.copyWith(
-            color: Colors.white,
+            color: isDark ? Colors.white : cs.primary,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -149,60 +219,26 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 
-  /// Placeholder abstracto preparado para sustituirse por una ilustración real.
-  Widget _buildHeroIllustration(BuildContext context) {
+  Widget _buildGlassContent(
+    BuildContext context,
+    AppLocalizations l10n,
+    bool isDark,
+  ) {
     final cs = Theme.of(context).colorScheme;
-    final accent = PetThemeExtension.of(context).accent;
-    return SizedBox(
-      height: 168,
-      width: double.infinity,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: cs.surface.withValues(alpha: 0.12),
-          borderRadius: PetRadius.xxlAll,
-          border: Border.all(color: cs.onPrimary.withValues(alpha: 0.24)),
-        ),
-        child: ClipRRect(
-          borderRadius: PetRadius.xxlAll,
-          child: AnimatedBuilder(
-            animation: _animController,
-            builder: (context, child) => Transform.translate(
-              offset: Offset(
-                0,
-                math.sin(_horizontalAnim.value * math.pi * 2) * 2,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: PetSpacing.lg,
-                  vertical: PetSpacing.sm,
-                ),
-                child: Semantics(
-                  image: true,
-                  label: 'Ilustración de PetLink',
-                  child: Image.asset(
-                    'assets/illustrations/petlink_welcome.png',
-                    fit: BoxFit.contain,
-                    alignment: Alignment.center,
-                    errorBuilder: (context, error, stackTrace) => CustomPaint(
-                      painter: _WelcomeHeroPainter(
-                        progress: _horizontalAnim.value,
-                        routeColor: cs.onPrimary.withValues(alpha: 0.42),
-                        accentColor: accent,
-                        markerColor: cs.onPrimary,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
-  Widget _buildGlassContent(BuildContext context, AppLocalizations l10n) {
-    final cs = Theme.of(context).colorScheme;
+    final cardBg = isDark
+        ? cs.surface.withValues(alpha: 0.18)
+        : Colors.white.withValues(alpha: 0.82);
+
+    final cardBorder = isDark
+        ? Border.all(color: Colors.white.withValues(alpha: 0.42))
+        : Border.all(color: Colors.white.withValues(alpha: 0.90), width: 1.5);
+
+    final titleColor = isDark ? Colors.white : const Color(0xFF103943);
+    final descColor = isDark
+        ? Colors.white.withValues(alpha: 0.86)
+        : const Color(0xFF37474F);
+
     return ClipRRect(
       borderRadius: PetRadius.xxlAll,
       child: BackdropFilter(
@@ -211,9 +247,18 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           width: double.infinity,
           padding: const EdgeInsets.all(PetSpacing.xl),
           decoration: BoxDecoration(
-            color: cs.surface.withValues(alpha: 0.18),
+            color: cardBg,
             borderRadius: PetRadius.xxlAll,
-            border: Border.all(color: Colors.white.withValues(alpha: 0.42)),
+            border: cardBorder,
+            boxShadow: isDark
+                ? null
+                : [
+                    BoxShadow(
+                      color: const Color(0xFF004D40).withValues(alpha: 0.08),
+                      blurRadius: 24,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,7 +266,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               Text(
                 l10n.authWelcomeTitle,
                 style: PetTypography.display.copyWith(
-                  color: Colors.white,
+                  color: titleColor,
                   fontSize: 34,
                   height: 1.08,
                   letterSpacing: -1.1,
@@ -231,20 +276,22 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               Text(
                 l10n.authWelcomeDescription,
                 style: PetTypography.body.copyWith(
-                  color: Colors.white.withValues(alpha: 0.86),
+                  color: descColor,
                   height: 1.5,
                 ),
               ),
               const SizedBox(height: PetSpacing.xl),
               PetButton(
                 label: l10n.authLogin,
-                variant: PetButtonVariant.accent,
+                variant: PetButtonVariant.primary,
                 onPressed: () => context.go('/login'),
               ),
               const SizedBox(height: PetSpacing.sm),
               PetButton(
                 label: l10n.authCreateAccount,
-                variant: PetButtonVariant.lightOutline,
+                variant: isDark
+                    ? PetButtonVariant.secondary
+                    : PetButtonVariant.outline,
                 onPressed: () => context.go('/register'),
               ),
             ],
@@ -253,117 +300,4 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       ),
     );
   }
-}
-
-class _WelcomeHeroPainter extends CustomPainter {
-  const _WelcomeHeroPainter({
-    required this.progress,
-    required this.routeColor,
-    required this.accentColor,
-    required this.markerColor,
-  });
-
-  final double progress;
-  final Color routeColor;
-  final Color accentColor;
-  final Color markerColor;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final routePaint = Paint()
-      ..color = routeColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.4
-      ..strokeCap = StrokeCap.round;
-
-    final route = Path()
-      ..moveTo(size.width * 0.10, size.height * 0.72)
-      ..cubicTo(
-        size.width * 0.28,
-        size.height * 0.42,
-        size.width * 0.48,
-        size.height * 0.92,
-        size.width * 0.76,
-        size.height * 0.32,
-      );
-    canvas.drawPath(route, routePaint);
-
-    final animatedPoint = Offset(
-      size.width * (0.20 + progress * 0.45),
-      size.height * (0.64 - math.sin(progress * math.pi) * 0.16),
-    );
-    _drawPaw(canvas, animatedPoint, accentColor.withValues(alpha: 0.88), 11);
-    _drawPaw(
-      canvas,
-      Offset(size.width * 0.38, size.height * 0.68),
-      markerColor.withValues(alpha: 0.56),
-      9,
-    );
-    _drawPaw(
-      canvas,
-      Offset(size.width * 0.56, size.height * 0.47),
-      markerColor.withValues(alpha: 0.42),
-      8,
-    );
-    _drawPin(
-      canvas,
-      Offset(size.width * 0.79, size.height * 0.25),
-      accentColor,
-    );
-  }
-
-  void _drawPaw(Canvas canvas, Offset center, Color color, double size) {
-    final paint = Paint()..color = color;
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: center,
-        width: size * 0.85,
-        height: size * 0.64,
-      ),
-      paint,
-    );
-
-    for (var index = 0; index < 3; index++) {
-      final angle = -0.95 + index * 0.95;
-      canvas.drawCircle(
-        center + Offset(math.cos(angle) * size * 0.34, math.sin(angle) * size * 0.34),
-        size * 0.14,
-        paint,
-      );
-    }
-  }
-
-  void _drawPin(Canvas canvas, Offset center, Color color) {
-    final pinPath = Path()
-      ..moveTo(center.dx, center.dy + 17)
-      ..cubicTo(
-        center.dx - 14,
-        center.dy + 2,
-        center.dx - 12,
-        center.dy - 11,
-        center.dx,
-        center.dy - 11,
-      )
-      ..cubicTo(
-        center.dx + 12,
-        center.dy - 11,
-        center.dx + 14,
-        center.dy + 2,
-        center.dx,
-        center.dy + 17,
-      );
-    canvas.drawPath(pinPath, Paint()..color = color.withValues(alpha: 0.9));
-    canvas.drawCircle(
-      Offset(center.dx, center.dy - 2),
-      4,
-      Paint()..color = markerColor,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _WelcomeHeroPainter oldDelegate) =>
-      oldDelegate.progress != progress ||
-      oldDelegate.routeColor != routeColor ||
-      oldDelegate.accentColor != accentColor ||
-      oldDelegate.markerColor != markerColor;
 }
