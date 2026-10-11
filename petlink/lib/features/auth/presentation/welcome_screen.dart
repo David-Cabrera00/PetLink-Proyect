@@ -9,7 +9,54 @@ import '../../../core/theme/pet_radius.dart';
 import '../../../core/theme/pet_spacing.dart';
 import '../../../core/theme/pet_typography.dart';
 import '../../../design_system/buttons/pet_button.dart';
-import '../../../shared/widgets/animal_pattern_field.dart';
+
+class _Decoration {
+  const _Decoration(
+    this.asset,
+    this.dx,
+    this.dy,
+    this.size,
+    this.angle,
+    this.opacity,
+  );
+
+  final String asset;
+
+  /// Posición horizontal (centro) y vertical (borde superior) como fracción.
+  final double dx;
+  final double dy;
+  final double size;
+  final double angle;
+  final double opacity;
+}
+
+const _paw = 'assets/decorations/paw_prints.png';
+const _pin = 'assets/decorations/location_pin.png';
+
+// Distribución orgánica por toda la pantalla (superior, media y baja/lateral)
+// evitando el wordmark y no compitiendo con el card.
+const _decorations = <_Decoration>[
+  // --- Zona Superior (arriba del card, laterales y centro-alto) ---
+  _Decoration(_paw, 0.88, 0.06, 26, 0.4, 0.22),
+  _Decoration(_paw, 0.52, 0.10, 24, -0.3, 0.20),
+  _Decoration(_paw, 0.12, 0.16, 28, -0.4, 0.24),
+  _Decoration(_pin, 0.76, 0.14, 22, 0, 0.22),
+  _Decoration(_paw, 0.40, 0.20, 20, 0.5, 0.18),
+  _Decoration(_pin, 0.89, 0.25, 20, 0, 0.20),
+  _Decoration(_paw, 0.18, 0.28, 30, 0.6, 0.22),
+
+  // --- Zona Media / Laterales (afuera del card en pantallas más anchas o bordes) ---
+  _Decoration(_paw, 0.93, 0.45, 26, -0.35, 0.20),
+  _Decoration(_pin, 0.06, 0.48, 22, 0, 0.20),
+  _Decoration(_paw, 0.90, 0.62, 28, 0.3, 0.22),
+  _Decoration(_paw, 0.08, 0.68, 24, 0.5, 0.20),
+
+  // --- Zona Inferior (debajo y en esquinas inferiores) ---
+  _Decoration(_pin, 0.15, 0.84, 24, 0, 0.20),
+  _Decoration(_paw, 0.84, 0.86, 28, -0.4, 0.22),
+  _Decoration(_paw, 0.48, 0.93, 24, 0.25, 0.18),
+  _Decoration(_paw, 0.12, 0.95, 26, -0.2, 0.20),
+];
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -33,11 +80,6 @@ class WelcomeScreen extends StatelessWidget {
               ),
             ),
           ),
-          Positioned.fill(
-            child: AnimalPatternField(
-              colors: [cs.tertiary, cs.secondary, cs.onPrimary],
-            ),
-          ),
           DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -50,6 +92,7 @@ class WelcomeScreen extends StatelessWidget {
               ),
             ),
           ),
+          Positioned.fill(child: _buildDecorations()),
           SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -87,6 +130,42 @@ class WelcomeScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Huellas y pins pequeños y sutiles, ubicados en la zona superior/lateral
+  /// (por encima del card) con posiciones fraccionales irregulares.
+  Widget _buildDecorations() {
+    return IgnorePointer(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth;
+          final height = constraints.maxHeight;
+          return Stack(
+            children: [
+              for (final item in _decorations)
+                Positioned(
+                  left: width * item.dx - item.size / 2,
+                  top: height * item.dy,
+                  child: Opacity(
+                    opacity: item.opacity,
+                    child: Transform.rotate(
+                      angle: item.angle,
+                      child: Image.asset(
+                        item.asset,
+                        width: item.size,
+                        height: item.size,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const SizedBox.shrink(),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }
