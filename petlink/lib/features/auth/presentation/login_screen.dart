@@ -14,13 +14,33 @@ class LoginScreen extends ConsumerStatefulWidget {
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen>
+    with SingleTickerProviderStateMixin {
   static const _pill = BorderRadius.all(Radius.circular(100));
 
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+
+  late final AnimationController _illustrationController;
+  late final Animation<double> _illustrationFloat;
+
+  @override
+  void initState() {
+    super.initState();
+    _illustrationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 3000),
+    );
+
+    // Flotado vertical muy sutil (8 px) en bucle suave.
+    _illustrationFloat = Tween<double>(begin: 0, end: -8).animate(
+      CurvedAnimation(parent: _illustrationController, curve: Curves.easeInOut),
+    );
+
+    _illustrationController.repeat(reverse: true);
+  }
 
   Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
@@ -39,6 +59,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   void dispose() {
+    _illustrationController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -145,24 +166,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  /// Ilustración simple hecha con widgets (sin assets externos).
+  /// Ilustración del login (PNG) con entrada suave y flotado vertical sutil.
   Widget _buildIllustration(Color foreground) {
-    return Container(
-      width: 112,
-      height: 112,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: foreground.withValues(alpha: 0.12),
-      ),
-      alignment: Alignment.center,
-      child: Container(
-        width: 80,
-        height: 80,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: foreground.withValues(alpha: 0.18),
+    final width = MediaQuery.sizeOf(context).width;
+    final height = (width * 0.5).clamp(160.0, 220.0).toDouble();
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 900),
+      curve: Curves.easeInOut,
+      builder: (context, value, child) => Opacity(
+        opacity: value,
+        child: Transform.translate(
+          offset: Offset(0, (1 - value) * 16),
+          child: child,
         ),
-        child: Icon(Icons.pets, size: 44, color: foreground),
+      ),
+      child: AnimatedBuilder(
+        animation: _illustrationFloat,
+        builder: (context, child) => Transform.translate(
+          offset: Offset(0, _illustrationFloat.value),
+          child: child,
+        ),
+        child: SizedBox(
+          height: height,
+          child: Image.asset(
+            'assets/illustrations/petlink_login_dog.png',
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) =>
+                Icon(Icons.pets, size: height * 0.4, color: foreground),
+          ),
+        ),
       ),
     );
   }
