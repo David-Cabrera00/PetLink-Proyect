@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:petlink/l10n/app_localizations.dart';
 
 import '../../../core/theme/pet_radius.dart';
 import '../../../core/theme/pet_spacing.dart';
+import '../../../core/theme/pet_theme_extension.dart';
 import '../../../core/theme/pet_typography.dart';
 import '../../../design_system/buttons/pet_button.dart';
 import '../../../shared/widgets/animal_pattern_field.dart';
@@ -21,7 +23,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _animController;
   late final Animation<double> _horizontalAnim;
-  late final Animation<double> _bounceAnim;
 
   @override
   void initState() {
@@ -36,36 +37,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       curve: Curves.easeInOutCubic,
     );
 
-    _bounceAnim = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween<double>(
-          begin: 0,
-          end: -6,
-        ).chain(CurveTween(curve: Curves.easeOut)),
-        weight: 25,
-      ),
-      TweenSequenceItem(
-        tween: Tween<double>(
-          begin: -6,
-          end: 0,
-        ).chain(CurveTween(curve: Curves.easeIn)),
-        weight: 25,
-      ),
-      TweenSequenceItem(
-        tween: Tween<double>(
-          begin: 0,
-          end: -6,
-        ).chain(CurveTween(curve: Curves.easeOut)),
-        weight: 25,
-      ),
-      TweenSequenceItem(
-        tween: Tween<double>(
-          begin: -6,
-          end: 0,
-        ).chain(CurveTween(curve: Curves.easeIn)),
-        weight: 25,
-      ),
-    ]).animate(_animController);
   }
 
   @override
@@ -139,7 +110,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       children: [
                         _buildWordmark(context),
                         SizedBox(height: topSpacing),
-                        _buildAnimatedPetSection(context, constraints.maxWidth),
+                        _buildHeroIllustration(context),
                         SizedBox(height: topSpacing),
                         _buildGlassContent(context, l10n),
                       ],
@@ -180,126 +151,53 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 
-  /// Sección animada con mascota trotando y huellas sutiles que aparecen detrás.
-  Widget _buildAnimatedPetSection(BuildContext context, double maxWidth) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryGlow = isDark ? Colors.tealAccent : Colors.white;
-
-    final travelRange = (maxWidth.clamp(320.0, 480.0) - 160).clamp(60.0, 160.0);
-
+  /// Placeholder abstracto preparado para sustituirse por una ilustración real.
+  Widget _buildHeroIllustration(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final accent = PetThemeExtension.of(context).accent;
     return SizedBox(
-      height: 100,
+      height: 168,
       width: double.infinity,
-      child: AnimatedBuilder(
-        animation: _animController,
-        builder: (context, child) {
-          final progress = _horizontalAnim.value;
-          final currentX = (progress * travelRange) - (travelRange / 2);
-          final isMovingRight =
-              _animController.status == AnimationStatus.forward;
-          final bounceY = _bounceAnim.value;
-
-          return Stack(
-            alignment: Alignment.center,
-            children: [
-              // Línea sutil de sendero / camino
-              Positioned(
-                bottom: 24,
-                left: 20,
-                right: 20,
-                child: Container(
-                  height: 2,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.transparent,
-                        primaryGlow.withValues(alpha: 0.22),
-                        Colors.transparent,
-                      ],
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: cs.surface.withValues(alpha: 0.12),
+          borderRadius: PetRadius.xxlAll,
+          border: Border.all(color: cs.onPrimary.withValues(alpha: 0.24)),
+        ),
+        child: ClipRRect(
+          borderRadius: PetRadius.xxlAll,
+          child: AnimatedBuilder(
+            animation: _animController,
+            builder: (context, child) => Transform.translate(
+              offset: Offset(
+                0,
+                math.sin(_horizontalAnim.value * math.pi * 2) * 2,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: PetSpacing.lg,
+                  vertical: PetSpacing.sm,
+                ),
+                child: Semantics(
+                  image: true,
+                  label: 'Ilustración de PetLink',
+                  child: Image.asset(
+                    'assets/illustrations/petlink_welcome.png',
+                    fit: BoxFit.contain,
+                    alignment: Alignment.center,
+                    errorBuilder: (context, error, stackTrace) => CustomPaint(
+                      painter: _WelcomeHeroPainter(
+                        progress: _horizontalAnim.value,
+                        routeColor: cs.onPrimary.withValues(alpha: 0.42),
+                        accentColor: accent,
+                        markerColor: cs.onPrimary,
+                      ),
                     ),
                   ),
                 ),
               ),
-              // Huellas sutiles que pulsan o se van desvaneciendo
-              ..._buildPawsTrack(progress, travelRange, primaryGlow),
-              // Mascota / perrito trotando
-              Transform.translate(
-                offset: Offset(currentX, bounceY),
-                child: Transform.flip(
-                  flipX: !isMovingRight,
-                  child: _buildRunningPetAvatar(primaryGlow),
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  /// Huellitas estáticas/sutiles a lo largo de la trayectoria
-  List<Widget> _buildPawsTrack(
-    double progress,
-    double travelRange,
-    Color glowColor,
-  ) {
-    const pawSteps = 4;
-    return List.generate(pawSteps, (index) {
-      final stepFraction = (index + 0.5) / pawSteps;
-      final xPos = (stepFraction * travelRange) - (travelRange / 2);
-      final distance = (progress - stepFraction).abs();
-      final alpha = (1.0 - (distance * 2.8)).clamp(0.08, 0.40);
-      final offsetY = (index % 2 == 0 ? -3.0 : 3.0);
-
-      return Transform.translate(
-        offset: Offset(xPos, 14.0 + offsetY),
-        child: Icon(
-          Icons.pets,
-          size: 13,
-          color: glowColor.withValues(alpha: alpha),
-        ),
-      );
-    });
-  }
-
-  /// Avatar circular con estilizado minimalista que representa la mascota en movimiento
-  Widget _buildRunningPetAvatar(Color glowColor) {
-    return Container(
-      width: 58,
-      height: 58,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white.withValues(alpha: 0.24),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.65),
-          width: 2,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: glowColor.withValues(alpha: 0.25),
-            blurRadius: 14,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: Center(
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.92),
-              ),
-              child: const Icon(
-                Icons.pets,
-                size: 24,
-                color: Color(0xFF0F766E), // PetLink Teal primario
-              ),
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -357,4 +255,117 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       ),
     );
   }
+}
+
+class _WelcomeHeroPainter extends CustomPainter {
+  const _WelcomeHeroPainter({
+    required this.progress,
+    required this.routeColor,
+    required this.accentColor,
+    required this.markerColor,
+  });
+
+  final double progress;
+  final Color routeColor;
+  final Color accentColor;
+  final Color markerColor;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final routePaint = Paint()
+      ..color = routeColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.4
+      ..strokeCap = StrokeCap.round;
+
+    final route = Path()
+      ..moveTo(size.width * 0.10, size.height * 0.72)
+      ..cubicTo(
+        size.width * 0.28,
+        size.height * 0.42,
+        size.width * 0.48,
+        size.height * 0.92,
+        size.width * 0.76,
+        size.height * 0.32,
+      );
+    canvas.drawPath(route, routePaint);
+
+    final animatedPoint = Offset(
+      size.width * (0.20 + progress * 0.45),
+      size.height * (0.64 - math.sin(progress * math.pi) * 0.16),
+    );
+    _drawPaw(canvas, animatedPoint, accentColor.withValues(alpha: 0.88), 11);
+    _drawPaw(
+      canvas,
+      Offset(size.width * 0.38, size.height * 0.68),
+      markerColor.withValues(alpha: 0.56),
+      9,
+    );
+    _drawPaw(
+      canvas,
+      Offset(size.width * 0.56, size.height * 0.47),
+      markerColor.withValues(alpha: 0.42),
+      8,
+    );
+    _drawPin(
+      canvas,
+      Offset(size.width * 0.79, size.height * 0.25),
+      accentColor,
+    );
+  }
+
+  void _drawPaw(Canvas canvas, Offset center, Color color, double size) {
+    final paint = Paint()..color = color;
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: center,
+        width: size * 0.85,
+        height: size * 0.64,
+      ),
+      paint,
+    );
+
+    for (var index = 0; index < 3; index++) {
+      final angle = -0.95 + index * 0.95;
+      canvas.drawCircle(
+        center + Offset(math.cos(angle) * size * 0.34, math.sin(angle) * size * 0.34),
+        size * 0.14,
+        paint,
+      );
+    }
+  }
+
+  void _drawPin(Canvas canvas, Offset center, Color color) {
+    final pinPath = Path()
+      ..moveTo(center.dx, center.dy + 17)
+      ..cubicTo(
+        center.dx - 14,
+        center.dy + 2,
+        center.dx - 12,
+        center.dy - 11,
+        center.dx,
+        center.dy - 11,
+      )
+      ..cubicTo(
+        center.dx + 12,
+        center.dy - 11,
+        center.dx + 14,
+        center.dy + 2,
+        center.dx,
+        center.dy + 17,
+      );
+    canvas.drawPath(pinPath, Paint()..color = color.withValues(alpha: 0.9));
+    canvas.drawCircle(
+      Offset(center.dx, center.dy - 2),
+      4,
+      Paint()..color = markerColor,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _WelcomeHeroPainter oldDelegate) =>
+      oldDelegate.progress != progress ||
+      oldDelegate.routeColor != routeColor ||
+      oldDelegate.accentColor != accentColor ||
+      oldDelegate.markerColor != markerColor;
 }
