@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:petlink/l10n/app_localizations.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/theme/pet_spacing.dart';
 import '../../../core/theme/pet_radius.dart';
@@ -53,7 +54,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
       appBar: AppBar(
         title: Text(l10n.reportLocationTitle),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(PhosphorIconsRegular.arrowLeft),
           onPressed: () => context.go('/report/new/photos'),
         ),
       ),
@@ -154,7 +155,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
                     width: 48,
                     height: 48,
                     child: Icon(
-                      Icons.location_on,
+                      PhosphorIconsRegular.mapPin,
                       size: 42,
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -226,7 +227,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
                         )
                       else
                         const Icon(
-                          Icons.my_location,
+                          PhosphorIconsRegular.crosshair,
                           size: 16,
                           color: Colors.white,
                         ),
@@ -339,7 +340,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
                 context.go('/report/new/details');
               }
             },
-            icon: Icons.arrow_forward,
+            icon: PhosphorIconsRegular.arrowRight,
           ),
         ),
       ],

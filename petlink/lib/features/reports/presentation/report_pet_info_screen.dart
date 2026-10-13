@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/theme/pet_spacing.dart';
 import '../../../design_system/buttons/pet_button.dart';
@@ -63,7 +64,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
       appBar: AppBar(
         title: Text(l10n.reportPetInfoTitle),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(PhosphorIconsRegular.arrowLeft),
           onPressed: () => context.go('/report/new'),
         ),
       ),
@@ -108,14 +109,18 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                         Text(
                           l10n.reportPetInfoSpecies,
                           style: Theme.of(context).textTheme.labelLarge
-                              ?.copyWith(fontWeight: FontWeight.w600),
+                              ?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                         ),
                         const SizedBox(height: PetSpacing.xs),
                         Row(
                           children: [
                             _buildChoiceChip(
                               label: 'Perro',
-                              icon: Icons.pets,
+                              icon: PhosphorIconsRegular.dog,
+                              selectedColor: const Color(0xFFE3A07F),
                               isSelected:
                                   _speciesController.text.toLowerCase() ==
                                   'perro',
@@ -126,7 +131,8 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                             const SizedBox(width: PetSpacing.sm),
                             _buildChoiceChip(
                               label: 'Gato',
-                              icon: Icons.pets_outlined,
+                              icon: PhosphorIconsRegular.cat,
+                              selectedColor: const Color(0xFF9D83A7),
                               isSelected:
                                   _speciesController.text.toLowerCase() ==
                                   'gato',
@@ -156,14 +162,18 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                         Text(
                           l10n.reportPetInfoSex,
                           style: Theme.of(context).textTheme.labelLarge
-                              ?.copyWith(fontWeight: FontWeight.w600),
+                              ?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                         ),
                         const SizedBox(height: PetSpacing.xs),
                         Row(
                           children: [
                             _buildChoiceChip(
                               label: 'Macho',
-                              icon: Icons.male,
+                              icon: PhosphorIconsRegular.genderMale,
+                              selectedColor: const Color(0xFF7D9BB2),
                               isSelected:
                                   _sexController.text.toLowerCase() == 'macho',
                               onSelected: () =>
@@ -172,7 +182,8 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                             const SizedBox(width: PetSpacing.sm),
                             _buildChoiceChip(
                               label: 'Hembra',
-                              icon: Icons.female,
+                              icon: PhosphorIconsRegular.genderFemale,
+                              selectedColor: const Color(0xFFD98C9A),
                               isSelected:
                                   _sexController.text.toLowerCase() == 'hembra',
                               onSelected: () => setState(
@@ -187,7 +198,10 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                         Text(
                           l10n.reportPetInfoSize,
                           style: Theme.of(context).textTheme.labelLarge
-                              ?.copyWith(fontWeight: FontWeight.w600),
+                              ?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                         ),
                         const SizedBox(height: PetSpacing.xs),
                         SingleChildScrollView(
@@ -277,10 +291,15 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
   Widget _buildChoiceChip({
     required String label,
     IconData? icon,
+    Color? selectedColor,
     required bool isSelected,
     required VoidCallback onSelected,
   }) {
     final cs = Theme.of(context).colorScheme;
+    final activeColor = selectedColor ?? cs.primary;
+    final activeForeground = activeColor.computeLuminance() > 0.45
+        ? cs.onSurface
+        : Colors.white;
 
     return GestureDetector(
       onTap: onSelected,
@@ -291,10 +310,10 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
           vertical: PetSpacing.sm + 2,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? cs.primary : cs.surface,
+          color: isSelected ? activeColor : cs.surface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? cs.primary : cs.outlineVariant,
+            color: isSelected ? activeColor : cs.outlineVariant,
             width: isSelected ? 1.5 : 1,
           ),
         ),
@@ -305,7 +324,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
               Icon(
                 icon,
                 size: 16,
-                color: isSelected ? cs.onPrimary : cs.onSurfaceVariant,
+                color: isSelected ? activeForeground : cs.onSurfaceVariant,
               ),
               const SizedBox(width: PetSpacing.xs),
             ],
@@ -314,7 +333,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? cs.onPrimary : cs.onSurface,
+                color: isSelected ? activeForeground : cs.onSurface,
               ),
             ),
           ],
@@ -346,7 +365,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                 context.go('/report/new/photos');
               }
             },
-            icon: Icons.arrow_forward,
+            icon: PhosphorIconsRegular.arrowRight,
           ),
         ),
       ],

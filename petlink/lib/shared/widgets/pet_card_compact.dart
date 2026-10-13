@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../core/theme/pet_radius.dart';
+import '../../core/theme/pet_theme_extension.dart';
 import '../../design_system/badges/status_badge.dart';
 import '../models/pet_report.dart';
 
@@ -13,30 +15,37 @@ class PetCardCompact extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final extension = PetThemeExtension.of(context);
+    final isLost = report.type == ReportType.lost;
+    final statusColor = isLost ? extension.lost : extension.found;
     return Card(
       margin: EdgeInsets.zero,
       color: cs.surface,
+      elevation: 2,
+      surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: PetRadius.lgAll,
-        side: BorderSide(color: Theme.of(context).dividerColor),
+        side: BorderSide(color: statusColor.withValues(alpha: 0.24)),
       ),
       child: InkWell(
         onTap: onTap,
         borderRadius: PetRadius.lgAll,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
           child: Row(
             children: [
               Container(
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: PetRadius.mdAll,
+                  color: statusColor.withValues(alpha: 0.10),
+                  borderRadius: PetRadius.lgAll,
                 ),
                 child: Icon(
-                  report.pet.species == 'Gato' ? Icons.pets : Icons.pets,
-                  color: Theme.of(context).colorScheme.primary,
+                  report.pet.species == 'Gato'
+                      ? PhosphorIconsRegular.cat
+                      : PhosphorIconsRegular.dog,
+                  color: statusColor,
                   size: 28,
                 ),
               ),
@@ -50,7 +59,8 @@ class PetCardCompact extends StatelessWidget {
                         Expanded(
                           child: Text(
                             report.pet.name,
-                            style: Theme.of(context).textTheme.titleMedium,
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w700),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -67,9 +77,9 @@ class PetCardCompact extends StatelessWidget {
                     Row(
                       children: [
                         Icon(
-                          Icons.location_on,
+                          PhosphorIconsRegular.mapPin,
                           size: 14,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          color: statusColor,
                         ),
                         const SizedBox(width: 8),
                         Expanded(

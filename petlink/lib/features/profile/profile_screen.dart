@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../core/theme/pet_colors.dart';
 import '../../core/theme/pet_spacing.dart';
@@ -28,7 +29,7 @@ class ProfileScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(PetSpacing.lg),
         children: [
           Icon(
-            Icons.person,
+            PhosphorIconsRegular.userCircle,
             size: 64,
             color: PetColors.primary.withValues(alpha: 0.5),
           ),
@@ -58,7 +59,7 @@ class ProfileScreen extends ConsumerWidget {
             PetButton(
               label: l10n.profileLogout,
               variant: PetButtonVariant.outline,
-              icon: Icons.logout,
+              icon: PhosphorIconsRegular.signOut,
               onPressed: () {
                 ref.read(authProvider.notifier).logout();
               },
@@ -79,28 +80,35 @@ class ProfileScreen extends ConsumerWidget {
         borderRadius: PetRadius.lgAll,
         border: Border.all(color: cs.outlineVariant),
       ),
-      child: ListTile(
-        shape: RoundedRectangleBorder(borderRadius: PetRadius.lgAll),
-        leading: Container(
-          padding: const EdgeInsets.all(PetSpacing.sm),
-          decoration: BoxDecoration(
-            color: cs.primaryContainer,
-            borderRadius: PetRadius.mdAll,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: PetRadius.lgAll,
+        child: ListTile(
+          shape: RoundedRectangleBorder(borderRadius: PetRadius.lgAll),
+          leading: Container(
+            padding: const EdgeInsets.all(PetSpacing.sm),
+            decoration: BoxDecoration(
+              color: cs.primaryContainer,
+              borderRadius: PetRadius.mdAll,
+            ),
+            child: Icon(PhosphorIconsRegular.pawPrint, color: cs.primary),
           ),
-          child: Icon(Icons.pets, color: cs.primary),
+          title: Text(
+            l10n.reportsTitle,
+            style: Theme.of(context).textTheme.titleMedium
+                ?.copyWith(fontWeight: FontWeight.w600),
+          ),
+          subtitle: Text(
+            'Administra y consulta tus mascotas reportadas',
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: cs.onSurfaceVariant),
+          ),
+          trailing: Icon(
+            PhosphorIconsRegular.caretRight,
+            color: cs.onSurfaceVariant,
+          ),
+          onTap: () => context.go('/reports/mine'),
         ),
-        title: Text(
-          l10n.reportsTitle,
-          style: Theme.of(context).textTheme.titleMedium
-              ?.copyWith(fontWeight: FontWeight.w600),
-        ),
-        subtitle: Text(
-          'Administra y consulta tus mascotas reportadas',
-          style: Theme.of(context).textTheme.bodySmall
-              ?.copyWith(color: cs.onSurfaceVariant),
-        ),
-        trailing: Icon(Icons.chevron_right, color: cs.onSurfaceVariant),
-        onTap: () => context.go('/reports'),
       ),
     );
   }
@@ -119,7 +127,10 @@ class ProfileScreen extends ConsumerWidget {
           CircleAvatar(
             radius: 28,
             backgroundColor: theme.colorScheme.primary,
-            child: Icon(Icons.person, color: theme.colorScheme.onPrimary),
+            child: Icon(
+              PhosphorIconsFill.user,
+              color: theme.colorScheme.onPrimary,
+            ),
           ),
           const SizedBox(width: PetSpacing.md),
           Expanded(
@@ -207,7 +218,7 @@ class ProfileScreen extends ConsumerWidget {
                           ),
                           child: currentLocale == options[index].$1
                               ? Icon(
-                                  Icons.check,
+                                  PhosphorIconsBold.check,
                                   size: 16,
                                   color: Theme.of(context)
                                       .colorScheme
@@ -256,7 +267,7 @@ class ProfileScreen extends ConsumerWidget {
                 ref,
                 ThemeMode.system,
                 currentMode,
-                Icons.settings_brightness,
+                PhosphorIconsRegular.slidersHorizontal,
                 l10n.themeSystem,
                 l10n.themeSystemDescription,
               ),
@@ -266,7 +277,7 @@ class ProfileScreen extends ConsumerWidget {
                 ref,
                 ThemeMode.light,
                 currentMode,
-                Icons.light_mode,
+                PhosphorIconsRegular.sun,
                 l10n.themeLight,
                 l10n.themeLightDescription,
               ),
@@ -276,7 +287,7 @@ class ProfileScreen extends ConsumerWidget {
                 ref,
                 ThemeMode.dark,
                 currentMode,
-                Icons.dark_mode,
+                PhosphorIconsRegular.moon,
                 l10n.themeDark,
                 l10n.themeDarkDescription,
               ),
@@ -359,7 +370,7 @@ class ProfileScreen extends ConsumerWidget {
             ),
             if (isSelected)
               Icon(
-                Icons.check_circle,
+                PhosphorIconsFill.checkCircle,
                 color: Theme.of(context).colorScheme.primary,
                 size: 24,
               ),

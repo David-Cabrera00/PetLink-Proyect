@@ -4,6 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter/services.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:petlink/l10n/app_localizations.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -32,7 +33,11 @@ class ReportDetailScreen extends ConsumerWidget {
         title: Text(l10n.reportDetailTitle),
         actions: [
           IconButton(
-            icon: Icon(isSaved ? Icons.bookmark : Icons.bookmark_border),
+            icon: Icon(
+              isSaved
+                  ? PhosphorIconsFill.bookmark
+                  : PhosphorIconsRegular.bookmark,
+            ),
             onPressed: () {
               final saved = {...ref.read(savedReportIdsProvider)};
               if (!saved.add(reportId)) saved.remove(reportId);
@@ -40,7 +45,7 @@ class ReportDetailScreen extends ConsumerWidget {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.share),
+            icon: const Icon(PhosphorIconsRegular.shareNetwork),
             onPressed: () async {
               await Clipboard.setData(
                 ClipboardData(text: 'https://petlink.app/reports/$reportId'),
@@ -75,7 +80,7 @@ class ReportDetailScreen extends ConsumerWidget {
   Widget _buildNotFound(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return EmptyState(
-      icon: Icons.description,
+      icon: PhosphorIconsRegular.fileText,
       title: l10n.reportDetailNotFound,
       subtitle: l10n.reportDetailNotFoundDescription,
     );
@@ -154,10 +159,17 @@ class ReportDetailScreen extends ConsumerWidget {
   Widget _buildPhotoSection(BuildContext context, dynamic report) {
     return Container(
       width: double.infinity,
-      height: 240,
+      height: 270,
       decoration: BoxDecoration(
         color: PetColors.primarySoft,
         borderRadius: PetRadius.lgAll,
+        boxShadow: [
+          BoxShadow(
+            color: PetColors.primary.withValues(alpha: 0.14),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
       child: report.pet.primaryPhotoUrl != null
           ? ClipRRect(
@@ -176,7 +188,7 @@ class ReportDetailScreen extends ConsumerWidget {
   Widget _buildPlaceholderPhoto() {
     return Center(
       child: Icon(
-        Icons.pets,
+        PhosphorIconsRegular.pawPrint,
         size: 64,
         color: PetColors.primary.withValues(alpha: 0.5),
       ),
@@ -224,7 +236,7 @@ class ReportDetailScreen extends ConsumerWidget {
         Row(
           children: [
             const Icon(
-              Icons.location_on,
+              PhosphorIconsRegular.mapPin,
               size: 20,
               color: PetColors.textSecondary,
             ),
@@ -257,7 +269,11 @@ class ReportDetailScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
-        const Icon(Icons.access_time, size: 20, color: PetColors.textSecondary),
+        const Icon(
+          PhosphorIconsRegular.clock,
+          size: 20,
+          color: PetColors.textSecondary,
+        ),
         const SizedBox(width: PetSpacing.xs),
         Text(
           l10n.exploreHoursAgo,
@@ -308,13 +324,14 @@ class ReportDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildDescriptionSection(BuildContext context, dynamic report) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(PetSpacing.md),
       decoration: BoxDecoration(
-        color: PetColors.surface,
+        color: cs.surface,
         borderRadius: PetRadius.lgAll,
-        border: Border.all(color: PetColors.border),
+        border: Border.all(color: cs.outlineVariant),
       ),
       child: Text(
         report.description,
@@ -355,7 +372,7 @@ class ReportDetailScreen extends ConsumerWidget {
                     width: 48,
                     height: 48,
                     child: Icon(
-                      Icons.location_on,
+                      PhosphorIconsFill.mapPin,
                       size: 42,
                       color: PetColors.primary,
                     ),
@@ -419,7 +436,7 @@ class ReportDetailScreen extends ConsumerWidget {
               SnackBar(content: Text(l10n.reportDetailReportSighting)),
             );
           },
-          icon: Icons.add_location,
+          icon: PhosphorIconsRegular.mapPinPlus,
         ),
       ],
     );
@@ -446,7 +463,7 @@ class ReportDetailScreen extends ConsumerWidget {
                     ).showSnackBar(SnackBar(content: Text(l10n.shareAction)));
                   }
                 },
-                icon: const Icon(Icons.share),
+                icon: const Icon(PhosphorIconsRegular.shareNetwork),
                 label: Text(l10n.shareAction),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: PetSpacing.md),
@@ -462,7 +479,7 @@ class ReportDetailScreen extends ConsumerWidget {
                     context,
                   ).showSnackBar(SnackBar(content: Text(l10n.contactAction)));
                 },
-                icon: Icons.phone,
+                icon: PhosphorIconsRegular.phone,
               ),
             ),
           ],

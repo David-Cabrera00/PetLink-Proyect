@@ -37,7 +37,9 @@ class PetTheme {
         bodyLarge: PetTypography.body,
         bodyMedium: PetTypography.bodySmall,
         bodySmall: PetTypography.label,
-        labelLarge: PetTypography.button,
+        labelLarge: PetTypography.button.copyWith(
+          color: PetColors.textPrimaryLight,
+        ),
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: PetColors.surfaceLight,
@@ -145,7 +147,9 @@ class PetTheme {
         bodySmall: PetTypography.label.copyWith(
           color: PetColors.textSecondaryDark,
         ),
-        labelLarge: PetTypography.button.copyWith(color: PetColors.surfaceDark),
+        labelLarge: PetTypography.button.copyWith(
+          color: PetColors.textPrimaryDark,
+        ),
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: PetColors.surfaceDark,

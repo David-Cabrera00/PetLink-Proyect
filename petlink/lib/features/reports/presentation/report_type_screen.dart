@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -23,10 +24,10 @@ class ReportTypeScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.reportCreate),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(PhosphorIconsRegular.arrowLeft),
           onPressed: () {
             ref.read(reportDraftProvider.notifier).clearDraft();
-            context.go('/radar');
+            context.go('/reports');
           },
         ),
       ),
@@ -60,7 +61,7 @@ class ReportTypeScreen extends ConsumerWidget {
                       context,
                       ref,
                       type: ReportType.lost,
-                      icon: Icons.priority_high,
+                      icon: PhosphorIconsRegular.warning,
                       title: l10n.reportLostTitle,
                       subtitle: l10n.reportLostDescription,
                       color: PetColors.lost,
@@ -72,7 +73,7 @@ class ReportTypeScreen extends ConsumerWidget {
                       context,
                       ref,
                       type: ReportType.found,
-                      icon: Icons.check_circle,
+                      icon: PhosphorIconsRegular.checkCircle,
                       title: l10n.reportFoundTitle,
                       subtitle: l10n.reportFoundDescription,
                       color: PetColors.found,
@@ -88,7 +89,7 @@ class ReportTypeScreen extends ConsumerWidget {
                 onPressed: draft.reportType != null
                     ? () => context.go('/report/new/pet-info')
                     : null,
-                icon: Icons.arrow_forward,
+                icon: PhosphorIconsRegular.arrowRight,
               ),
             ],
           ),
@@ -185,7 +186,11 @@ class ReportTypeScreen extends ConsumerWidget {
                 ),
               ),
               child: isSelected
-                  ? const Icon(Icons.check, size: 16, color: Colors.white)
+                  ? const Icon(
+                      PhosphorIconsBold.check,
+                      size: 16,
+                      color: Colors.white,
+                    )
                   : null,
             ),
           ],

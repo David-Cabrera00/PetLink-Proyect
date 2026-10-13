@@ -16,7 +16,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navigationExplore => 'Explore';
 
   @override
-  String get navigationReport => 'Report';
+  String get navigationReport => 'Reports';
 
   @override
   String get navigationActivity => 'Activity';
@@ -664,7 +664,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get viewMyReport => 'View my report';
 
   @override
-  String get backToRadar => 'Back to radar';
+  String get backToRadar => 'Back to reports';
 
   @override
   String get reportDetailRegion => 'Pasto, Nariño';

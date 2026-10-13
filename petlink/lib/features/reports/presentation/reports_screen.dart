@@ -2,23 +2,80 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
 import '../../../core/theme/pet_radius.dart';
-import '../../../design_system/badges/status_badge.dart';
+import '../../../core/theme/pet_theme_extension.dart';
 import '../../../design_system/buttons/pet_button.dart';
 import '../../../shared/models/pet_report.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/error_state.dart';
 import '../providers/reports_providers.dart';
+import '../../explore/providers/explore_providers.dart';
 
 class ReportsScreen extends ConsumerWidget {
-  const ReportsScreen({super.key});
+  final bool onlyMyReports;
+
+  const ReportsScreen({super.key, this.onlyMyReports = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    if (onlyMyReports) {
+      return _buildMyReportsScreen(context, ref, l10n);
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.navigationReport),
+        leading: IconButton(
+          icon: const Icon(PhosphorIconsRegular.arrowLeft),
+          onPressed: () => context.go('/profile'),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(PetSpacing.lg),
+        child: Column(
+          children: [
+            _buildHubAction(
+              context,
+              icon: PhosphorIconsRegular.plusCircle,
+              title: 'Crear nuevo reporte',
+              subtitle: 'Informa sobre una mascota perdida o encontrada',
+              onTap: () => context.go('/report/new'),
+              emphasized: true,
+            ),
+            const SizedBox(height: PetSpacing.md),
+            _buildHubAction(
+              context,
+              icon: PhosphorIconsRegular.usersThree,
+              title: 'Reportes de la comunidad',
+              subtitle: 'Consulta reportes de otras personas cerca de ti',
+              onTap: () {
+                ref.read(exploreViewModeProvider.notifier).state =
+                    ExploreViewMode.list;
+                context.go('/explore');
+              },
+            ),
+            const Spacer(),
+            Text(
+              'Tus reportes personales están disponibles desde Perfil.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMyReportsScreen(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
     final reportsAsync = ref.watch(myReportsProvider);
     final filter = ref.watch(reportsFilterProvider);
 
@@ -26,7 +83,7 @@ class ReportsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.reportsTitle),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(PhosphorIconsRegular.arrowLeft),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -74,10 +131,64 @@ class ReportsScreen extends ConsumerWidget {
             child: PetButton(
               label: l10n.reportCreate,
               onPressed: () => context.go('/report/new'),
-              icon: Icons.add,
+              icon: PhosphorIconsRegular.plus,
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildHubAction(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    bool emphasized = false,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+    return Material(
+      color: emphasized ? cs.primary : cs.surface,
+      borderRadius: PetRadius.lgAll,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: PetRadius.lgAll,
+        child: Padding(
+          padding: const EdgeInsets.all(PetSpacing.md),
+          child: Row(
+            children: [
+              Icon(icon, color: emphasized ? cs.onPrimary : cs.primary),
+              const SizedBox(width: PetSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: emphasized ? cs.onPrimary : cs.onSurface,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: emphasized
+                            ? cs.onPrimary.withValues(alpha: 0.78)
+                            : cs.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                PhosphorIconsRegular.caretRight,
+                color: emphasized ? cs.onPrimary : cs.onSurfaceVariant,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -158,15 +269,28 @@ class ReportsScreen extends ConsumerWidget {
   }
 
   Widget _buildReportCard(BuildContext context, report) {
-    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final extension = PetThemeExtension.of(context);
+    final isLost = report.type == ReportType.lost;
+    final statusColor = isLost ? extension.lost : extension.found;
     return Card(
       margin: EdgeInsets.zero,
+      color: theme.colorScheme.surface,
+      elevation: 3,
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: PetRadius.xlAll,
+        side: BorderSide(color: statusColor.withValues(alpha: 0.28)),
+      ),
       child: InkWell(
         onTap: () => context.go('/reports/${report.id}'),
         borderRadius: PetRadius.xlAll,
-        child: Padding(
-          padding: const EdgeInsets.all(PetSpacing.lg),
-          child: Column(
+        child: Column(
+          children: [
+            _buildReportHero(context, report, statusColor),
+            Padding(
+              padding: const EdgeInsets.all(PetSpacing.lg),
+              child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
@@ -175,10 +299,14 @@ class ReportsScreen extends ConsumerWidget {
                     width: 64,
                     height: 64,
                     decoration: BoxDecoration(
-                      color: PetColors.primarySoft,
-                      borderRadius: PetRadius.mdAll,
+                      color: statusColor.withValues(alpha: 0.10),
+                      borderRadius: PetRadius.lgAll,
                     ),
-                    child: Icon(Icons.pets, color: PetColors.primary, size: 32),
+                    child: Icon(
+                      PhosphorIconsRegular.pawPrint,
+                      color: statusColor,
+                      size: 32,
+                    ),
                   ),
                   const SizedBox(width: PetSpacing.md),
                   Expanded(
@@ -189,14 +317,12 @@ class ReportsScreen extends ConsumerWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                report.pet.name,
-                                style: Theme.of(context).textTheme.titleMedium,
+                                '${report.pet.breed} · ${report.pet.sex}',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                            StatusBadge(
-                              status: report.type == ReportType.lost
-                                  ? PetStatus.lost
-                                  : PetStatus.found,
                             ),
                           ],
                         ),
@@ -205,7 +331,10 @@ class ReportsScreen extends ConsumerWidget {
                           report.status == ReportStatus.active
                               ? 'Búsqueda activa'
                               : 'Recuperada',
-                          style: Theme.of(context).textTheme.bodySmall,
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: statusColor,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ],
                     ),
@@ -216,15 +345,17 @@ class ReportsScreen extends ConsumerWidget {
               Row(
                 children: [
                   Icon(
-                    Icons.location_on,
+                    PhosphorIconsRegular.mapPin,
                     size: 16,
-                    color: PetColors.textSecondary,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: PetSpacing.xs),
                   Expanded(
                     child: Text(
                       report.address,
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
@@ -233,9 +364,9 @@ class ReportsScreen extends ConsumerWidget {
               Row(
                 children: [
                   Icon(
-                    Icons.access_time,
+                    PhosphorIconsRegular.clock,
                     size: 16,
-                    color: PetColors.textSecondary,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: PetSpacing.xs),
                   Text(
@@ -249,29 +380,127 @@ class ReportsScreen extends ConsumerWidget {
                 children: [
                   _buildIndicator(
                     context,
-                    Icons.visibility,
+                    PhosphorIconsRegular.eye,
                     '${report.sightingsCount} avistamientos',
                     PetColors.primary,
                   ),
-                  const SizedBox(width: PetSpacing.lg),
-                  _buildIndicator(
-                    context,
-                    Icons.diamond,
-                    '1 posible coincidencia',
-                    PetColors.match,
+                  const Spacer(),
+                  Text(
+                    'Ver detalle',
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(width: PetSpacing.xs),
+                  Icon(
+                    PhosphorIconsRegular.arrowUpRight,
+                    size: 17,
+                    color: theme.colorScheme.primary,
                   ),
                 ],
               ),
-              const SizedBox(height: PetSpacing.md),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () => context.go('/activity'),
-                  child: Text(l10n.navigationActivity),
-                ),
-              ),
             ],
           ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReportHero(
+    BuildContext context,
+    dynamic report,
+    Color statusColor,
+  ) {
+    final theme = Theme.of(context);
+    final imageUrl = report.pet.primaryPhotoUrl;
+
+    return SizedBox(
+      height: 128,
+      width: double.infinity,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          if (imageUrl != null)
+            Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => _buildReportHeroPlaceholder(statusColor),
+            )
+          else
+            _buildReportHeroPlaceholder(statusColor),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  Colors.black.withValues(alpha: 0.48),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            left: PetSpacing.lg,
+            right: PetSpacing.lg,
+            bottom: PetSpacing.md,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    report.pet.name,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: PetSpacing.sm,
+                    vertical: PetSpacing.xs,
+                  ),
+                  decoration: BoxDecoration(
+                    color: statusColor,
+                    borderRadius: PetRadius.smAll,
+                  ),
+                  child: Text(
+                    report.type == ReportType.lost ? 'PERDIDA' : 'ENCONTRADA',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReportHeroPlaceholder(Color statusColor) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            statusColor.withValues(alpha: 0.28),
+            PetColors.primary.withValues(alpha: 0.92),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Center(
+        child: Icon(
+          PhosphorIconsRegular.pawPrint,
+          size: 58,
+          color: Colors.white.withValues(alpha: 0.88),
         ),
       ),
     );
@@ -317,7 +546,7 @@ class ReportsScreen extends ConsumerWidget {
     }
 
     return EmptyState(
-      icon: Icons.description,
+      icon: PhosphorIconsRegular.fileText,
       title: title,
       subtitle: subtitle,
     );
@@ -328,19 +557,56 @@ class ReportsScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(PetSpacing.lg),
       itemCount: 3,
       itemBuilder: (context, index) {
+        final cs = Theme.of(context).colorScheme;
         return Container(
-          height: 200,
+          height: 188,
           margin: const EdgeInsets.only(bottom: PetSpacing.md),
           decoration: BoxDecoration(
-            color: PetColors.surface,
+            color: cs.surface,
             borderRadius: PetRadius.xlAll,
-            border: Border.all(color: PetColors.border),
+            border: Border.all(color: cs.outlineVariant),
           ),
-          child: Center(
-            child: CircularProgressIndicator(color: PetColors.primary),
+          child: Padding(
+            padding: const EdgeInsets.all(PetSpacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    _buildSkeletonBlock(context, 64, 64),
+                    const SizedBox(width: PetSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSkeletonBlock(context, 130, 18),
+                          const SizedBox(height: PetSpacing.sm),
+                          _buildSkeletonBlock(context, 90, 12),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: PetSpacing.lg),
+                _buildSkeletonBlock(context, double.infinity, 14),
+                const SizedBox(height: PetSpacing.sm),
+                _buildSkeletonBlock(context, 150, 14),
+              ],
+            ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildSkeletonBlock(BuildContext context, double width, double height) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: PetRadius.smAll,
+      ),
     );
   }
 }

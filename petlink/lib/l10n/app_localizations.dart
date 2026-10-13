@@ -113,7 +113,7 @@ abstract class AppLocalizations {
   /// No description provided for @navigationReport.
   ///
   /// In es, this message translates to:
-  /// **'Reportar'**
+  /// **'Reportes'**
   String get navigationReport;
 
   /// No description provided for @navigationActivity.
@@ -1319,7 +1319,7 @@ abstract class AppLocalizations {
   /// No description provided for @backToRadar.
   ///
   /// In es, this message translates to:
-  /// **'Volver al radar'**
+  /// **'Volver a reportes'**
   String get backToRadar;
 
   /// No description provided for @reportDetailRegion.

@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:petlink/l10n/app_localizations.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -82,8 +83,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 : 'Ver en mapa',
             icon: Icon(
               viewMode == ExploreViewMode.map
-                  ? Icons.format_list_bulleted
-                  : Icons.map_outlined,
+                  ? PhosphorIconsRegular.list
+                  : PhosphorIconsRegular.mapTrifold,
             ),
             onPressed: () {
               ref
@@ -156,7 +157,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             l10n.exploreAll,
             ExploreFilter.all,
             currentFilter,
-            Icons.list,
+            PhosphorIconsRegular.list,
           ),
           const SizedBox(width: PetSpacing.sm),
           _buildFilterChip(
@@ -165,7 +166,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             l10n.exploreLost,
             ExploreFilter.lost,
             currentFilter,
-            Icons.priority_high,
+            PhosphorIconsRegular.warning,
           ),
           const SizedBox(width: PetSpacing.sm),
           _buildFilterChip(
@@ -174,7 +175,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             l10n.exploreFound,
             ExploreFilter.found,
             currentFilter,
-            Icons.check_circle,
+            PhosphorIconsRegular.checkCircle,
           ),
           const SizedBox(width: PetSpacing.sm),
           _buildFilterChip(
@@ -183,7 +184,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             l10n.exploreNearby,
             ExploreFilter.nearby,
             currentFilter,
-            Icons.near_me,
+            PhosphorIconsRegular.navigationArrow,
           ),
         ],
       ),
@@ -264,7 +265,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
         data: (reports) {
           if (reports.isEmpty) {
             return EmptyState(
-              icon: Icons.map,
+              icon: PhosphorIconsRegular.mapTrifold,
               title: l10n.exploreNoReports,
               subtitle: l10n.exploreNoReportsDescription,
             );
@@ -328,8 +329,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                 ),
                                 child: Icon(
                                   report.type == ReportType.lost
-                                      ? Icons.pets
-                                      : Icons.pets_outlined,
+                                      ? PhosphorIconsFill.pawPrint
+                                      : PhosphorIconsRegular.pawPrint,
                                   size: 22,
                                   color: PetColors.surface,
                                 ),
@@ -365,7 +366,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              Icons.map_outlined,
+                              PhosphorIconsRegular.mapTrifold,
                               size: 16,
                               color: Theme.of(context).colorScheme.primary,
                             ),
@@ -416,7 +417,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           height: 20,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Icon(Icons.my_location),
+                      : const Icon(PhosphorIconsRegular.crosshair),
                 ),
               ),
             ],
@@ -511,8 +512,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           errorBuilder: (_, _, _) => Center(
                             child: Icon(
                               report.pet.species.toLowerCase() == 'gato'
-                                  ? Icons.pets
-                                  : Icons.pets,
+                                  ? PhosphorIconsFill.pawPrint
+                                  : PhosphorIconsRegular.pawPrint,
                               color: cs.primary,
                               size: 28,
                             ),
@@ -521,8 +522,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       : Center(
                           child: Icon(
                             report.pet.species.toLowerCase() == 'gato'
-                                ? Icons.pets
-                                : Icons.pets,
+                                ? PhosphorIconsFill.pawPrint
+                                : PhosphorIconsRegular.pawPrint,
                             color: cs.primary,
                             size: 28,
                           ),
@@ -555,7 +556,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                   null;
                             },
                             icon: Icon(
-                              Icons.close,
+                              PhosphorIconsRegular.x,
                               size: 18,
                               color: cs.onSurfaceVariant,
                             ),
@@ -571,7 +572,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       Row(
                         children: [
                           Icon(
-                            Icons.location_on,
+                            PhosphorIconsRegular.mapPin,
                             size: 14,
                             color: Theme.of(context)
                                 .colorScheme
@@ -584,7 +585,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           ),
                           const SizedBox(width: PetSpacing.md),
                           Icon(
-                            Icons.access_time,
+                            PhosphorIconsRegular.clock,
                             size: 14,
                             color: Theme.of(context)
                                 .colorScheme
@@ -605,7 +606,11 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             const SizedBox(height: PetSpacing.md),
             Row(
               children: [
-                Icon(Icons.place_outlined, size: 16, color: cs.primary),
+                Icon(
+                  PhosphorIconsRegular.mapPin,
+                  size: 16,
+                  color: cs.primary,
+                ),
                 const SizedBox(width: PetSpacing.xs),
                 Expanded(
                   child: Text(
@@ -636,8 +641,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                   },
                   icon: Icon(
                     ref.watch(savedReportIdsProvider).contains(report.id)
-                        ? Icons.bookmark
-                        : Icons.bookmark_border,
+                        ? PhosphorIconsFill.bookmark
+                        : PhosphorIconsRegular.bookmark,
                     color: cs.primary,
                   ),
                   style: IconButton.styleFrom(
@@ -663,7 +668,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     }
                   },
                   icon: Icon(
-                    Icons.share,
+                    PhosphorIconsRegular.shareNetwork,
                     color: cs.primary,
                   ),
                   style: IconButton.styleFrom(
@@ -691,7 +696,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       data: (reports) {
         if (reports.isEmpty) {
           return EmptyState(
-            icon: Icons.search_off,
+            icon: PhosphorIconsRegular.magnifyingGlass,
             title: l10n.exploreNoReports,
             subtitle: l10n.exploreNoReportsDescription,
           );

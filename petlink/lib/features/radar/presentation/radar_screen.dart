@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/theme/pet_spacing.dart';
 import '../../../core/theme/pet_radius.dart';
@@ -75,7 +76,7 @@ class RadarScreen extends ConsumerWidget {
       children: [
         Row(
           children: [
-            Icon(Icons.pets, color: cs.primary, size: 20),
+            Icon(PhosphorIconsRegular.pawPrint, color: cs.primary, size: 20),
             const SizedBox(width: PetSpacing.sm),
             Text(
               l10n.radarActive,
@@ -125,7 +126,7 @@ class RadarScreen extends ConsumerWidget {
               color: cs.primaryContainer,
               borderRadius: PetRadius.lgAll,
             ),
-            child: Icon(Icons.location_on, color: cs.primary),
+            child: Icon(PhosphorIconsRegular.mapPin, color: cs.primary),
           ),
           const SizedBox(width: PetSpacing.md),
           Expanded(
@@ -144,7 +145,7 @@ class RadarScreen extends ConsumerWidget {
               ],
             ),
           ),
-          Icon(Icons.chevron_right, color: cs.onSurfaceVariant),
+          Icon(PhosphorIconsRegular.caretRight, color: cs.onSurfaceVariant),
         ],
       ),
     );
@@ -179,7 +180,11 @@ class RadarScreen extends ConsumerWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.radar, size: 18, color: cs.onPrimary),
+                        Icon(
+                          PhosphorIconsFill.broadcast,
+                          size: 18,
+                          color: cs.onPrimary,
+                        ),
                         const SizedBox(width: PetSpacing.sm),
                         Text(
                           l10n.radarActive.toUpperCase(),
@@ -239,7 +244,7 @@ class RadarScreen extends ConsumerWidget {
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: () => context.go('/explore'),
-              icon: const Icon(Icons.arrow_forward),
+              icon: const Icon(PhosphorIconsRegular.arrowRight),
               label: Text(l10n.radarExplore),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
@@ -309,7 +314,7 @@ class RadarScreen extends ConsumerWidget {
       child: Column(
         children: [
           Icon(
-            Icons.search_off,
+            PhosphorIconsRegular.magnifyingGlass,
             size: 48,
             color: cs.onSurfaceVariant.withValues(alpha: 0.5),
           ),
@@ -343,7 +348,7 @@ class RadarScreen extends ConsumerWidget {
           data: (reports) {
             if (reports.isEmpty) {
               return EmptyState(
-                icon: Icons.location_off,
+                icon: PhosphorIconsRegular.mapPinLine,
                 title: l10n.radarNoNearbyReports,
                 subtitle: l10n.radarNoNearbyReportsDescription,
               );
@@ -375,17 +380,57 @@ class RadarScreen extends ConsumerWidget {
   }
 
   Widget _buildLoadingCard(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
-      height: 120,
+      height: 126,
+      padding: const EdgeInsets.all(PetSpacing.md),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: cs.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).dividerColor),
+        border: Border.all(color: cs.outlineVariant),
       ),
-      child: Center(
-        child: CircularProgressIndicator(
-          color: Theme.of(context).colorScheme.primary,
-        ),
+      child: Row(
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: cs.surfaceContainerHighest,
+              borderRadius: PetRadius.lgAll,
+            ),
+          ),
+          const SizedBox(width: PetSpacing.md),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 140,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: cs.surfaceContainerHighest,
+                    borderRadius: PetRadius.smAll,
+                  ),
+                ),
+                const SizedBox(height: PetSpacing.sm),
+                Container(
+                  width: 100,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: cs.surfaceContainerHighest,
+                    borderRadius: PetRadius.smAll,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Icon(
+            PhosphorIconsRegular.spinner,
+            color: cs.primary,
+            size: 22,
+          ),
+        ],
       ),
     );
   }

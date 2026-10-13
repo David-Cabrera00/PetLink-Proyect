@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../features/radar/presentation/radar_screen.dart';
 import '../features/explore/presentation/explore_screen.dart';
@@ -150,6 +151,11 @@ class AppRouter {
             GoRoute(
               path: '/reports',
               builder: (context, state) => const ReportsScreen(),
+            ),
+            GoRoute(
+              path: '/reports/mine',
+              builder: (context, state) =>
+                  const ReportsScreen(onlyMyReports: true),
             ),
             GoRoute(
               path: '/reports/:id',
@@ -328,37 +334,37 @@ class ScaffoldWithNav extends StatelessWidget {
                         Row(
                           children: [
                             _LiquidNavItem(
-                              icon: Icons.radar_outlined,
-                              selectedIcon: Icons.radar,
+                              icon: PhosphorIconsRegular.broadcast,
+                              selectedIcon: PhosphorIconsFill.broadcast,
                               label: l10n.navigationRadar,
                               selected: currentIndex == 0,
                               onTap: () => context.go('/radar'),
                             ),
                             _LiquidNavItem(
-                              icon: Icons.map_outlined,
-                              selectedIcon: Icons.map,
+                              icon: PhosphorIconsRegular.mapTrifold,
+                              selectedIcon: PhosphorIconsFill.mapTrifold,
                               label: l10n.navigationExplore,
                               selected: currentIndex == 1,
                               onTap: () => context.go('/explore'),
                             ),
                             _LiquidNavItem(
-                              icon: Icons.add_circle_outline,
-                              selectedIcon: Icons.add_circle,
+                              icon: PhosphorIconsRegular.plusCircle,
+                              selectedIcon: PhosphorIconsFill.plusCircle,
                               label: l10n.navigationReport,
                               selected: currentIndex == 2,
                               isPrimary: true,
-                              onTap: () => context.go('/report/new'),
+                              onTap: () => context.go('/reports'),
                             ),
                             _LiquidNavItem(
-                              icon: Icons.notifications_outlined,
-                              selectedIcon: Icons.notifications,
+                              icon: PhosphorIconsRegular.bell,
+                              selectedIcon: PhosphorIconsFill.bell,
                               label: l10n.navigationActivity,
                               selected: currentIndex == 3,
                               onTap: () => context.go('/activity'),
                             ),
                             _LiquidNavItem(
-                              icon: Icons.person_outline,
-                              selectedIcon: Icons.person,
+                              icon: PhosphorIconsRegular.userCircle,
+                              selectedIcon: PhosphorIconsFill.userCircle,
                               label: l10n.navigationProfile,
                               selected: currentIndex == 4,
                               onTap: () => context.go('/profile'),
