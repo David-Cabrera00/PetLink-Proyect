@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/theme/pet_radius.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -205,7 +206,7 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   ],
           ),
-          child: Icon(Icons.pets, color: cs.primary, size: 19),
+          child: Icon(PhosphorIconsRegular.pawPrint, color: cs.primary, size: 19),
         ),
         const SizedBox(width: PetSpacing.sm),
         Text(

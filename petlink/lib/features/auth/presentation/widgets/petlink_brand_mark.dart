@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../../core/theme/pet_typography.dart';
 
@@ -12,7 +13,7 @@ class PetLinkBrandMark extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Icons.pets, size: 20, color: colorScheme.primary),
+        Icon(PhosphorIconsRegular.pawPrint, size: 20, color: colorScheme.primary),
         const SizedBox(width: 8),
         Text(
           'PetLink',

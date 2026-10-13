@@ -24,7 +24,7 @@ La aplicación se divide en una navegación principal y un flujo de publicación
 Navegación principal
 ├── Radar       → resumen local, reportes cercanos y coincidencias
 ├── Explorar    → búsqueda/filtrado visual de reportes
-├── Reportar    → flujo paso a paso para publicar un reporte
+├── Reportar    → hub para crear, consultar y descubrir reportes
 ├── Actividad   → notificaciones y eventos del usuario
 └── Perfil      → preferencias y tema
 
@@ -42,13 +42,15 @@ Los tokens deben consumirse desde `lib/core/theme/` y no duplicarse dentro de la
 
 | Rol | Claro | Oscuro | Uso |
 |---|---|---|---|
-| Primario | `#0F6B6F` | `#54B8B5` | Acción principal, navegación activa y enlaces importantes. |
-| Acento | `#F4A261` | `#F5B375` | Destacar acciones secundarias o información relevante. |
-| Perdida | `#C2414B` | `#F1787F` | Reportes de mascotas perdidas y errores. |
-| Encontrada | `#2D7A5F` | `#64C49B` | Reportes de mascotas encontradas y estados positivos. |
-| Coincidencia | `#6257B8` | `#9C92E8` | Matches y señales de posible coincidencia. |
-| Fondo | `#F6F8F7` | `#0E1515` | Fondo general de la aplicación. |
-| Superficie | `#FFFFFF` | `#151F1F` | Tarjetas, campos y contenedores. |
+| Primario | `#4A3048` | `#C9A3C1` | Acción principal, navegación activa y enlaces importantes. |
+| Acento | `#E99478` | `#F0A083` | Destacar acciones secundarias o información relevante. |
+| Perdida | `#A9474E` | `#E58E98` | Reportes de mascotas perdidas y errores. |
+| Encontrada | `#687D91` | `#A9BDD0` | Reportes de mascotas encontradas y estados positivos. |
+| Coincidencia | `#8A6386` | `#C6A8C3` | Matches y señales de posible coincidencia. |
+| Fondo | `#F5EEE8` | `#121016` | Fondo general de la aplicación. |
+| Superficie | `#FFF9F5` | `#1C1821` | Tarjetas, campos y contenedores. |
+
+En modo oscuro, las superficies elevadas usan `#28202C`, el texto principal `#F7F1F4`, el texto secundario `#B9ABB8` y los bordes `#433747`. El botón principal blanco del radar es intencional: crea contraste con la tarjeta ciruela sin reintroducir el naranja como acción dominante.
 
 Los tonos suaves (`lostSoft`, `foundSoft`, `matchSoft`, `surfaceVariant`) sirven como fondos de apoyo y no deben utilizarse como único indicador de estado: siempre acompañar con texto, icono o etiqueta.
 
@@ -141,11 +143,11 @@ Es la pantalla inicial y debe responder tres preguntas: qué está pasando cerca
 
 ### Explorar
 
-Debe permitir descubrir reportes mediante búsqueda y filtros (`all`, `lost`, `found`, `nearby`). El mapa/área visual es de demostración actualmente; la implementación real deberá conservar una alternativa de lista accesible.
+Debe permitir descubrir reportes mediante búsqueda y filtros (`all`, `lost`, `found`, `nearby`). El mapa/área visual es de demostración actualmente; la implementación real deberá conservar una alternativa de lista accesible. La jerarquía es búsqueda y filtros arriba, mapa/lista en el área principal y vista previa contextual al seleccionar un reporte.
 
 ### Reportes
 
-Debe separar claramente reportes activos, recuperados y todos. El estado de cada reporte debe ser legible sin abrir el detalle.
+Debe separar claramente crear un reporte, mis reportes y comunidad. En la vista personal, los filtros activos, recuperados y todos deben ser fáciles de distinguir. El estado de cada reporte debe ser legible sin abrir el detalle.
 
 ### Detalle de reporte
 

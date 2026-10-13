@@ -112,10 +112,10 @@ La navegación está en `lib/app/router.dart` y usa `GoRouter`. La ruta inicial 
 |---|---|---|
 | `/radar` | `RadarScreen` | Resumen de reportes cercanos y coincidencias. |
 | `/explore` | `ExploreScreen` | Explorar reportes en el área y filtrarlos. |
-| `/reports` | `ReportsScreen` | Listar reportes propios. |
+| `/reports` | `ReportsScreen` | Hub de reportes: crear, consultar propios y explorar comunidad. |
 | `/reports/:id` | `ReportDetailScreen` | Ver el detalle de un reporte. |
 | `/matches/:id` | `MatchDetailScreen` | Ver el detalle de una coincidencia. |
-| `/activity` | `ActivityScreen` | Actividad/notificaciones; actualmente es una pantalla de base. |
+| `/activity` | `ActivityScreen` | Actividad y novedades de reportes. |
 | `/profile` | `ProfileScreen` | Perfil y selección del tema. |
 | `/welcome` | `WelcomeScreen` | Entrada de usuarios no autenticados. |
 | `/login` | `LoginScreen` | Inicio de sesión mock. |
@@ -228,7 +228,7 @@ No depender de tiempos artificiales en tests nuevos; inyectar repositorios fake 
 - La autenticación actual es mock y no persiste la sesión.
 - No hay integración real con mapas, geolocalización, cámara, galería o subida de imágenes; el flujo de fotos usa datos de demostración.
 - No hay persistencia local del borrador o de los reportes.
-- `ActivityScreen` es una pantalla inicial.
+- La actividad usa datos de demostración; falta conectarla a eventos reales del usuario.
 - La URL de API está declarada, pero no existe todavía una capa HTTP funcional.
 - Mantener la codificación UTF-8 y colocar los nuevos textos visibles en las localizaciones correspondientes.
 
@@ -254,3 +254,26 @@ La siguiente pantalla prioritaria es `ExploreScreen`: debe resolver la relación
 - Para cambios de contrato, actualizar interfaces, mocks y providers en el mismo cambio.
 - Actualizar `DESING.md` si cambia arquitectura visual, tokens, navegación o componentes.
 - Mantener este archivo actualizado cuando cambien comandos, dependencias, estructura, rutas o limitaciones.
+
+## Estado del proyecto — octubre de 2026
+
+Estimación actual para un MVP:
+
+- Diseño e interfaz: 85%.
+- Navegación y flujo de pantallas: 85%.
+- Reportes y coincidencias con datos mock: 75%.
+- Estados de carga, error y vacío: 70%.
+- Persistencia local: 25%.
+- Backend y autenticación real: 10%.
+- Pruebas: 35%.
+
+Avance global estimado: 65% como MVP visual/funcional.
+
+### Próximos bloques prioritarios
+
+1. Conectar backend y base de datos sin romper las interfaces de repositorio.
+2. Implementar autenticación real y persistencia de sesión.
+3. Persistir reportes, borradores e imágenes.
+4. Integrar geolocalización, permisos y mapas de producción.
+5. Ampliar pruebas de navegación, providers, formularios y temas.
+6. Realizar la revisión final en Android, iOS y Web.
