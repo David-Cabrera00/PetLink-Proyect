@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -218,50 +220,215 @@ class ScaffoldWithNav extends StatelessWidget {
     final currentIndex = _indexFromLocation(location);
 
     return Scaffold(
-      body: child,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: currentIndex,
-        onDestinationSelected: (index) {
-          switch (index) {
-            case 0:
-              context.go('/radar');
-            case 1:
-              context.go('/explore');
-            case 2:
-              context.go('/report/new');
-            case 3:
-              context.go('/activity');
-            case 4:
-              context.go('/profile');
-          }
-        },
-        destinations: [
-          NavigationDestination(
-            icon: Icon(Icons.radar_outlined),
-            selectedIcon: Icon(Icons.radar),
-            label: l10n.navigationRadar,
+      body: Stack(
+        children: [
+          child,
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: SafeArea(
+              top: false,
+              child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Theme.of(context)
+                          .colorScheme
+                          .surface
+                          .withValues(alpha: 0.52),
+                      Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest
+                          .withValues(alpha: 0.34),
+                      Theme.of(context)
+                          .colorScheme
+                          .primaryContainer
+                          .withValues(alpha: 0.20),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.34),
+                    width: 1.2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.18),
+                      blurRadius: 26,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 7,
+                  ),
+                  child: Row(
+                    children: [
+                      _LiquidNavItem(
+                        icon: Icons.radar_outlined,
+                        selectedIcon: Icons.radar,
+                        label: l10n.navigationRadar,
+                        selected: currentIndex == 0,
+                        onTap: () => context.go('/radar'),
+                      ),
+                      _LiquidNavItem(
+                        icon: Icons.map_outlined,
+                        selectedIcon: Icons.map,
+                        label: l10n.navigationExplore,
+                        selected: currentIndex == 1,
+                        onTap: () => context.go('/explore'),
+                      ),
+                      _LiquidNavItem(
+                        icon: Icons.add_circle_outline,
+                        selectedIcon: Icons.add_circle,
+                        label: l10n.navigationReport,
+                        selected: currentIndex == 2,
+                        isPrimary: true,
+                        onTap: () => context.go('/report/new'),
+                      ),
+                      _LiquidNavItem(
+                        icon: Icons.notifications_outlined,
+                        selectedIcon: Icons.notifications,
+                        label: l10n.navigationActivity,
+                        selected: currentIndex == 3,
+                        onTap: () => context.go('/activity'),
+                      ),
+                      _LiquidNavItem(
+                        icon: Icons.person_outline,
+                        selectedIcon: Icons.person,
+                        label: l10n.navigationProfile,
+                        selected: currentIndex == 4,
+                        onTap: () => context.go('/profile'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
-          NavigationDestination(
-            icon: Icon(Icons.map_outlined),
-            selectedIcon: Icon(Icons.map),
-            label: l10n.navigationExplore,
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.add_circle_outline),
-            selectedIcon: Icon(Icons.add_circle),
-            label: l10n.navigationReport,
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.notifications_outlined),
-            selectedIcon: Icon(Icons.notifications),
-            label: l10n.navigationActivity,
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: l10n.navigationProfile,
+              ),
+            ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _LiquidNavItem extends StatefulWidget {
+  final IconData icon;
+  final IconData selectedIcon;
+  final String label;
+  final bool selected;
+  final bool isPrimary;
+  final VoidCallback onTap;
+
+  const _LiquidNavItem({
+    required this.icon,
+    required this.selectedIcon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    this.isPrimary = false,
+  });
+
+  @override
+  State<_LiquidNavItem> createState() => _LiquidNavItemState();
+}
+
+class _LiquidNavItemState extends State<_LiquidNavItem> {
+  bool _pressed = false;
+
+  void _setPressed(bool value) {
+    if (mounted && _pressed != value) {
+      setState(() => _pressed = value);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final selectedColor = widget.isPrimary ? cs.secondary : cs.primaryContainer;
+    final selectedForeground = widget.isPrimary
+        ? cs.onSecondary
+        : cs.onPrimaryContainer;
+
+    return Expanded(
+      child: Semantics(
+        button: true,
+        selected: widget.selected,
+        label: widget.label,
+        child: InkWell(
+          onTap: widget.onTap,
+          onTapDown: (_) => _setPressed(true),
+          onTapUp: (_) => _setPressed(false),
+          onTapCancel: () => _setPressed(false),
+          borderRadius: BorderRadius.circular(22),
+          splashColor: (widget.isPrimary ? cs.secondary : cs.primary).withValues(
+            alpha: 0.16,
+          ),
+          highlightColor: (widget.isPrimary ? cs.secondary : cs.primary)
+              .withValues(alpha: 0.08),
+          child: AnimatedScale(
+            scale: _pressed ? 0.94 : 1,
+            duration: const Duration(milliseconds: 110),
+            curve: Curves.easeOutCubic,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+              padding: const EdgeInsets.symmetric(vertical: 7),
+              decoration: BoxDecoration(
+                color: widget.selected ? selectedColor : Colors.transparent,
+                borderRadius: BorderRadius.circular(22),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 180),
+                    transitionBuilder: (child, animation) => ScaleTransition(
+                      scale: animation,
+                      child: child,
+                    ),
+                    child: Icon(
+                      widget.selected ? widget.selectedIcon : widget.icon,
+                      key: ValueKey(widget.selected),
+                      size: 22,
+                      color: widget.selected
+                          ? selectedForeground
+                          : cs.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    widget.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: widget.selected
+                          ? selectedForeground
+                          : cs.onSurfaceVariant,
+                      fontWeight: widget.selected
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

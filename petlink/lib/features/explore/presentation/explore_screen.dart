@@ -29,6 +29,7 @@ class ExploreScreen extends ConsumerStatefulWidget {
 
 class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   final _mapController = MapController();
+  final _filterScrollController = ScrollController();
   late final TextEditingController _searchController;
   bool _isLocating = false;
 
@@ -43,6 +44,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   @override
   void dispose() {
     _searchController.dispose();
+    _filterScrollController.dispose();
     super.dispose();
   }
 
@@ -143,7 +145,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   ) {
     final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
+      controller: _filterScrollController,
       scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
       child: Row(
         children: [
           _buildFilterChip(
@@ -197,40 +201,51 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     final cs = Theme.of(context).colorScheme;
     final isSelected = value == currentFilter;
 
-    return GestureDetector(
-      onTap: () => ref.read(exploreFilterProvider.notifier).state = value,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 48),
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: PetSpacing.md,
-            vertical: PetSpacing.md,
-          ),
-          decoration: BoxDecoration(
-            color: isSelected ? cs.primary : cs.surface,
-            borderRadius: PetRadius.xxlAll,
-            border: Border.all(
-              color: isSelected ? cs.primary : cs.outlineVariant,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                size: 16,
-                color: isSelected ? cs.onPrimary : cs.onSurfaceVariant,
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: label,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: PetRadius.xxlAll,
+          onTap: () => ref.read(exploreFilterProvider.notifier).state = value,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 48),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: PetSpacing.md,
+                vertical: PetSpacing.md,
               ),
-              const SizedBox(width: PetSpacing.xs),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                  color: isSelected ? cs.onPrimary : cs.onSurface,
+              decoration: BoxDecoration(
+                color: isSelected ? cs.primary : cs.surface,
+                borderRadius: PetRadius.xxlAll,
+                border: Border.all(
+                  color: isSelected ? cs.primary : cs.outlineVariant,
                 ),
               ),
-            ],
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    icon,
+                    size: 16,
+                    color: isSelected ? cs.onPrimary : cs.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: PetSpacing.xs),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w400,
+                      color: isSelected ? cs.onPrimary : cs.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -327,24 +342,66 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 ],
               ),
               Positioned(
-                left: PetSpacing.sm,
-                top: PetSpacing.sm,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface
-                        .withValues(alpha: 0.85),
-                    borderRadius: PetRadius.smAll,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: PetSpacing.sm,
-                      vertical: PetSpacing.xs,
+                left: PetSpacing.md,
+                top: PetSpacing.md,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface
+                            .withValues(alpha: 0.92),
+                        borderRadius: PetRadius.mdAll,
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: PetSpacing.md,
+                          vertical: PetSpacing.sm,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.map_outlined,
+                              size: 16,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            const SizedBox(width: PetSpacing.xs),
+                            Text(
+                              l10n.exploreMapTitle,
+                              style: Theme.of(context).textTheme.labelLarge
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    child: Text(
-                      '\u00A9 OpenStreetMap contributors',
-                      style: Theme.of(context).textTheme.labelSmall,
+                    const SizedBox(height: PetSpacing.xs),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface
+                            .withValues(alpha: 0.85),
+                        borderRadius: PetRadius.smAll,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: PetSpacing.sm,
+                          vertical: PetSpacing.xs,
+                        ),
+                        child: Text(
+                          '\u00A9 OpenStreetMap contributors',
+                          style: Theme.of(context).textTheme.labelSmall,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
               Positioned(
@@ -423,10 +480,14 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
 
   Widget _buildReportPreview(BuildContext context, report, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final cs = Theme.of(context).colorScheme;
     return Card(
       margin: EdgeInsets.zero,
+      elevation: 4,
+      surfaceTintColor: Colors.transparent,
+      clipBehavior: Clip.antiAlias,
       child: Padding(
-        padding: const EdgeInsets.all(PetSpacing.lg),
+        padding: const EdgeInsets.all(PetSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -438,7 +499,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                   height: 64,
                   clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
+                    color: cs.primaryContainer,
                     borderRadius: PetRadius.mdAll,
                   ),
                   child:
@@ -452,7 +513,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                               report.pet.species.toLowerCase() == 'gato'
                                   ? Icons.pets
                                   : Icons.pets,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: cs.primary,
                               size: 28,
                             ),
                           ),
@@ -462,7 +523,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                             report.pet.species.toLowerCase() == 'gato'
                                 ? Icons.pets
                                 : Icons.pets,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: cs.primary,
                             size: 28,
                           ),
                         ),
@@ -486,21 +547,17 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                 : PetStatus.found,
                           ),
                           const SizedBox(width: PetSpacing.xs),
-                          InkWell(
-                            borderRadius: BorderRadius.circular(100),
-                            onTap: () {
+                          IconButton(
+                            tooltip: 'Cerrar vista previa',
+                            visualDensity: VisualDensity.compact,
+                            onPressed: () {
                               ref.read(selectedReportProvider.notifier).state =
                                   null;
                             },
-                            child: Padding(
-                              padding: const EdgeInsets.all(PetSpacing.xs),
-                              child: Icon(
-                                Icons.close,
-                                size: 18,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
-                              ),
+                            icon: Icon(
+                              Icons.close,
+                              size: 18,
+                              color: cs.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -546,8 +603,21 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
               ],
             ),
             const SizedBox(height: PetSpacing.md),
-            Text(report.address, style: Theme.of(context).textTheme.bodySmall),
-            const SizedBox(height: PetSpacing.lg),
+            Row(
+              children: [
+                Icon(Icons.place_outlined, size: 16, color: cs.primary),
+                const SizedBox(width: PetSpacing.xs),
+                Expanded(
+                  child: Text(
+                    report.address,
+                    style: Theme.of(context).textTheme.bodySmall,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: PetSpacing.md),
             Row(
               children: [
                 Expanded(
@@ -558,6 +628,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 ),
                 const SizedBox(width: PetSpacing.md),
                 IconButton(
+                  tooltip: 'Guardar reporte',
                   onPressed: () {
                     final saved = {...ref.read(savedReportIdsProvider)};
                     if (!saved.add(report.id)) saved.remove(report.id);
@@ -567,13 +638,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     ref.watch(savedReportIdsProvider).contains(report.id)
                         ? Icons.bookmark
                         : Icons.bookmark_border,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: cs.primary,
                   ),
                   style: IconButton.styleFrom(
-                    backgroundColor: Theme.of(context)
-                        .colorScheme
-                        .primaryContainer
-                        .withValues(alpha: 0.5),
+                    backgroundColor: cs.primaryContainer,
                     shape: RoundedRectangleBorder(
                       borderRadius: PetRadius.mdAll,
                     ),
@@ -581,6 +649,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 ),
                 const SizedBox(width: PetSpacing.sm),
                 IconButton(
+                  tooltip: l10n.shareAction,
                   onPressed: () async {
                     await Clipboard.setData(
                       ClipboardData(
@@ -595,13 +664,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                   },
                   icon: Icon(
                     Icons.share,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: cs.primary,
                   ),
                   style: IconButton.styleFrom(
-                    backgroundColor: Theme.of(context)
-                        .colorScheme
-                        .primaryContainer
-                        .withValues(alpha: 0.5),
+                    backgroundColor: cs.primaryContainer,
                     shape: RoundedRectangleBorder(
                       borderRadius: PetRadius.mdAll,
                     ),
