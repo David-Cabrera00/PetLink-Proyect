@@ -142,47 +142,44 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     ExploreFilter currentFilter,
   ) {
     final l10n = AppLocalizations.of(context)!;
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          _buildFilterChip(
-            context,
-            ref,
-            l10n.exploreAll,
-            ExploreFilter.all,
-            currentFilter,
-            Icons.list,
-          ),
-          const SizedBox(width: PetSpacing.sm),
-          _buildFilterChip(
-            context,
-            ref,
-            l10n.exploreLost,
-            ExploreFilter.lost,
-            currentFilter,
-            Icons.priority_high,
-          ),
-          const SizedBox(width: PetSpacing.sm),
-          _buildFilterChip(
-            context,
-            ref,
-            l10n.exploreFound,
-            ExploreFilter.found,
-            currentFilter,
-            Icons.check_circle,
-          ),
-          const SizedBox(width: PetSpacing.sm),
-          _buildFilterChip(
-            context,
-            ref,
-            l10n.exploreNearby,
-            ExploreFilter.nearby,
-            currentFilter,
-            Icons.near_me,
-          ),
-        ],
-      ),
+    return Wrap(
+      spacing: PetSpacing.sm,
+      runSpacing: PetSpacing.sm,
+      alignment: WrapAlignment.start,
+      children: [
+        _buildFilterChip(
+          context,
+          ref,
+          l10n.exploreAll,
+          ExploreFilter.all,
+          currentFilter,
+          Icons.list,
+        ),
+        _buildFilterChip(
+          context,
+          ref,
+          l10n.exploreLost,
+          ExploreFilter.lost,
+          currentFilter,
+          Icons.priority_high,
+        ),
+        _buildFilterChip(
+          context,
+          ref,
+          l10n.exploreFound,
+          ExploreFilter.found,
+          currentFilter,
+          Icons.check_circle,
+        ),
+        _buildFilterChip(
+          context,
+          ref,
+          l10n.exploreNearby,
+          ExploreFilter.nearby,
+          currentFilter,
+          Icons.near_me,
+        ),
+      ],
     );
   }
 
@@ -197,40 +194,51 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     final cs = Theme.of(context).colorScheme;
     final isSelected = value == currentFilter;
 
-    return GestureDetector(
-      onTap: () => ref.read(exploreFilterProvider.notifier).state = value,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 48),
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: PetSpacing.md,
-            vertical: PetSpacing.md,
-          ),
-          decoration: BoxDecoration(
-            color: isSelected ? cs.primary : cs.surface,
-            borderRadius: PetRadius.xxlAll,
-            border: Border.all(
-              color: isSelected ? cs.primary : cs.outlineVariant,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                size: 16,
-                color: isSelected ? cs.onPrimary : cs.onSurfaceVariant,
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: label,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: PetRadius.xxlAll,
+          onTap: () => ref.read(exploreFilterProvider.notifier).state = value,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 48),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: PetSpacing.md,
+                vertical: PetSpacing.md,
               ),
-              const SizedBox(width: PetSpacing.xs),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                  color: isSelected ? cs.onPrimary : cs.onSurface,
+              decoration: BoxDecoration(
+                color: isSelected ? cs.primary : cs.surface,
+                borderRadius: PetRadius.xxlAll,
+                border: Border.all(
+                  color: isSelected ? cs.primary : cs.outlineVariant,
                 ),
               ),
-            ],
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    icon,
+                    size: 16,
+                    color: isSelected ? cs.onPrimary : cs.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: PetSpacing.xs),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w400,
+                      color: isSelected ? cs.onPrimary : cs.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -327,24 +335,66 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 ],
               ),
               Positioned(
-                left: PetSpacing.sm,
-                top: PetSpacing.sm,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface
-                        .withValues(alpha: 0.85),
-                    borderRadius: PetRadius.smAll,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: PetSpacing.sm,
-                      vertical: PetSpacing.xs,
+                left: PetSpacing.md,
+                top: PetSpacing.md,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface
+                            .withValues(alpha: 0.92),
+                        borderRadius: PetRadius.mdAll,
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: PetSpacing.md,
+                          vertical: PetSpacing.sm,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.map_outlined,
+                              size: 16,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            const SizedBox(width: PetSpacing.xs),
+                            Text(
+                              l10n.exploreMapTitle,
+                              style: Theme.of(context).textTheme.labelLarge
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    child: Text(
-                      '\u00A9 OpenStreetMap contributors',
-                      style: Theme.of(context).textTheme.labelSmall,
+                    const SizedBox(height: PetSpacing.xs),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface
+                            .withValues(alpha: 0.85),
+                        borderRadius: PetRadius.smAll,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: PetSpacing.sm,
+                          vertical: PetSpacing.xs,
+                        ),
+                        child: Text(
+                          '\u00A9 OpenStreetMap contributors',
+                          style: Theme.of(context).textTheme.labelSmall,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
               Positioned(
