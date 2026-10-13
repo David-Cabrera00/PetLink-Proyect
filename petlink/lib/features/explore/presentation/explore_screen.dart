@@ -29,6 +29,7 @@ class ExploreScreen extends ConsumerStatefulWidget {
 
 class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   final _mapController = MapController();
+  final _filterScrollController = ScrollController();
   late final TextEditingController _searchController;
   bool _isLocating = false;
 
@@ -43,6 +44,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   @override
   void dispose() {
     _searchController.dispose();
+    _filterScrollController.dispose();
     super.dispose();
   }
 
@@ -142,44 +144,49 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     ExploreFilter currentFilter,
   ) {
     final l10n = AppLocalizations.of(context)!;
-    return Wrap(
-      spacing: PetSpacing.sm,
-      runSpacing: PetSpacing.sm,
-      alignment: WrapAlignment.start,
-      children: [
-        _buildFilterChip(
-          context,
-          ref,
-          l10n.exploreAll,
-          ExploreFilter.all,
-          currentFilter,
-          Icons.list,
-        ),
-        _buildFilterChip(
-          context,
-          ref,
-          l10n.exploreLost,
-          ExploreFilter.lost,
-          currentFilter,
-          Icons.priority_high,
-        ),
-        _buildFilterChip(
-          context,
-          ref,
-          l10n.exploreFound,
-          ExploreFilter.found,
-          currentFilter,
-          Icons.check_circle,
-        ),
-        _buildFilterChip(
-          context,
-          ref,
-          l10n.exploreNearby,
-          ExploreFilter.nearby,
-          currentFilter,
-          Icons.near_me,
-        ),
-      ],
+    return SingleChildScrollView(
+      controller: _filterScrollController,
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
+      child: Row(
+        children: [
+          _buildFilterChip(
+            context,
+            ref,
+            l10n.exploreAll,
+            ExploreFilter.all,
+            currentFilter,
+            Icons.list,
+          ),
+          const SizedBox(width: PetSpacing.sm),
+          _buildFilterChip(
+            context,
+            ref,
+            l10n.exploreLost,
+            ExploreFilter.lost,
+            currentFilter,
+            Icons.priority_high,
+          ),
+          const SizedBox(width: PetSpacing.sm),
+          _buildFilterChip(
+            context,
+            ref,
+            l10n.exploreFound,
+            ExploreFilter.found,
+            currentFilter,
+            Icons.check_circle,
+          ),
+          const SizedBox(width: PetSpacing.sm),
+          _buildFilterChip(
+            context,
+            ref,
+            l10n.exploreNearby,
+            ExploreFilter.nearby,
+            currentFilter,
+            Icons.near_me,
+          ),
+        ],
+      ),
     );
   }
 
