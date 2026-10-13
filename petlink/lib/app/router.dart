@@ -334,8 +334,8 @@ class ScaffoldWithNav extends StatelessWidget {
                         Row(
                           children: [
                             _LiquidNavItem(
-                              icon: PhosphorIconsRegular.radar,
-                              selectedIcon: PhosphorIconsFill.radar,
+                              icon: PhosphorIconsRegular.broadcast,
+                              selectedIcon: PhosphorIconsFill.broadcast,
                               label: l10n.navigationRadar,
                               selected: currentIndex == 0,
                               onTap: () => context.go('/radar'),

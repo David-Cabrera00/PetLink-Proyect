@@ -181,7 +181,7 @@ class RadarScreen extends ConsumerWidget {
                     Row(
                       children: [
                         Icon(
-                          PhosphorIconsFill.radar,
+                          PhosphorIconsFill.broadcast,
                           size: 18,
                           color: cs.onPrimary,
                         ),
