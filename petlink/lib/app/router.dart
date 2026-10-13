@@ -230,7 +230,12 @@ class ScaffoldWithNav extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          child,
+          // The navigation bar floats above the shell content. Reserve its
+          // space so the last controls on long screens remain reachable.
+          Padding(
+            padding: const EdgeInsets.only(bottom: 96),
+            child: child,
+          ),
           Positioned(
             left: 0,
             right: 0,
@@ -298,7 +303,7 @@ class ScaffoldWithNav extends StatelessWidget {
                                 child: DecoratedBox(
                                   decoration: BoxDecoration(
                                     color: currentIndex == 2
-                                        ? cs.secondary
+                                        ? cs.primary
                                         : cs.primaryContainer,
                                     borderRadius: BorderRadius.circular(22),
                                     border: Border.all(
@@ -308,9 +313,7 @@ class ScaffoldWithNav extends StatelessWidget {
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: (currentIndex == 2
-                                                ? cs.secondary
-                                                : cs.primary)
+                                      color: cs.primary
                                             .withValues(alpha: 0.22),
                                         blurRadius: 12,
                                         offset: const Offset(0, 4),
@@ -412,7 +415,7 @@ class _LiquidNavItemState extends State<_LiquidNavItem> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final selectedForeground = widget.isPrimary
-        ? cs.onSecondary
+        ? cs.onPrimary
         : cs.onPrimaryContainer;
 
     return Expanded(
@@ -426,11 +429,10 @@ class _LiquidNavItemState extends State<_LiquidNavItem> {
           onTapUp: (_) => _setPressed(false),
           onTapCancel: () => _setPressed(false),
           borderRadius: BorderRadius.circular(22),
-          splashColor: (widget.isPrimary ? cs.secondary : cs.primary).withValues(
+          splashColor: cs.primary.withValues(
             alpha: 0.16,
           ),
-          highlightColor: (widget.isPrimary ? cs.secondary : cs.primary)
-              .withValues(alpha: 0.08),
+          highlightColor: cs.primary.withValues(alpha: 0.08),
           child: AnimatedScale(
             scale: _pressed ? 0.94 : 1,
             duration: const Duration(milliseconds: 110),
