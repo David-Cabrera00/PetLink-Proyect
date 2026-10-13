@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/theme/pet_spacing.dart';
 import '../../../core/theme/pet_radius.dart';
@@ -26,7 +27,7 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
       appBar: AppBar(
         title: Text(l10n.reportPhotosTitle),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(PhosphorIconsRegular.arrowLeft),
           onPressed: () => context.go('/report/new/pet-info'),
         ),
       ),
@@ -107,7 +108,11 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
               color: cs.primaryContainer.withValues(alpha: 0.5),
               borderRadius: PetRadius.xlAll,
             ),
-            child: Icon(Icons.camera_alt_outlined, size: 44, color: cs.primary),
+            child: Icon(
+              PhosphorIconsRegular.camera,
+              size: 44,
+              color: cs.primary,
+            ),
           ),
           const SizedBox(height: PetSpacing.lg),
           Text(
@@ -125,7 +130,7 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
           PetButton(
             label: l10n.addPhoto,
             onPressed: () => _showPhotoOptions(context, ref),
-            icon: Icons.add_a_photo,
+            icon: PhosphorIconsRegular.cameraPlus,
           ),
         ],
       ),
@@ -169,7 +174,11 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                 color: Colors.black.withValues(alpha: 0.65),
                 borderRadius: BorderRadius.circular(100),
               ),
-              child: const Icon(Icons.close, size: 16, color: Colors.white),
+              child: const Icon(
+                PhosphorIconsRegular.x,
+                size: 16,
+                color: Colors.white,
+              ),
             ),
           ),
         ),
@@ -183,7 +192,7 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
       color: cs.surfaceContainerHighest,
       child: Center(
         child: Icon(
-          Icons.image_outlined,
+          PhosphorIconsRegular.image,
           size: 32,
           color: cs.onSurfaceVariant.withValues(alpha: 0.5),
         ),
@@ -215,7 +224,11 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                 color: cs.primaryContainer.withValues(alpha: 0.5),
                 borderRadius: PetRadius.lgAll,
               ),
-              child: Icon(Icons.add_a_photo, size: 28, color: cs.primary),
+              child: Icon(
+                PhosphorIconsRegular.cameraPlus,
+                size: 28,
+                color: cs.primary,
+              ),
             ),
             const SizedBox(height: PetSpacing.sm),
             Text(
@@ -253,7 +266,7 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                     Expanded(
                       child: _buildPhotoOption(
                         context,
-                        Icons.camera_alt,
+                        PhosphorIconsRegular.camera,
                         l10n.takePhoto,
                         () {
                           Navigator.pop(context);
@@ -265,7 +278,7 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                     Expanded(
                       child: _buildPhotoOption(
                         context,
-                        Icons.photo_library,
+                        PhosphorIconsRegular.images,
                         l10n.gallery,
                         () {
                           Navigator.pop(context);
@@ -354,7 +367,7 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
             onPressed: canContinue
                 ? () => context.go('/report/new/location')
                 : null,
-            icon: Icons.arrow_forward,
+            icon: PhosphorIconsRegular.arrowRight,
           ),
         ),
       ],

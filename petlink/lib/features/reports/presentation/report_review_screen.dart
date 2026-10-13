@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -26,7 +27,7 @@ class ReportReviewScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.reportReviewTitle),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(PhosphorIconsRegular.arrowLeft),
           onPressed: () => context.go('/report/new/details'),
         ),
       ),
@@ -258,7 +259,7 @@ class ReportReviewScreen extends ConsumerWidget {
       color: cs.surfaceContainerHighest,
       child: Center(
         child: Icon(
-          Icons.image_outlined,
+          PhosphorIconsRegular.image,
           size: 24,
           color: cs.onSurfaceVariant.withValues(alpha: 0.5),
         ),
@@ -273,7 +274,7 @@ class ReportReviewScreen extends ConsumerWidget {
         PetButton(
           label: l10n.publishReport,
           onPressed: () => _publishReport(context, ref),
-          icon: Icons.publish,
+          icon: PhosphorIconsRegular.paperPlaneTilt,
         ),
         const SizedBox(height: PetSpacing.md),
         OutlinedButton(

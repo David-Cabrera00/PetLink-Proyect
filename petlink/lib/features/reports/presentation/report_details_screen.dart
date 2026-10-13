@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -58,7 +59,7 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
       appBar: AppBar(
         title: Text(l10n.reportDetailsTitle),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(PhosphorIconsRegular.arrowLeft),
           onPressed: () => context.go('/report/new/location'),
         ),
       ),
@@ -173,7 +174,7 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
                 child: _buildOptionCard(
                   context,
                   l10n.yes,
-                  Icons.check_circle,
+                  PhosphorIconsRegular.checkCircle,
                   draft.isPetWithFinder == true,
                 ),
               ),
@@ -187,7 +188,7 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
                 child: _buildOptionCard(
                   context,
                   l10n.no,
-                  Icons.cancel,
+                  PhosphorIconsRegular.xCircle,
                   draft.isPetWithFinder == false,
                 ),
               ),
@@ -262,7 +263,7 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
                 context.go('/report/new/review');
               }
             },
-            icon: Icons.arrow_forward,
+            icon: PhosphorIconsRegular.arrowRight,
           ),
         ),
       ],

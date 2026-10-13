@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -30,7 +31,7 @@ class ReportsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.navigationReport),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(PhosphorIconsRegular.arrowLeft),
           onPressed: () => context.go('/profile'),
         ),
       ),
@@ -40,7 +41,7 @@ class ReportsScreen extends ConsumerWidget {
           children: [
             _buildHubAction(
               context,
-              icon: Icons.add_circle_outline,
+              icon: PhosphorIconsRegular.plusCircle,
               title: 'Crear nuevo reporte',
               subtitle: 'Informa sobre una mascota perdida o encontrada',
               onTap: () => context.go('/report/new'),
@@ -49,7 +50,7 @@ class ReportsScreen extends ConsumerWidget {
             const SizedBox(height: PetSpacing.md),
             _buildHubAction(
               context,
-              icon: Icons.groups_outlined,
+              icon: PhosphorIconsRegular.usersThree,
               title: 'Reportes de la comunidad',
               subtitle: 'Consulta reportes de otras personas cerca de ti',
               onTap: () {
@@ -82,7 +83,7 @@ class ReportsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.reportsTitle),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(PhosphorIconsRegular.arrowLeft),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -130,7 +131,7 @@ class ReportsScreen extends ConsumerWidget {
             child: PetButton(
               label: l10n.reportCreate,
               onPressed: () => context.go('/report/new'),
-              icon: Icons.add,
+              icon: PhosphorIconsRegular.plus,
             ),
           ),
         ],
@@ -182,7 +183,7 @@ class ReportsScreen extends ConsumerWidget {
                 ),
               ),
               Icon(
-                Icons.chevron_right,
+                PhosphorIconsRegular.caretRight,
                 color: emphasized ? cs.onPrimary : cs.onSurfaceVariant,
               ),
             ],
@@ -288,7 +289,11 @@ class ReportsScreen extends ConsumerWidget {
                       color: PetColors.primarySoft,
                       borderRadius: PetRadius.mdAll,
                     ),
-                    child: Icon(Icons.pets, color: PetColors.primary, size: 32),
+                    child: Icon(
+                      PhosphorIconsRegular.pawPrint,
+                      color: PetColors.primary,
+                      size: 32,
+                    ),
                   ),
                   const SizedBox(width: PetSpacing.md),
                   Expanded(
@@ -326,7 +331,7 @@ class ReportsScreen extends ConsumerWidget {
               Row(
                 children: [
                   Icon(
-                    Icons.location_on,
+                    PhosphorIconsRegular.mapPin,
                     size: 16,
                     color: PetColors.textSecondary,
                   ),
@@ -343,7 +348,7 @@ class ReportsScreen extends ConsumerWidget {
               Row(
                 children: [
                   Icon(
-                    Icons.access_time,
+                    PhosphorIconsRegular.clock,
                     size: 16,
                     color: PetColors.textSecondary,
                   ),
@@ -359,14 +364,14 @@ class ReportsScreen extends ConsumerWidget {
                 children: [
                   _buildIndicator(
                     context,
-                    Icons.visibility,
+                    PhosphorIconsRegular.eye,
                     '${report.sightingsCount} avistamientos',
                     PetColors.primary,
                   ),
                   const SizedBox(width: PetSpacing.lg),
                   _buildIndicator(
                     context,
-                    Icons.diamond,
+                    PhosphorIconsRegular.diamond,
                     '1 posible coincidencia',
                     PetColors.match,
                   ),
@@ -427,7 +432,7 @@ class ReportsScreen extends ConsumerWidget {
     }
 
     return EmptyState(
-      icon: Icons.description,
+      icon: PhosphorIconsRegular.fileText,
       title: title,
       subtitle: subtitle,
     );

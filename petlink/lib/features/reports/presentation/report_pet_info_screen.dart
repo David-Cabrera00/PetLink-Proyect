@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/theme/pet_spacing.dart';
 import '../../../design_system/buttons/pet_button.dart';
@@ -63,7 +64,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
       appBar: AppBar(
         title: Text(l10n.reportPetInfoTitle),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(PhosphorIconsRegular.arrowLeft),
           onPressed: () => context.go('/report/new'),
         ),
       ),
@@ -118,7 +119,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                           children: [
                             _buildChoiceChip(
                               label: 'Perro',
-                              icon: Icons.pets,
+                              icon: PhosphorIconsRegular.dog,
                               selectedColor: const Color(0xFFE3A07F),
                               isSelected:
                                   _speciesController.text.toLowerCase() ==
@@ -130,7 +131,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                             const SizedBox(width: PetSpacing.sm),
                             _buildChoiceChip(
                               label: 'Gato',
-                              icon: Icons.pets_outlined,
+                              icon: PhosphorIconsRegular.cat,
                               selectedColor: const Color(0xFF9D83A7),
                               isSelected:
                                   _speciesController.text.toLowerCase() ==
@@ -171,7 +172,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                           children: [
                             _buildChoiceChip(
                               label: 'Macho',
-                              icon: Icons.male,
+                              icon: PhosphorIconsRegular.genderMale,
                               selectedColor: const Color(0xFF7D9BB2),
                               isSelected:
                                   _sexController.text.toLowerCase() == 'macho',
@@ -181,7 +182,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                             const SizedBox(width: PetSpacing.sm),
                             _buildChoiceChip(
                               label: 'Hembra',
-                              icon: Icons.female,
+                              icon: PhosphorIconsRegular.genderFemale,
                               selectedColor: const Color(0xFFD98C9A),
                               isSelected:
                                   _sexController.text.toLowerCase() == 'hembra',
@@ -364,7 +365,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                 context.go('/report/new/photos');
               }
             },
-            icon: Icons.arrow_forward,
+            icon: PhosphorIconsRegular.arrowRight,
           ),
         ),
       ],

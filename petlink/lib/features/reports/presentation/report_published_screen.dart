@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -29,7 +30,7 @@ class ReportPublishedScreen extends ConsumerWidget {
                   borderRadius: PetRadius.xxlAll,
                 ),
                 child: Icon(
-                  Icons.check_circle,
+                  PhosphorIconsFill.checkCircle,
                   size: 64,
                   color: PetColors.found,
                 ),
@@ -50,7 +51,7 @@ class ReportPublishedScreen extends ConsumerWidget {
               PetButton(
                 label: l10n.viewMyReport,
                 onPressed: () => context.go('/reports/mine'),
-                icon: Icons.description,
+                icon: PhosphorIconsRegular.fileText,
               ),
               const SizedBox(height: PetSpacing.md),
               OutlinedButton(
