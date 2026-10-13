@@ -254,3 +254,26 @@ La siguiente pantalla prioritaria es `ExploreScreen`: debe resolver la relación
 - Para cambios de contrato, actualizar interfaces, mocks y providers en el mismo cambio.
 - Actualizar `DESING.md` si cambia arquitectura visual, tokens, navegación o componentes.
 - Mantener este archivo actualizado cuando cambien comandos, dependencias, estructura, rutas o limitaciones.
+
+## Estado del proyecto — octubre de 2026
+
+Estimación actual para un MVP:
+
+- Diseño e interfaz: 85%.
+- Navegación y flujo de pantallas: 85%.
+- Reportes y coincidencias con datos mock: 75%.
+- Estados de carga, error y vacío: 70%.
+- Persistencia local: 25%.
+- Backend y autenticación real: 10%.
+- Pruebas: 35%.
+
+Avance global estimado: 65% como MVP visual/funcional.
+
+### Próximos bloques prioritarios
+
+1. Conectar backend y base de datos sin romper las interfaces de repositorio.
+2. Implementar autenticación real y persistencia de sesión.
+3. Persistir reportes, borradores e imágenes.
+4. Integrar geolocalización, permisos y mapas de producción.
+5. Ampliar pruebas de navegación, providers, formularios y temas.
+6. Realizar la revisión final en Android, iOS y Web.
