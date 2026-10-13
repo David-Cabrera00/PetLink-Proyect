@@ -26,7 +26,7 @@ class ReportTypeScreen extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             ref.read(reportDraftProvider.notifier).clearDraft();
-            context.go('/radar');
+            context.go('/reports');
           },
         ),
       ),

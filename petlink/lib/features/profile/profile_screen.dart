@@ -100,7 +100,7 @@ class ProfileScreen extends ConsumerWidget {
               ?.copyWith(color: cs.onSurfaceVariant),
         ),
         trailing: Icon(Icons.chevron_right, color: cs.onSurfaceVariant),
-        onTap: () => context.go('/reports'),
+        onTap: () => context.go('/reports/mine'),
       ),
     );
   }

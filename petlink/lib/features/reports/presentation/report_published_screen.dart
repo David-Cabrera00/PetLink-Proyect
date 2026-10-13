@@ -49,12 +49,12 @@ class ReportPublishedScreen extends ConsumerWidget {
               const SizedBox(height: PetSpacing.xl),
               PetButton(
                 label: l10n.viewMyReport,
-                onPressed: () => context.go('/reports'),
+                onPressed: () => context.go('/reports/mine'),
                 icon: Icons.description,
               ),
               const SizedBox(height: PetSpacing.md),
               OutlinedButton(
-                onPressed: () => context.go('/radar'),
+                onPressed: () => context.go('/reports'),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 52),
                   padding: const EdgeInsets.symmetric(vertical: PetSpacing.md),

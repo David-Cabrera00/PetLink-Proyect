@@ -12,13 +12,69 @@ import '../../../shared/models/pet_report.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/error_state.dart';
 import '../providers/reports_providers.dart';
+import '../../explore/providers/explore_providers.dart';
 
 class ReportsScreen extends ConsumerWidget {
-  const ReportsScreen({super.key});
+  final bool onlyMyReports;
+
+  const ReportsScreen({super.key, this.onlyMyReports = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    if (onlyMyReports) {
+      return _buildMyReportsScreen(context, ref, l10n);
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.navigationReport),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/profile'),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(PetSpacing.lg),
+        child: Column(
+          children: [
+            _buildHubAction(
+              context,
+              icon: Icons.add_circle_outline,
+              title: 'Crear nuevo reporte',
+              subtitle: 'Informa sobre una mascota perdida o encontrada',
+              onTap: () => context.go('/report/new'),
+              emphasized: true,
+            ),
+            const SizedBox(height: PetSpacing.md),
+            _buildHubAction(
+              context,
+              icon: Icons.groups_outlined,
+              title: 'Reportes de la comunidad',
+              subtitle: 'Consulta reportes de otras personas cerca de ti',
+              onTap: () {
+                ref.read(exploreViewModeProvider.notifier).state =
+                    ExploreViewMode.list;
+                context.go('/explore');
+              },
+            ),
+            const Spacer(),
+            Text(
+              'Tus reportes personales están disponibles desde Perfil.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMyReportsScreen(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
     final reportsAsync = ref.watch(myReportsProvider);
     final filter = ref.watch(reportsFilterProvider);
 
@@ -78,6 +134,60 @@ class ReportsScreen extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildHubAction(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    bool emphasized = false,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+    return Material(
+      color: emphasized ? cs.primary : cs.surface,
+      borderRadius: PetRadius.lgAll,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: PetRadius.lgAll,
+        child: Padding(
+          padding: const EdgeInsets.all(PetSpacing.md),
+          child: Row(
+            children: [
+              Icon(icon, color: emphasized ? cs.onPrimary : cs.primary),
+              const SizedBox(width: PetSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: emphasized ? cs.onPrimary : cs.onSurface,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: emphasized
+                            ? cs.onPrimary.withValues(alpha: 0.78)
+                            : cs.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right,
+                color: emphasized ? cs.onPrimary : cs.onSurfaceVariant,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

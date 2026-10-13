@@ -152,6 +152,11 @@ class AppRouter {
               builder: (context, state) => const ReportsScreen(),
             ),
             GoRoute(
+              path: '/reports/mine',
+              builder: (context, state) =>
+                  const ReportsScreen(onlyMyReports: true),
+            ),
+            GoRoute(
               path: '/reports/:id',
               builder: (context, state) =>
                   ReportDetailScreen(reportId: state.pathParameters['id']!),
@@ -347,7 +352,7 @@ class ScaffoldWithNav extends StatelessWidget {
                               label: l10n.navigationReport,
                               selected: currentIndex == 2,
                               isPrimary: true,
-                              onTap: () => context.go('/report/new'),
+                              onTap: () => context.go('/reports'),
                             ),
                             _LiquidNavItem(
                               icon: Icons.notifications_outlined,

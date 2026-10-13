@@ -108,7 +108,10 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                         Text(
                           l10n.reportPetInfoSpecies,
                           style: Theme.of(context).textTheme.labelLarge
-                              ?.copyWith(fontWeight: FontWeight.w600),
+                              ?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                         ),
                         const SizedBox(height: PetSpacing.xs),
                         Row(
@@ -116,6 +119,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                             _buildChoiceChip(
                               label: 'Perro',
                               icon: Icons.pets,
+                              selectedColor: const Color(0xFFE3A07F),
                               isSelected:
                                   _speciesController.text.toLowerCase() ==
                                   'perro',
@@ -127,6 +131,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                             _buildChoiceChip(
                               label: 'Gato',
                               icon: Icons.pets_outlined,
+                              selectedColor: const Color(0xFF9D83A7),
                               isSelected:
                                   _speciesController.text.toLowerCase() ==
                                   'gato',
@@ -156,7 +161,10 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                         Text(
                           l10n.reportPetInfoSex,
                           style: Theme.of(context).textTheme.labelLarge
-                              ?.copyWith(fontWeight: FontWeight.w600),
+                              ?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                         ),
                         const SizedBox(height: PetSpacing.xs),
                         Row(
@@ -164,6 +172,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                             _buildChoiceChip(
                               label: 'Macho',
                               icon: Icons.male,
+                              selectedColor: const Color(0xFF7D9BB2),
                               isSelected:
                                   _sexController.text.toLowerCase() == 'macho',
                               onSelected: () =>
@@ -173,6 +182,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                             _buildChoiceChip(
                               label: 'Hembra',
                               icon: Icons.female,
+                              selectedColor: const Color(0xFFD98C9A),
                               isSelected:
                                   _sexController.text.toLowerCase() == 'hembra',
                               onSelected: () => setState(
@@ -187,7 +197,10 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                         Text(
                           l10n.reportPetInfoSize,
                           style: Theme.of(context).textTheme.labelLarge
-                              ?.copyWith(fontWeight: FontWeight.w600),
+                              ?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                         ),
                         const SizedBox(height: PetSpacing.xs),
                         SingleChildScrollView(
@@ -277,10 +290,15 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
   Widget _buildChoiceChip({
     required String label,
     IconData? icon,
+    Color? selectedColor,
     required bool isSelected,
     required VoidCallback onSelected,
   }) {
     final cs = Theme.of(context).colorScheme;
+    final activeColor = selectedColor ?? cs.primary;
+    final activeForeground = activeColor.computeLuminance() > 0.45
+        ? cs.onSurface
+        : Colors.white;
 
     return GestureDetector(
       onTap: onSelected,
@@ -305,7 +323,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
               Icon(
                 icon,
                 size: 16,
-                color: isSelected ? cs.onPrimary : cs.onSurfaceVariant,
+                color: isSelected ? activeForeground : cs.onSurfaceVariant,
               ),
               const SizedBox(width: PetSpacing.xs),
             ],
@@ -314,7 +332,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? cs.onPrimary : cs.onSurface,
+                color: isSelected ? activeForeground : cs.onSurface,
               ),
             ),
           ],
