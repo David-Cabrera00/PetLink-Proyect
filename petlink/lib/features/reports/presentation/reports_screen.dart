@@ -8,7 +8,6 @@ import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
 import '../../../core/theme/pet_radius.dart';
 import '../../../core/theme/pet_theme_extension.dart';
-import '../../../design_system/badges/status_badge.dart';
 import '../../../design_system/buttons/pet_button.dart';
 import '../../../shared/models/pet_report.dart';
 import '../../../shared/widgets/empty_state.dart';
@@ -286,9 +285,12 @@ class ReportsScreen extends ConsumerWidget {
       child: InkWell(
         onTap: () => context.go('/reports/${report.id}'),
         borderRadius: PetRadius.xlAll,
-        child: Padding(
-          padding: const EdgeInsets.all(PetSpacing.lg),
-          child: Column(
+        child: Column(
+          children: [
+            _buildReportHero(context, report, statusColor),
+            Padding(
+              padding: const EdgeInsets.all(PetSpacing.lg),
+              child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
@@ -315,16 +317,12 @@ class ReportsScreen extends ConsumerWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                report.pet.name,
-                                style: theme.textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.w700,
+                                '${report.pet.breed} · ${report.pet.sex}',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
-                            ),
-                            StatusBadge(
-                              status: report.type == ReportType.lost
-                                  ? PetStatus.lost
-                                  : PetStatus.found,
                             ),
                           ],
                         ),
@@ -404,6 +402,105 @@ class ReportsScreen extends ConsumerWidget {
               ),
             ],
           ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReportHero(
+    BuildContext context,
+    dynamic report,
+    Color statusColor,
+  ) {
+    final theme = Theme.of(context);
+    final imageUrl = report.pet.primaryPhotoUrl;
+
+    return SizedBox(
+      height: 128,
+      width: double.infinity,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          if (imageUrl != null)
+            Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => _buildReportHeroPlaceholder(statusColor),
+            )
+          else
+            _buildReportHeroPlaceholder(statusColor),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  Colors.black.withValues(alpha: 0.48),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            left: PetSpacing.lg,
+            right: PetSpacing.lg,
+            bottom: PetSpacing.md,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    report.pet.name,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: PetSpacing.sm,
+                    vertical: PetSpacing.xs,
+                  ),
+                  decoration: BoxDecoration(
+                    color: statusColor,
+                    borderRadius: PetRadius.smAll,
+                  ),
+                  child: Text(
+                    report.type == ReportType.lost ? 'PERDIDA' : 'ENCONTRADA',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReportHeroPlaceholder(Color statusColor) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            statusColor.withValues(alpha: 0.28),
+            PetColors.primary.withValues(alpha: 0.92),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Center(
+        child: Icon(
+          PhosphorIconsRegular.pawPrint,
+          size: 58,
+          color: Colors.white.withValues(alpha: 0.88),
         ),
       ),
     );
@@ -460,19 +557,56 @@ class ReportsScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(PetSpacing.lg),
       itemCount: 3,
       itemBuilder: (context, index) {
+        final cs = Theme.of(context).colorScheme;
         return Container(
-          height: 200,
+          height: 188,
           margin: const EdgeInsets.only(bottom: PetSpacing.md),
           decoration: BoxDecoration(
-            color: PetColors.surface,
+            color: cs.surface,
             borderRadius: PetRadius.xlAll,
-            border: Border.all(color: PetColors.border),
+            border: Border.all(color: cs.outlineVariant),
           ),
-          child: Center(
-            child: CircularProgressIndicator(color: PetColors.primary),
+          child: Padding(
+            padding: const EdgeInsets.all(PetSpacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    _buildSkeletonBlock(context, 64, 64),
+                    const SizedBox(width: PetSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSkeletonBlock(context, 130, 18),
+                          const SizedBox(height: PetSpacing.sm),
+                          _buildSkeletonBlock(context, 90, 12),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: PetSpacing.lg),
+                _buildSkeletonBlock(context, double.infinity, 14),
+                const SizedBox(height: PetSpacing.sm),
+                _buildSkeletonBlock(context, 150, 14),
+              ],
+            ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildSkeletonBlock(BuildContext context, double width, double height) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: PetRadius.smAll,
+      ),
     );
   }
 }

@@ -80,31 +80,35 @@ class ProfileScreen extends ConsumerWidget {
         borderRadius: PetRadius.lgAll,
         border: Border.all(color: cs.outlineVariant),
       ),
-      child: ListTile(
-        shape: RoundedRectangleBorder(borderRadius: PetRadius.lgAll),
-        leading: Container(
-          padding: const EdgeInsets.all(PetSpacing.sm),
-          decoration: BoxDecoration(
-            color: cs.primaryContainer,
-            borderRadius: PetRadius.mdAll,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: PetRadius.lgAll,
+        child: ListTile(
+          shape: RoundedRectangleBorder(borderRadius: PetRadius.lgAll),
+          leading: Container(
+            padding: const EdgeInsets.all(PetSpacing.sm),
+            decoration: BoxDecoration(
+              color: cs.primaryContainer,
+              borderRadius: PetRadius.mdAll,
+            ),
+            child: Icon(PhosphorIconsRegular.pawPrint, color: cs.primary),
           ),
-          child: Icon(PhosphorIconsRegular.pawPrint, color: cs.primary),
+          title: Text(
+            l10n.reportsTitle,
+            style: Theme.of(context).textTheme.titleMedium
+                ?.copyWith(fontWeight: FontWeight.w600),
+          ),
+          subtitle: Text(
+            'Administra y consulta tus mascotas reportadas',
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: cs.onSurfaceVariant),
+          ),
+          trailing: Icon(
+            PhosphorIconsRegular.caretRight,
+            color: cs.onSurfaceVariant,
+          ),
+          onTap: () => context.go('/reports/mine'),
         ),
-        title: Text(
-          l10n.reportsTitle,
-          style: Theme.of(context).textTheme.titleMedium
-              ?.copyWith(fontWeight: FontWeight.w600),
-        ),
-        subtitle: Text(
-          'Administra y consulta tus mascotas reportadas',
-          style: Theme.of(context).textTheme.bodySmall
-              ?.copyWith(color: cs.onSurfaceVariant),
-        ),
-        trailing: Icon(
-          PhosphorIconsRegular.caretRight,
-          color: cs.onSurfaceVariant,
-        ),
-        onTap: () => context.go('/reports/mine'),
       ),
     );
   }

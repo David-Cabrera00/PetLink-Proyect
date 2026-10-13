@@ -380,17 +380,57 @@ class RadarScreen extends ConsumerWidget {
   }
 
   Widget _buildLoadingCard(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
-      height: 120,
+      height: 126,
+      padding: const EdgeInsets.all(PetSpacing.md),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: cs.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).dividerColor),
+        border: Border.all(color: cs.outlineVariant),
       ),
-      child: Center(
-        child: CircularProgressIndicator(
-          color: Theme.of(context).colorScheme.primary,
-        ),
+      child: Row(
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: cs.surfaceContainerHighest,
+              borderRadius: PetRadius.lgAll,
+            ),
+          ),
+          const SizedBox(width: PetSpacing.md),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 140,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: cs.surfaceContainerHighest,
+                    borderRadius: PetRadius.smAll,
+                  ),
+                ),
+                const SizedBox(height: PetSpacing.sm),
+                Container(
+                  width: 100,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: cs.surfaceContainerHighest,
+                    borderRadius: PetRadius.smAll,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Icon(
+            PhosphorIconsRegular.spinner,
+            color: cs.primary,
+            size: 22,
+          ),
+        ],
       ),
     );
   }
