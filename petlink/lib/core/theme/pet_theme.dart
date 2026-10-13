@@ -111,7 +111,7 @@ class PetTheme {
       useMaterial3: true,
       extensions: [extension],
       colorScheme: ColorScheme.dark(
-        primary: Color(0xFF75B6B5),
+        primary: PetColors.primaryLight,
         onPrimary: PetColors.surfaceDark,
         primaryContainer: PetColors.primarySoftDark,
         onPrimaryContainer: PetColors.primarySoftLight,
@@ -155,7 +155,7 @@ class PetTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFF54B8B5),
+          backgroundColor: PetColors.primaryLight,
           foregroundColor: PetColors.surfaceDark,
           minimumSize: const Size(double.infinity, 52),
           shape: RoundedRectangleBorder(borderRadius: PetRadius.lgAll),
@@ -164,9 +164,9 @@ class PetTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: Color(0xFF54B8B5),
+          foregroundColor: PetColors.primaryLight,
           minimumSize: const Size(double.infinity, 52),
-          side: const BorderSide(color: Color(0xFF54B8B5), width: 1.5),
+          side: BorderSide(color: PetColors.primaryLight, width: 1.5),
           shape: RoundedRectangleBorder(borderRadius: PetRadius.lgAll),
           textStyle: PetTypography.button,
         ),
@@ -188,7 +188,7 @@ class PetTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: PetRadius.lgAll,
-          borderSide: const BorderSide(color: Color(0xFF54B8B5), width: 2),
+          borderSide: BorderSide(color: PetColors.primaryLight, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: PetRadius.lgAll,
@@ -205,7 +205,7 @@ class PetTheme {
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: PetColors.surfaceDark,
-        selectedItemColor: Color(0xFF54B8B5),
+        selectedItemColor: PetColors.primaryLight,
         unselectedItemColor: PetColors.textSecondaryDark,
         type: BottomNavigationBarType.fixed,
         elevation: 8,

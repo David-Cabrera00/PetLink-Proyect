@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/pet_spacing.dart';
 import '../../../core/theme/pet_radius.dart';
 import '../../../core/theme/pet_theme_extension.dart';
-import '../../../design_system/buttons/pet_button.dart';
 import '../../../shared/widgets/match_card.dart';
 import '../../../shared/widgets/pet_card_compact.dart';
 import '../../../shared/widgets/section_header.dart';
@@ -236,11 +235,21 @@ class RadarScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: PetSpacing.lg),
-          PetButton(
-            label: l10n.radarExplore,
-            variant: PetButtonVariant.accent,
-            onPressed: () => context.go('/explore'),
-            icon: Icons.arrow_forward,
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () => context.go('/explore'),
+              icon: const Icon(Icons.arrow_forward),
+              label: Text(l10n.radarExplore),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: cs.primary,
+                minimumSize: const Size(double.infinity, 52),
+                shape: RoundedRectangleBorder(
+                  borderRadius: PetRadius.lgAll,
+                ),
+              ),
+            ),
           ),
         ],
       ),
