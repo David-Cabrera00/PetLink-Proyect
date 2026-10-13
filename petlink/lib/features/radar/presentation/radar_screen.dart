@@ -154,71 +154,96 @@ class RadarScreen extends ConsumerWidget {
   Widget _buildRadarActiveSection(BuildContext context, RadarSummary summary) {
     final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
-    return Column(
-      children: [
-        SectionHeader(
-          title: l10n.radarActive,
-          trailing: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: PetSpacing.md,
-              vertical: PetSpacing.sm,
-            ),
-            decoration: BoxDecoration(
-              color: cs.primaryContainer,
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Text(
-              l10n.radarReportsCount(summary.totalReports),
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: cs.primary,
-              ),
-            ),
+    return Container(
+      padding: const EdgeInsets.all(PetSpacing.lg),
+      decoration: BoxDecoration(
+        color: cs.primary,
+        borderRadius: PetRadius.xxlAll,
+        border: Border.all(color: cs.onPrimary.withValues(alpha: 0.12)),
+        boxShadow: [
+          BoxShadow(
+            color: cs.primary.withValues(alpha: 0.22),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
           ),
-        ),
-        const SizedBox(height: PetSpacing.md),
-        Container(
-          padding: const EdgeInsets.all(PetSpacing.lg),
-          decoration: BoxDecoration(
-            color: cs.primaryContainer.withValues(alpha: 0.55),
-            borderRadius: PetRadius.xlAll,
-            border: Border.all(color: cs.outlineVariant),
-          ),
-          child: Column(
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Icon(Icons.radar, color: cs.primary),
-                  const SizedBox(width: PetSpacing.sm),
-                  Expanded(
-                    child: Text(
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.radar, size: 18, color: cs.onPrimary),
+                        const SizedBox(width: PetSpacing.sm),
+                        Text(
+                          l10n.radarActive.toUpperCase(),
+                          style: Theme.of(context).textTheme.labelLarge
+                              ?.copyWith(
+                                color: cs.onPrimary.withValues(alpha: 0.78),
+                                letterSpacing: 1.1,
+                                fontWeight: FontWeight.w700,
+                              ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: PetSpacing.md),
+                    Text(
                       l10n.radarReportsWithinRadius(summary.totalReports),
-                      style: Theme.of(context).textTheme.bodyLarge,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: cs.onPrimary,
+                        fontWeight: FontWeight.w700,
+                        height: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: PetSpacing.sm),
+                    Text(
+                      l10n.radarPublishedLast24Hours(summary.recentReports),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: cs.onPrimary.withValues(alpha: 0.72),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: PetSpacing.md),
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: cs.onPrimary.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: cs.onPrimary.withValues(alpha: 0.24),
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    '${summary.totalReports}',
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      color: cs.onPrimary,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: PetSpacing.sm),
-              Text(
-                l10n.radarPublishedLast24Hours(summary.recentReports),
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              const SizedBox(height: PetSpacing.lg),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: PetButton(
-                  label: l10n.radarExplore,
-                  variant: PetButtonVariant.accent,
-                  onPressed: () => context.go('/explore'),
-                  icon: Icons.arrow_forward,
                 ),
               ),
             ],
           ),
-        ),
-      ],
+          const SizedBox(height: PetSpacing.lg),
+          PetButton(
+            label: l10n.radarExplore,
+            variant: PetButtonVariant.accent,
+            onPressed: () => context.go('/explore'),
+            icon: Icons.arrow_forward,
+          ),
+        ],
+      ),
     );
   }
 
