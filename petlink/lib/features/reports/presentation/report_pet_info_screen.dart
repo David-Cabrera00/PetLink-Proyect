@@ -309,10 +309,10 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
           vertical: PetSpacing.sm + 2,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? cs.primary : cs.surface,
+          color: isSelected ? activeColor : cs.surface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? cs.primary : cs.outlineVariant,
+            color: isSelected ? activeColor : cs.outlineVariant,
             width: isSelected ? 1.5 : 1,
           ),
         ),
