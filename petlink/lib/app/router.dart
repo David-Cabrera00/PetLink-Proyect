@@ -326,7 +326,7 @@ class ScaffoldWithNav extends StatelessWidget {
   }
 }
 
-class _LiquidNavItem extends StatelessWidget {
+class _LiquidNavItem extends StatefulWidget {
   final IconData icon;
   final IconData selectedIcon;
   final String label;
@@ -344,46 +344,88 @@ class _LiquidNavItem extends StatelessWidget {
   });
 
   @override
+  State<_LiquidNavItem> createState() => _LiquidNavItemState();
+}
+
+class _LiquidNavItemState extends State<_LiquidNavItem> {
+  bool _pressed = false;
+
+  void _setPressed(bool value) {
+    if (mounted && _pressed != value) {
+      setState(() => _pressed = value);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final selectedColor = isPrimary ? cs.secondary : cs.primaryContainer;
-    final selectedForeground = isPrimary ? cs.onSecondary : cs.onPrimaryContainer;
+    final selectedColor = widget.isPrimary ? cs.secondary : cs.primaryContainer;
+    final selectedForeground = widget.isPrimary
+        ? cs.onSecondary
+        : cs.onPrimaryContainer;
 
     return Expanded(
       child: Semantics(
         button: true,
-        selected: selected,
-        label: label,
+        selected: widget.selected,
+        label: widget.label,
         child: InkWell(
-          onTap: onTap,
+          onTap: widget.onTap,
+          onTapDown: (_) => _setPressed(true),
+          onTapUp: (_) => _setPressed(false),
+          onTapCancel: () => _setPressed(false),
           borderRadius: BorderRadius.circular(22),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 220),
+          splashColor: (widget.isPrimary ? cs.secondary : cs.primary).withValues(
+            alpha: 0.16,
+          ),
+          highlightColor: (widget.isPrimary ? cs.secondary : cs.primary)
+              .withValues(alpha: 0.08),
+          child: AnimatedScale(
+            scale: _pressed ? 0.94 : 1,
+            duration: const Duration(milliseconds: 110),
             curve: Curves.easeOutCubic,
-            padding: const EdgeInsets.symmetric(vertical: 7),
-            decoration: BoxDecoration(
-              color: selected ? selectedColor : Colors.transparent,
-              borderRadius: BorderRadius.circular(22),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  selected ? selectedIcon : icon,
-                  size: 22,
-                  color: selected ? selectedForeground : cs.onSurfaceVariant,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: selected ? selectedForeground : cs.onSurfaceVariant,
-                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+              padding: const EdgeInsets.symmetric(vertical: 7),
+              decoration: BoxDecoration(
+                color: widget.selected ? selectedColor : Colors.transparent,
+                borderRadius: BorderRadius.circular(22),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 180),
+                    transitionBuilder: (child, animation) => ScaleTransition(
+                      scale: animation,
+                      child: child,
+                    ),
+                    child: Icon(
+                      widget.selected ? widget.selectedIcon : widget.icon,
+                      key: ValueKey(widget.selected),
+                      size: 22,
+                      color: widget.selected
+                          ? selectedForeground
+                          : cs.onSurfaceVariant,
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 2),
+                  Text(
+                    widget.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: widget.selected
+                          ? selectedForeground
+                          : cs.onSurfaceVariant,
+                      fontWeight: widget.selected
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
