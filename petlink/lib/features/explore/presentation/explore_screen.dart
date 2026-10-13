@@ -480,10 +480,14 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
 
   Widget _buildReportPreview(BuildContext context, report, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final cs = Theme.of(context).colorScheme;
     return Card(
       margin: EdgeInsets.zero,
+      elevation: 4,
+      surfaceTintColor: Colors.transparent,
+      clipBehavior: Clip.antiAlias,
       child: Padding(
-        padding: const EdgeInsets.all(PetSpacing.lg),
+        padding: const EdgeInsets.all(PetSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -495,7 +499,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                   height: 64,
                   clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
+                    color: cs.primaryContainer,
                     borderRadius: PetRadius.mdAll,
                   ),
                   child:
@@ -509,7 +513,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                               report.pet.species.toLowerCase() == 'gato'
                                   ? Icons.pets
                                   : Icons.pets,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: cs.primary,
                               size: 28,
                             ),
                           ),
@@ -519,7 +523,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                             report.pet.species.toLowerCase() == 'gato'
                                 ? Icons.pets
                                 : Icons.pets,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: cs.primary,
                             size: 28,
                           ),
                         ),
@@ -543,21 +547,17 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                 : PetStatus.found,
                           ),
                           const SizedBox(width: PetSpacing.xs),
-                          InkWell(
-                            borderRadius: BorderRadius.circular(100),
-                            onTap: () {
+                          IconButton(
+                            tooltip: 'Cerrar vista previa',
+                            visualDensity: VisualDensity.compact,
+                            onPressed: () {
                               ref.read(selectedReportProvider.notifier).state =
                                   null;
                             },
-                            child: Padding(
-                              padding: const EdgeInsets.all(PetSpacing.xs),
-                              child: Icon(
-                                Icons.close,
-                                size: 18,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
-                              ),
+                            icon: Icon(
+                              Icons.close,
+                              size: 18,
+                              color: cs.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -603,8 +603,21 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
               ],
             ),
             const SizedBox(height: PetSpacing.md),
-            Text(report.address, style: Theme.of(context).textTheme.bodySmall),
-            const SizedBox(height: PetSpacing.lg),
+            Row(
+              children: [
+                Icon(Icons.place_outlined, size: 16, color: cs.primary),
+                const SizedBox(width: PetSpacing.xs),
+                Expanded(
+                  child: Text(
+                    report.address,
+                    style: Theme.of(context).textTheme.bodySmall,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: PetSpacing.md),
             Row(
               children: [
                 Expanded(
@@ -615,6 +628,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 ),
                 const SizedBox(width: PetSpacing.md),
                 IconButton(
+                  tooltip: 'Guardar reporte',
                   onPressed: () {
                     final saved = {...ref.read(savedReportIdsProvider)};
                     if (!saved.add(report.id)) saved.remove(report.id);
@@ -624,13 +638,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     ref.watch(savedReportIdsProvider).contains(report.id)
                         ? Icons.bookmark
                         : Icons.bookmark_border,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: cs.primary,
                   ),
                   style: IconButton.styleFrom(
-                    backgroundColor: Theme.of(context)
-                        .colorScheme
-                        .primaryContainer
-                        .withValues(alpha: 0.5),
+                    backgroundColor: cs.primaryContainer,
                     shape: RoundedRectangleBorder(
                       borderRadius: PetRadius.mdAll,
                     ),
@@ -638,6 +649,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 ),
                 const SizedBox(width: PetSpacing.sm),
                 IconButton(
+                  tooltip: l10n.shareAction,
                   onPressed: () async {
                     await Clipboard.setData(
                       ClipboardData(
@@ -652,13 +664,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                   },
                   icon: Icon(
                     Icons.share,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: cs.primary,
                   ),
                   style: IconButton.styleFrom(
-                    backgroundColor: Theme.of(context)
-                        .colorScheme
-                        .primaryContainer
-                        .withValues(alpha: 0.5),
+                    backgroundColor: cs.primaryContainer,
                     shape: RoundedRectangleBorder(
                       borderRadius: PetRadius.mdAll,
                     ),
