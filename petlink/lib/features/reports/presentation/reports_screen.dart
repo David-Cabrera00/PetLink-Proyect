@@ -7,6 +7,7 @@ import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
 import '../../../core/theme/pet_radius.dart';
+import '../../../core/theme/pet_theme_extension.dart';
 import '../../../design_system/badges/status_badge.dart';
 import '../../../design_system/buttons/pet_button.dart';
 import '../../../shared/models/pet_report.dart';
@@ -269,9 +270,19 @@ class ReportsScreen extends ConsumerWidget {
   }
 
   Widget _buildReportCard(BuildContext context, report) {
-    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final extension = PetThemeExtension.of(context);
+    final isLost = report.type == ReportType.lost;
+    final statusColor = isLost ? extension.lost : extension.found;
     return Card(
       margin: EdgeInsets.zero,
+      color: theme.colorScheme.surface,
+      elevation: 3,
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: PetRadius.xlAll,
+        side: BorderSide(color: statusColor.withValues(alpha: 0.28)),
+      ),
       child: InkWell(
         onTap: () => context.go('/reports/${report.id}'),
         borderRadius: PetRadius.xlAll,
@@ -286,12 +297,12 @@ class ReportsScreen extends ConsumerWidget {
                     width: 64,
                     height: 64,
                     decoration: BoxDecoration(
-                      color: PetColors.primarySoft,
-                      borderRadius: PetRadius.mdAll,
+                      color: statusColor.withValues(alpha: 0.10),
+                      borderRadius: PetRadius.lgAll,
                     ),
                     child: Icon(
                       PhosphorIconsRegular.pawPrint,
-                      color: PetColors.primary,
+                      color: statusColor,
                       size: 32,
                     ),
                   ),
@@ -305,7 +316,9 @@ class ReportsScreen extends ConsumerWidget {
                             Expanded(
                               child: Text(
                                 report.pet.name,
-                                style: Theme.of(context).textTheme.titleMedium,
+                                style: theme.textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
                             StatusBadge(
@@ -320,7 +333,10 @@ class ReportsScreen extends ConsumerWidget {
                           report.status == ReportStatus.active
                               ? 'Búsqueda activa'
                               : 'Recuperada',
-                          style: Theme.of(context).textTheme.bodySmall,
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: statusColor,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ],
                     ),
@@ -333,13 +349,15 @@ class ReportsScreen extends ConsumerWidget {
                   Icon(
                     PhosphorIconsRegular.mapPin,
                     size: 16,
-                    color: PetColors.textSecondary,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: PetSpacing.xs),
                   Expanded(
                     child: Text(
                       report.address,
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
@@ -350,7 +368,7 @@ class ReportsScreen extends ConsumerWidget {
                   Icon(
                     PhosphorIconsRegular.clock,
                     size: 16,
-                    color: PetColors.textSecondary,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: PetSpacing.xs),
                   Text(
@@ -368,22 +386,21 @@ class ReportsScreen extends ConsumerWidget {
                     '${report.sightingsCount} avistamientos',
                     PetColors.primary,
                   ),
-                  const SizedBox(width: PetSpacing.lg),
-                  _buildIndicator(
-                    context,
-                    PhosphorIconsRegular.diamond,
-                    '1 posible coincidencia',
-                    PetColors.match,
+                  const Spacer(),
+                  Text(
+                    'Ver detalle',
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(width: PetSpacing.xs),
+                  Icon(
+                    PhosphorIconsRegular.arrowUpRight,
+                    size: 17,
+                    color: theme.colorScheme.primary,
                   ),
                 ],
-              ),
-              const SizedBox(height: PetSpacing.md),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () => context.go('/activity'),
-                  child: Text(l10n.navigationActivity),
-                ),
               ),
             ],
           ),

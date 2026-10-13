@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:petlink/l10n/app_localizations.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../core/theme/pet_spacing.dart';
 import '../../core/theme/pet_radius.dart';
@@ -52,13 +53,17 @@ class StatusBadge extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     switch (status) {
       case PetStatus.lost:
-        return (l10n.statusLost, extension.lost, Icons.priority_high);
+        return (l10n.statusLost, extension.lost, PhosphorIconsRegular.warning);
       case PetStatus.found:
-        return (l10n.statusFound, extension.found, Icons.check_circle);
+        return (
+          l10n.statusFound,
+          extension.found,
+          PhosphorIconsRegular.checkCircle,
+        );
       case PetStatus.match:
-        return (l10n.statusMatch, extension.match, Icons.diamond);
+        return (l10n.statusMatch, extension.match, PhosphorIconsRegular.diamond);
       case PetStatus.recovered:
-        return (l10n.statusRecovered, extension.found, Icons.favorite);
+        return (l10n.statusRecovered, extension.found, PhosphorIconsRegular.heart);
     }
   }
 }
