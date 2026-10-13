@@ -220,10 +220,16 @@ class ScaffoldWithNav extends StatelessWidget {
     final currentIndex = _indexFromLocation(location);
 
     return Scaffold(
-      body: child,
-      bottomNavigationBar: SafeArea(
-        top: false,
-        child: Padding(
+      body: Stack(
+        children: [
+          child,
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: SafeArea(
+              top: false,
+              child: Padding(
           padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(28),
@@ -231,22 +237,34 @@ class ScaffoldWithNav extends StatelessWidget {
               filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .surface
-                      .withValues(alpha: 0.78),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Theme.of(context)
+                          .colorScheme
+                          .surface
+                          .withValues(alpha: 0.52),
+                      Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest
+                          .withValues(alpha: 0.34),
+                      Theme.of(context)
+                          .colorScheme
+                          .primaryContainer
+                          .withValues(alpha: 0.20),
+                    ],
+                  ),
                   borderRadius: BorderRadius.circular(28),
                   border: Border.all(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .outline
-                        .withValues(alpha: 0.28),
+                    color: Colors.white.withValues(alpha: 0.34),
+                    width: 1.2,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.12),
-                      blurRadius: 24,
-                      offset: const Offset(0, 8),
+                      color: Colors.black.withValues(alpha: 0.18),
+                      blurRadius: 26,
+                      offset: const Offset(0, 10),
                     ),
                   ],
                 ),
@@ -299,7 +317,10 @@ class ScaffoldWithNav extends StatelessWidget {
               ),
             ),
           ),
-        ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
