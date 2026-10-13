@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/theme/pet_spacing.dart';
 import '../../../design_system/buttons/pet_button.dart';
@@ -41,7 +42,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(PhosphorIconsRegular.arrowLeft),
           onPressed: () => context.go('/login'),
         ),
         title: const Text('PetLink'),
@@ -88,7 +89,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           hint: l10n.authEmailHint,
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
-                          prefixIcon: const Icon(Icons.email_outlined),
+                          prefixIcon: const Icon(PhosphorIconsRegular.envelope),
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
                               return l10n.authEmailRequired;
@@ -117,7 +118,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Icon(
-                                  Icons.check_circle_outline,
+                                  PhosphorIconsRegular.checkCircle,
                                   color: theme.colorScheme.onSecondaryContainer,
                                 ),
                                 const SizedBox(width: PetSpacing.sm),

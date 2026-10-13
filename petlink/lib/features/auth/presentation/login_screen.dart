@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/theme/pet_spacing.dart';
 import '../../../core/theme/pet_typography.dart';
@@ -134,7 +135,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               IconButton(
-                icon: const Icon(Icons.arrow_back),
+                icon: const Icon(PhosphorIconsRegular.arrowLeft),
                 color: foreground,
                 onPressed: () => context.go('/welcome'),
               ),
@@ -194,7 +195,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             'assets/illustrations/petlink_login_dog.png',
             fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) =>
-                Icon(Icons.pets, size: height * 0.4, color: foreground),
+                Icon(PhosphorIconsRegular.pawPrint, size: height * 0.4, color: foreground),
           ),
         ),
       ),
@@ -221,7 +222,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               context,
               label: l10n.authEmail,
               hint: l10n.authEmailHint,
-              prefixIcon: const Icon(Icons.email_outlined),
+              prefixIcon: const Icon(PhosphorIconsRegular.envelope),
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -243,13 +244,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               context,
               label: l10n.authPassword,
               hint: l10n.authPasswordHint,
-              prefixIcon: const Icon(Icons.lock_outline),
+              prefixIcon: const Icon(PhosphorIconsRegular.lockKey),
               suffixIcon: IconButton(
                 tooltip: l10n.authPasswordVisibility,
                 icon: Icon(
                   _obscurePassword
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined,
+                      ? PhosphorIconsRegular.eye
+                      : PhosphorIconsRegular.eyeSlash,
                 ),
                 onPressed: () {
                   setState(() {
@@ -296,7 +297,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             ),
             icon: isLoading
                 ? _buildLoader(cs.primary)
-                : Icon(Icons.g_mobiledata, size: 28, color: cs.primary),
+                : Icon(PhosphorIconsRegular.googleLogo, size: 28, color: cs.primary),
             label: Text(l10n.authContinueWithGoogle),
           ),
         ],

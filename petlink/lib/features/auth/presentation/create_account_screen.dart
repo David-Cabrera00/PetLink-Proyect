@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/theme/pet_spacing.dart';
 import '../../../core/theme/pet_typography.dart';
@@ -57,7 +58,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(PhosphorIconsRegular.arrowLeft),
           onPressed: () => context.go('/welcome'),
         ),
         title: const Text('PetLink'),
@@ -109,7 +110,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                             label: l10n.authName,
                             hint: l10n.authNameHint,
                             controller: _nameController,
-                            prefixIcon: const Icon(Icons.person_outline),
+                            prefixIcon: const Icon(PhosphorIconsRegular.user),
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
                                 return l10n.authNameRequired;
@@ -123,7 +124,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                             hint: l10n.authEmailHint,
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
-                            prefixIcon: const Icon(Icons.email_outlined),
+                            prefixIcon: const Icon(PhosphorIconsRegular.envelope),
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
                                 return l10n.authEmailRequired;
@@ -163,13 +164,13 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
       hint: l10n.authPasswordHint,
       controller: _passwordController,
       obscureText: _obscurePassword,
-      prefixIcon: const Icon(Icons.lock_outline),
+      prefixIcon: const Icon(PhosphorIconsRegular.lockKey),
       suffixIcon: IconButton(
         tooltip: l10n.authPasswordVisibility,
         icon: Icon(
           _obscurePassword
-              ? Icons.visibility_outlined
-              : Icons.visibility_off_outlined,
+              ? PhosphorIconsRegular.eye
+              : PhosphorIconsRegular.eyeSlash,
         ),
         onPressed: () {
           setState(() => _obscurePassword = !_obscurePassword);
@@ -190,13 +191,13 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
       hint: l10n.authConfirmPasswordHint,
       controller: _confirmPasswordController,
       obscureText: _obscureConfirmation,
-      prefixIcon: const Icon(Icons.lock_reset_outlined),
+      prefixIcon: const Icon(PhosphorIconsRegular.lockKeyOpen),
       suffixIcon: IconButton(
         tooltip: l10n.authPasswordVisibility,
         icon: Icon(
           _obscureConfirmation
-              ? Icons.visibility_outlined
-              : Icons.visibility_off_outlined,
+              ? PhosphorIconsRegular.eye
+              : PhosphorIconsRegular.eyeSlash,
         ),
         onPressed: () {
           setState(() => _obscureConfirmation = !_obscureConfirmation);

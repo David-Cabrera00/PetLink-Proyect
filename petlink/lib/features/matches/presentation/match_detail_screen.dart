@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:petlink/l10n/app_localizations.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -46,7 +47,7 @@ class MatchDetailScreen extends ConsumerWidget {
   Widget _buildNotFound(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return EmptyState(
-      icon: Icons.diamond,
+      icon: PhosphorIconsRegular.diamond,
       title: l10n.matchDetailNotFound,
       subtitle: l10n.matchDetailNotFoundDescription,
     );
@@ -222,7 +223,7 @@ class MatchDetailScreen extends ConsumerWidget {
             Row(
               children: [
                 const Icon(
-                  Icons.straighten,
+                  PhosphorIconsRegular.ruler,
                   size: 14,
                   color: PetColors.textSecondary,
                 ),
@@ -238,7 +239,7 @@ class MatchDetailScreen extends ConsumerWidget {
           Row(
             children: [
               const Icon(
-                Icons.access_time,
+                PhosphorIconsRegular.clock,
                 size: 14,
                 color: PetColors.textSecondary,
               ),
@@ -315,7 +316,7 @@ class MatchDetailScreen extends ConsumerWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               const Icon(
-                                Icons.check,
+                                PhosphorIconsBold.check,
                                 size: 14,
                                 color: PetColors.found,
                               ),
@@ -374,7 +375,7 @@ class MatchDetailScreen extends ConsumerWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Icon(
-                            Icons.check,
+                            PhosphorIconsBold.check,
                             size: 14,
                             color: PetColors.found,
                           ),
@@ -424,7 +425,7 @@ class MatchDetailScreen extends ConsumerWidget {
               children: [
                 _buildLocationTimeItem(
                   context,
-                  Icons.straighten,
+                  PhosphorIconsRegular.ruler,
                   l10n.matchDetailDistance,
                   '${match.distanceKm} km',
                 ),
@@ -437,7 +438,7 @@ class MatchDetailScreen extends ConsumerWidget {
                 const SizedBox(height: PetSpacing.md),
                 _buildLocationTimeItem(
                   context,
-                  Icons.access_time,
+                  PhosphorIconsRegular.clock,
                   l10n.matchDetailTimeBetween,
                   _formatDuration(l10n, match.timeDifference),
                 ),
@@ -449,7 +450,7 @@ class MatchDetailScreen extends ConsumerWidget {
                   child: Column(
                     children: [
                       const Icon(
-                        Icons.straighten,
+                        PhosphorIconsRegular.ruler,
                         size: 28,
                         color: PetColors.primary,
                       ),
@@ -475,7 +476,7 @@ class MatchDetailScreen extends ConsumerWidget {
                   child: Column(
                     children: [
                       const Icon(
-                        Icons.access_time,
+                        PhosphorIconsRegular.clock,
                         size: 28,
                         color: PetColors.primary,
                       ),
@@ -631,7 +632,7 @@ class MatchDetailScreen extends ConsumerWidget {
               SnackBar(content: Text(l10n.matchDetailContactFinder)),
             );
           },
-          icon: Icons.phone,
+          icon: PhosphorIconsRegular.phone,
         ),
         const SizedBox(height: PetSpacing.md),
         OutlinedButton(
