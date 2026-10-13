@@ -218,11 +218,24 @@ class ScaffoldWithNav extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final location = GoRouterState.of(context).uri.toString();
     final currentIndex = _indexFromLocation(location);
+    final cs = Theme.of(context).colorScheme;
+    final selectionAlignment = switch (currentIndex) {
+      0 => Alignment.centerLeft,
+      1 => const Alignment(-0.5, 0),
+      2 => Alignment.center,
+      3 => const Alignment(0.5, 0),
+      _ => Alignment.centerRight,
+    };
 
     return Scaffold(
       body: Stack(
         children: [
-          child,
+          // The navigation bar floats above the shell content. Reserve its
+          // space so the last controls on long screens remain reachable.
+          Padding(
+            padding: const EdgeInsets.only(bottom: 96),
+            child: child,
+          ),
           Positioned(
             left: 0,
             right: 0,
@@ -273,45 +286,87 @@ class ScaffoldWithNav extends StatelessWidget {
                     horizontal: 6,
                     vertical: 7,
                   ),
-                  child: Row(
-                    children: [
-                      _LiquidNavItem(
-                        icon: Icons.radar_outlined,
-                        selectedIcon: Icons.radar,
-                        label: l10n.navigationRadar,
-                        selected: currentIndex == 0,
-                        onTap: () => context.go('/radar'),
-                      ),
-                      _LiquidNavItem(
-                        icon: Icons.map_outlined,
-                        selectedIcon: Icons.map,
-                        label: l10n.navigationExplore,
-                        selected: currentIndex == 1,
-                        onTap: () => context.go('/explore'),
-                      ),
-                      _LiquidNavItem(
-                        icon: Icons.add_circle_outline,
-                        selectedIcon: Icons.add_circle,
-                        label: l10n.navigationReport,
-                        selected: currentIndex == 2,
-                        isPrimary: true,
-                        onTap: () => context.go('/report/new'),
-                      ),
-                      _LiquidNavItem(
-                        icon: Icons.notifications_outlined,
-                        selectedIcon: Icons.notifications,
-                        label: l10n.navigationActivity,
-                        selected: currentIndex == 3,
-                        onTap: () => context.go('/activity'),
-                      ),
-                      _LiquidNavItem(
-                        icon: Icons.person_outline,
-                        selectedIcon: Icons.person,
-                        label: l10n.navigationProfile,
-                        selected: currentIndex == 4,
-                        onTap: () => context.go('/profile'),
-                      ),
-                    ],
+                  child: SizedBox(
+                    height: 58,
+                    child: Stack(
+                      children: [
+                        IgnorePointer(
+                          child: AnimatedAlign(
+                            alignment: selectionAlignment,
+                            duration: const Duration(milliseconds: 360),
+                            curve: Curves.easeOutBack,
+                            child: FractionallySizedBox(
+                              widthFactor: 0.2,
+                              heightFactor: 1,
+                              child: Padding(
+                                padding: const EdgeInsets.all(2),
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    color: currentIndex == 2
+                                        ? cs.primary
+                                        : cs.primaryContainer,
+                                    borderRadius: BorderRadius.circular(22),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.24,
+                                      ),
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                      color: cs.primary
+                                            .withValues(alpha: 0.22),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            _LiquidNavItem(
+                              icon: Icons.radar_outlined,
+                              selectedIcon: Icons.radar,
+                              label: l10n.navigationRadar,
+                              selected: currentIndex == 0,
+                              onTap: () => context.go('/radar'),
+                            ),
+                            _LiquidNavItem(
+                              icon: Icons.map_outlined,
+                              selectedIcon: Icons.map,
+                              label: l10n.navigationExplore,
+                              selected: currentIndex == 1,
+                              onTap: () => context.go('/explore'),
+                            ),
+                            _LiquidNavItem(
+                              icon: Icons.add_circle_outline,
+                              selectedIcon: Icons.add_circle,
+                              label: l10n.navigationReport,
+                              selected: currentIndex == 2,
+                              isPrimary: true,
+                              onTap: () => context.go('/report/new'),
+                            ),
+                            _LiquidNavItem(
+                              icon: Icons.notifications_outlined,
+                              selectedIcon: Icons.notifications,
+                              label: l10n.navigationActivity,
+                              selected: currentIndex == 3,
+                              onTap: () => context.go('/activity'),
+                            ),
+                            _LiquidNavItem(
+                              icon: Icons.person_outline,
+                              selectedIcon: Icons.person,
+                              label: l10n.navigationProfile,
+                              selected: currentIndex == 4,
+                              onTap: () => context.go('/profile'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -359,9 +414,8 @@ class _LiquidNavItemState extends State<_LiquidNavItem> {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final selectedColor = widget.isPrimary ? cs.secondary : cs.primaryContainer;
     final selectedForeground = widget.isPrimary
-        ? cs.onSecondary
+        ? cs.onPrimary
         : cs.onPrimaryContainer;
 
     return Expanded(
@@ -375,11 +429,10 @@ class _LiquidNavItemState extends State<_LiquidNavItem> {
           onTapUp: (_) => _setPressed(false),
           onTapCancel: () => _setPressed(false),
           borderRadius: BorderRadius.circular(22),
-          splashColor: (widget.isPrimary ? cs.secondary : cs.primary).withValues(
+          splashColor: cs.primary.withValues(
             alpha: 0.16,
           ),
-          highlightColor: (widget.isPrimary ? cs.secondary : cs.primary)
-              .withValues(alpha: 0.08),
+          highlightColor: cs.primary.withValues(alpha: 0.08),
           child: AnimatedScale(
             scale: _pressed ? 0.94 : 1,
             duration: const Duration(milliseconds: 110),
@@ -389,7 +442,7 @@ class _LiquidNavItemState extends State<_LiquidNavItem> {
               curve: Curves.easeOutCubic,
               padding: const EdgeInsets.symmetric(vertical: 7),
               decoration: BoxDecoration(
-                color: widget.selected ? selectedColor : Colors.transparent,
+                color: Colors.transparent,
                 borderRadius: BorderRadius.circular(22),
               ),
               child: Column(
