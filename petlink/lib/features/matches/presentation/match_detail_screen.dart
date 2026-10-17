@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
@@ -229,7 +230,7 @@ class MatchDetailScreen extends ConsumerWidget {
                 ),
                 const SizedBox(width: PetSpacing.xs),
                 Text(
-                  '${match.distanceKm} km',
+                  '${match.distanceKm.toStringAsFixed(2).replaceAll('.', ',')} km',
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
@@ -427,7 +428,7 @@ class MatchDetailScreen extends ConsumerWidget {
                   context,
                   PhosphorIconsRegular.ruler,
                   l10n.matchDetailDistance,
-                  '${match.distanceKm} km',
+                  '${match.distanceKm.toStringAsFixed(2).replaceAll('.', ',')} km',
                 ),
                 const SizedBox(height: PetSpacing.md),
                 Container(
@@ -462,7 +463,7 @@ class MatchDetailScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: PetSpacing.xs),
                       Text(
-                        '${match.distanceKm} km',
+                        '${match.distanceKm.toStringAsFixed(2).replaceAll('.', ',')} km',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           color: PetColors.primary,
                           fontWeight: FontWeight.w700,
@@ -536,17 +537,15 @@ class MatchDetailScreen extends ConsumerWidget {
 
   Widget _buildParticularTraitsSection(BuildContext context, PetMatch match) {
     final l10n = AppLocalizations.of(context)!;
+    const unspecified = 'No especificado';
+    String value(String text) => text.trim().isEmpty ? unspecified : text;
     final lostTraits = [
-      '${l10n.reportDetailColor}: ${l10n.reportDetailSoftGold}',
-      '${l10n.reportDetailCollar}: ${l10n.reportDetailBrownCollar}',
-      '${l10n.reportDetailPhysicalMark}: ${l10n.reportDetailWhiteMark}',
-      '${l10n.reportDetailTemperament}: ${l10n.reportDetailDocile}',
+      '${l10n.reportDetailColor}: ${value(match.lostReport.pet.color)}',
+      '${l10n.reportDetailPhysicalMark}: ${value(match.lostReport.traits)}',
     ];
     final foundTraits = [
-      '${l10n.reportDetailColor}: ${l10n.matchValueGold}',
-      '${l10n.reportDetailCollar}: ${l10n.matchValueNoVisibleCollar}',
-      '${l10n.reportDetailPhysicalMark}: ${l10n.reportDetailWhiteMark}',
-      '${l10n.reportDetailTemperament}: ${l10n.matchValueCalm}',
+      '${l10n.reportDetailColor}: ${value(match.foundReport.pet.color)}',
+      '${l10n.reportDetailPhysicalMark}: ${value(match.foundReport.traits)}',
     ];
 
     return Column(
@@ -660,7 +659,7 @@ class MatchDetailScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(PetSpacing.lg),
         child: PetButton(
           label: l10n.matchDetailBack,
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => context.go('/radar'),
           variant: PetButtonVariant.outline,
         ),
       ),
