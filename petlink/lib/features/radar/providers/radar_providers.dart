@@ -6,9 +6,12 @@ import '../../../shared/repositories/pet_report_repository.dart';
 import '../../../shared/repositories/match_repository.dart';
 import '../../../shared/repositories/mock/mock_pet_report_repository.dart';
 import '../../../shared/repositories/mock/mock_match_repository.dart';
+import '../../../core/network/api_client.dart';
+import '../../../shared/repositories/remote/remote_pet_report_repository.dart';
 
 final petReportRepositoryProvider = Provider<PetReportRepository>((ref) {
-  return MockPetReportRepository();
+  final client = ApiClient.instance;
+  return client.isConfigured ? RemotePetReportRepository(client) : MockPetReportRepository();
 });
 
 final matchRepositoryProvider = Provider<MatchRepository>((ref) {
