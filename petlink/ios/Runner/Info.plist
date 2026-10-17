@@ -4,6 +4,10 @@
 <dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>PetLink usa tu ubicación para ayudarte a reportar y encontrar mascotas cercanas.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>PetLink necesita acceso a la cámara para adjuntar fotos de la mascota.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>PetLink necesita acceso a tus fotos para adjuntar imágenes al reporte.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
