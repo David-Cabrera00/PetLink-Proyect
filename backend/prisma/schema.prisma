@@ -1,0 +1,81 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql" url = env("DATABASE_URL") }
+
+enum ReportType { LOST FOUND }
+enum ReportStatus { ACTIVE POSSIBLE_MATCH RECOVERED CLOSED }
+
+model User {
+  id String @id @default(cuid())
+  name String
+  email String @unique
+  passwordHash String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  reports PetReport[]
+  sightings Sighting[]
+  favorites Favorite[]
+}
+
+model PetReport {
+  id String @id @default(cuid())
+  ownerId String
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  type ReportType
+  status ReportStatus @default(ACTIVE)
+  name String
+  species String
+  breed String
+  sex String
+  age String
+  size String
+  color String
+  description String
+  traits String?
+  latitude Float
+  longitude Float
+  address String
+  lastSeenAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  photos Photo[]
+  sightings Sighting[]
+  favorites Favorite[]
+  @@index([type, status, createdAt])
+  @@index([latitude, longitude])
+  @@index([ownerId, status])
+}
+
+model Photo {
+  id String @id @default(cuid())
+  reportId String
+  report PetReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  url String
+  storagePath String?
+  mimeType String?
+  sizeBytes Int?
+  createdAt DateTime @default(now())
+  @@index([reportId])
+}
+
+model Sighting {
+  id String @id @default(cuid())
+  reportId String
+  reporterId String
+  report PetReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  reporter User @relation(fields: [reporterId], references: [id], onDelete: Restrict)
+  latitude Float
+  longitude Float
+  description String
+  photoUrl String?
+  createdAt DateTime @default(now())
+  @@index([reportId, createdAt])
+}
+
+model Favorite {
+  userId String
+  reportId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  report PetReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  @@id([userId, reportId])
+}

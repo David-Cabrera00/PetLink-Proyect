@@ -36,6 +36,9 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
     super.initState();
     final draft = ref.read(reportDraftProvider);
     _addressController = TextEditingController(text: draft.address);
+    if (draft.latitude != 0.0 && draft.longitude != 0.0) {
+      _selectedLocation = LatLng(draft.latitude, draft.longitude);
+    }
   }
 
   @override

@@ -32,4 +32,14 @@ class PetReport {
     required this.distanceKm,
     required this.sightingsCount,
   });
+
+  factory PetReport.fromJson(Map<String, dynamic> json) => PetReport(
+        id: json['id'] as String? ?? '', pet: Pet.fromJson((json['pet'] as Map?)?.cast<String, dynamic>() ?? json),
+        type: (json['type'] as String? ?? 'lost').toLowerCase() == 'found' ? ReportType.found : ReportType.lost,
+        status: ReportStatus.values.firstWhere((value) => value.name.toLowerCase() == (json['status'] as String? ?? 'active').toLowerCase(), orElse: () => ReportStatus.active),
+        latitude: (json['latitude'] as num?)?.toDouble() ?? 0, longitude: (json['longitude'] as num?)?.toDouble() ?? 0,
+        address: json['address'] as String? ?? '', createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
+        lastSeenAt: DateTime.tryParse(json['lastSeenAt'] as String? ?? '') ?? DateTime.now(), description: json['description'] as String? ?? '',
+        distanceKm: (json['distanceKm'] as num?)?.toDouble() ?? 0, sightingsCount: json['sightingsCount'] as int? ?? 0,
+      );
 }

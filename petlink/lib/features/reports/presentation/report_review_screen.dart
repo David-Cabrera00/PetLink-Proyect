@@ -11,14 +11,24 @@ import '../../../design_system/badges/status_badge.dart';
 import '../../../design_system/buttons/pet_button.dart';
 import '../../../shared/models/pet_report.dart';
 import '../../../shared/widgets/step_indicator.dart';
+import '../../../shared/widgets/photo_preview.dart';
 import '../../radar/providers/radar_providers.dart';
+import '../../explore/providers/explore_providers.dart';
+import '../providers/reports_providers.dart';
 import '../providers/report_draft_provider.dart';
 
-class ReportReviewScreen extends ConsumerWidget {
+class ReportReviewScreen extends ConsumerStatefulWidget {
   const ReportReviewScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ReportReviewScreen> createState() => _ReportReviewScreenState();
+}
+
+class _ReportReviewScreenState extends ConsumerState<ReportReviewScreen> {
+  bool _isPublishing = false;
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final draft = ref.watch(reportDraftProvider);
     final isLost = draft.reportType == ReportType.lost;
@@ -248,7 +258,14 @@ class ReportReviewScreen extends ConsumerWidget {
                 errorBuilder: (context, error, stackTrace) =>
                     _buildPlaceholder(context),
               )
-            : _buildPlaceholder(context),
+            : buildLocalPhotoPreview(
+                url,
+                fit: BoxFit.cover,
+                width: 60,
+                height: 60,
+                errorBuilder: (context, error, stackTrace) =>
+                    _buildPlaceholder(context),
+              ),
       ),
     );
   }
@@ -273,7 +290,8 @@ class ReportReviewScreen extends ConsumerWidget {
       children: [
         PetButton(
           label: l10n.publishReport,
-          onPressed: () => _publishReport(context, ref),
+          onPressed: _isPublishing ? null : () => _publishReport(context),
+          isLoading: _isPublishing,
           icon: PhosphorIconsRegular.paperPlaneTilt,
         ),
         const SizedBox(height: PetSpacing.md),
@@ -289,18 +307,9 @@ class ReportReviewScreen extends ConsumerWidget {
     );
   }
 
-  void _publishReport(BuildContext context, WidgetRef ref) async {
+  Future<void> _publishReport(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
-
-    await Future.delayed(const Duration(milliseconds: 1000));
-
-    if (!context.mounted) return;
-    Navigator.pop(context);
+    setState(() => _isPublishing = true);
 
     final notifier = ref.read(reportDraftProvider.notifier);
     final draft = ref.read(reportDraftProvider);
@@ -310,6 +319,9 @@ class ReportReviewScreen extends ConsumerWidget {
       final _ = await repository.createReport(draft);
 
       if (context.mounted) {
+        ref.invalidate(nearbyReportsProvider);
+        ref.invalidate(myReportsProvider);
+        ref.invalidate(exploreReportsProvider);
         notifier.clearDraft();
         context.go('/report/new/published');
       }
@@ -322,6 +334,8 @@ class ReportReviewScreen extends ConsumerWidget {
           ),
         );
       }
+    } finally {
+      if (mounted) setState(() => _isPublishing = false);
     }
   }
 
