@@ -5,7 +5,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../shared/models/pet_report.dart';
 import '../../radar/providers/radar_providers.dart';
 
-enum ExploreFilter { all, lost, found, nearby }
+enum ExploreFilter { all, lost, found, nearby, mine }
 
 enum ExploreViewMode { map, list }
 
@@ -50,6 +50,7 @@ final exploreReportsProvider = FutureProvider<List<PetReport>>((ref) async {
         }
         return report.distanceKm <= AppConstants.searchRadiusKm;
       }(),
+      ExploreFilter.mine => report.isOwner,
     };
 
     if (!matchesFilter) return false;

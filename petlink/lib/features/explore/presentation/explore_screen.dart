@@ -186,6 +186,17 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             currentFilter,
             PhosphorIconsRegular.navigationArrow,
           ),
+          const SizedBox(width: PetSpacing.sm),
+          _buildFilterChip(
+            context,
+            ref,
+            Localizations.localeOf(context).languageCode == 'en'
+                ? 'My reports'
+                : 'Mis reportes',
+            ExploreFilter.mine,
+            currentFilter,
+            PhosphorIconsRegular.user,
+          ),
         ],
       ),
     );
@@ -300,7 +311,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           width: 44,
                           height: 44,
                           child: Tooltip(
-                            message: report.pet.name,
+                            message: report.isOwner
+                                ? '${report.pet.name} · ${Localizations.localeOf(context).languageCode == 'en' ? 'My report' : 'Tu reporte'}'
+                                : report.pet.name,
                             child: GestureDetector(
                               onTap: () =>
                                   ref
@@ -309,7 +322,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                       report,
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: report.type == ReportType.lost
+                                  color: report.isOwner
+                                      ? Theme.of(context).colorScheme.primary
+                                      : report.type == ReportType.lost
                                       ? PetColors.lost
                                       : PetColors.found,
                                   shape: BoxShape.circle,

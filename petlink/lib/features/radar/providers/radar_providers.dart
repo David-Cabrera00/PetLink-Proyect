@@ -22,7 +22,8 @@ final matchRepositoryProvider = Provider<MatchRepository>((ref) {
 
 final nearbyReportsProvider = FutureProvider<List<PetReport>>((ref) async {
   final repository = ref.watch(petReportRepositoryProvider);
-  return repository.getNearbyReports();
+  final reports = await repository.getNearbyReports();
+  return reports.where((report) => !report.isOwner).toList();
 });
 
 final matchesProvider = FutureProvider<List<PetMatch>>((ref) async {
