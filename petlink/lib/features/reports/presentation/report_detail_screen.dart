@@ -161,7 +161,7 @@ class ReportDetailScreen extends ConsumerWidget {
           const SizedBox(height: PetSpacing.md),
           _buildMapPlaceholder(context, report),
           const SizedBox(height: PetSpacing.lg),
-          _buildCTASection(context, report),
+          if (!report.isOwner) _buildCTASection(context, report),
           const SizedBox(height: PetSpacing.xl),
         ],
       ),
