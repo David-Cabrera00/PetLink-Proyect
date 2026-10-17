@@ -188,4 +188,9 @@ class MockPetReportRepository implements PetReportRepository {
     _createdReports.add(newReport);
     return newReport;
   }
+
+  @override
+  Future<void> deleteReport(String id) async {
+    _createdReports.removeWhere((report) => report.id == id);
+  }
 }
