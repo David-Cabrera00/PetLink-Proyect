@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
@@ -49,8 +50,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     await ref
         .read(authProvider.notifier)
         .login(
-          email: _emailController.text,
-          password: _passwordController.text,
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
         );
   }
 
@@ -237,6 +238,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           const SizedBox(height: PetSpacing.lg),
           TextFormField(
             controller: _passwordController,
+            inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
             obscureText: _obscurePassword,
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => _submit(),
