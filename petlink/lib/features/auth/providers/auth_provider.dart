@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/api_client.dart';
+import '../../../core/notifications/notification_permission_service.dart';
 
 class AuthUser {
   final String name;
@@ -57,9 +58,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true);
     try {
       if (!_client.isConfigured) { await Future<void>.delayed(const Duration(milliseconds: 300)); state = AuthState(user: AuthUser(name: 'PetLink user', email: email.trim())); return; }
-      final result = await _client.post('/auth/login', body: {'email': email.trim(), 'password': password});
+      final result = await _client.post('/auth/login', body: {'email': email.trim(), 'password': password.trim()});
       await _client.saveToken(result['accessToken'] as String);
       state = AuthState(user: AuthUser(name: result['user']['name'] as String, email: result['user']['email'] as String));
+      await NotificationPermissionService.request();
     } finally {
       if (state.isLoading) state = state.copyWith(isLoading: false);
     }
@@ -78,9 +80,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true);
     try {
       if (!_client.isConfigured) { await Future<void>.delayed(const Duration(milliseconds: 300)); state = AuthState(user: AuthUser(name: name.trim(), email: email.trim())); return; }
-      final result = await _client.post('/auth/register', body: {'name': name.trim(), 'email': email.trim(), 'password': password});
+      final result = await _client.post('/auth/register', body: {'name': name.trim(), 'email': email.trim(), 'password': password.trim()});
       await _client.saveToken(result['accessToken'] as String);
       state = AuthState(user: AuthUser(name: result['user']['name'] as String, email: result['user']['email'] as String));
+      await NotificationPermissionService.request();
     } finally {
       if (state.isLoading) state = state.copyWith(isLoading: false);
     }
