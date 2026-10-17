@@ -2,278 +2,250 @@
 
 ## Propósito
 
-PetLink es una aplicación Flutter para reportar mascotas perdidas o encontradas y ayudar a encontrar coincidencias cercanas. El proyecto está en una fase funcional de prototipo: las pantallas, navegación, estado y datos de demostración están implementados, pero la persistencia y la conexión con el backend todavía no están integradas.
+PetLink es una aplicación Flutter para reportar mascotas perdidas o encontradas, explorar reportes cercanos, registrar avistamientos y detectar posibles coincidencias.
 
-## Alcance de este documento
+El proyecto incluye:
 
-Estas instrucciones aplican a todo el paquete Flutter ubicado en `petlink/`. El repositorio padre (`C:\proyectos-flutter`) puede contener configuración del IDE, pero el código de la aplicación y sus comandos se ejecutan desde `petlink/`.
+- Aplicación Flutter en `petlink/`.
+- Backend NestJS en `backend/`.
+- PostgreSQL gestionado por Supabase mediante Prisma.
+- Almacenamiento de fotos en Supabase Storage.
+- Autenticación JWT.
 
-## Stack y configuración
+El repositorio Git se trabaja normalmente desde `petlink/`, aunque `backend/` es un directorio hermano incluido en el mismo repositorio padre.
 
-- Flutter/Dart.
-- SDK de Dart declarado: `^3.13.5`.
-- Material 3.
-- `flutter_riverpod` `^2.6.1` para estado e inyección de dependencias.
-- `go_router` `^14.8.1` para navegación.
-- `google_fonts` `^6.2.1`; la tipografía principal es Manrope.
-- `cupertino_icons` `^1.0.8`.
-- `flutter_lints` `^6.0.0` en desarrollo.
-- Nombre del paquete: `petlink`.
-- Versión declarada: `1.0.0+1`.
-- El paquete no se publica en pub.dev (`publish_to: none`).
-- Plataformas generadas presentes: Android, iOS, macOS, Linux, Windows y Web.
+## Comandos principales
 
-## Comandos de desarrollo
+Desde `petlink/`:
 
-Ejecutar desde `petlink/`:
-
-```bash
+```powershell
 flutter pub get
-flutter run
+flutter run -d RF8R32JL3GE --dart-define=API_BASE_URL=http://192.168.1.35:3000/api/v1
 flutter analyze
 flutter test
 dart format lib test
 ```
 
-Antes de entregar cambios:
+Desde `backend/`:
 
-1. Ejecutar `dart format lib test` sobre los archivos Dart modificados.
-2. Ejecutar `flutter analyze`.
-3. Ejecutar `flutter test`.
-4. Si se cambia navegación o UI, probar al menos el flujo afectado en una plataforma disponible.
+```powershell
+npm install
+npm run prisma:generate
+npm run prisma:migrate
+npm run prisma:seed
+npm run build
+npm run start:dev
+```
 
-El análisis usa `package:flutter_lints/flutter.yaml` y excluye `build/`, `android/`, `ios/`, `web/`, `windows/`, `macos/` y `linux/`. No agregar silenciosamente excepciones de lint; corregir el código o documentar de forma puntual el motivo.
+El backend se sirve con el prefijo `/api/v1` y Swagger está disponible en `/docs`.
 
-## Arranque de la aplicación
+## Variables de entorno
 
-`lib/main.dart` inicia la aplicación con un `ProviderScope` global y monta `PetLinkApp`.
+El backend usa `backend/.env`. Nunca versionar este archivo ni pegar sus secretos en el chat.
 
-`lib/app/app.dart` configura:
+Variables principales:
 
-- título `PetLink`;
-- tema claro y oscuro de `PetTheme`;
-- modo de tema desde `themeModeProvider`;
-- `MaterialApp.router` con `AppRouter.router`;
-- banner de depuración desactivado.
-- locale controlado por `localeProvider`, con español como idioma inicial e inglés disponible.
+```env
+DATABASE_URL=...
+DIRECT_URL=...
+JWT_ACCESS_SECRET=...
+SUPABASE_URL=...
+SUPABASE_SERVICE_ROLE_KEY=...
+SUPABASE_STORAGE_BUCKET=pet-photos
+OPENROUTER_API_KEY=...
+OPENROUTER_MODEL=...
+```
 
-## Arquitectura y reglas de organización
+`OPENROUTER_API_KEY` es opcional y actualmente solo se usa por el endpoint experimental de análisis de imágenes. No colocar claves en Flutter, Git, `README.md` ni archivos `.example`.
 
-El código Dart está organizado por responsabilidad:
+## Arquitectura Flutter
+
+La aplicación usa Flutter, Material 3, Riverpod y GoRouter.
 
 ```text
 lib/
-├── main.dart
-├── app/
-│   ├── app.dart
-│   └── router.dart
-├── core/
-│   ├── constants/
-│   ├── network/
-│   └── theme/
-├── design_system/
-│   ├── badges/
-│   ├── buttons/
-│   ├── cards/
-│   ├── chips/
-│   └── inputs/
+├── app/                 # Aplicación y navegación
+├── core/                # Red, permisos, constantes y tema
+├── design_system/       # Botones, inputs, badges y componentes base
 ├── features/
-│   ├── activity/
-│   ├── explore/
-│   ├── matches/
-│   ├── profile/
-│   ├── radar/
-│   └── reports/
+│   ├── auth/            # Login, registro e intro
+│   ├── activity/        # Actividad/notificaciones en la app
+│   ├── explore/         # Lista, mapa y filtros públicos
+│   ├── matches/         # Detalle de coincidencias
+│   ├── profile/         # Perfil y preferencias
+│   ├── radar/           # Reportes cercanos y coincidencias
+│   └── reports/         # Flujo de creación, detalle y avistamientos
 └── shared/
     ├── models/
     ├── repositories/
     └── widgets/
 ```
 
-Reglas para nuevos cambios:
+Las pantallas no deben acceder directamente a HTTP. Usar `ApiClient`, interfaces de repositorio y providers de Riverpod.
 
-- Mantener cada funcionalidad dentro de `features/<feature>/`.
-- Dejar modelos reutilizables en `shared/models/`.
-- Usar interfaces de repositorio en `shared/repositories/` y no acceder a datos desde una pantalla directamente.
-- Registrar los repositorios y estados con providers de Riverpod.
-- Poner componentes reutilizables de UI en `shared/widgets/` o `design_system/` según corresponda.
-- Usar tokens de `core/theme/`; evitar colores, radios y espaciados arbitrarios en las pantallas.
-- Mantener las pantallas enfocadas en composición y eventos de UI; la lógica de estado debe vivir en providers/notifiers.
-- Preferir widgets pequeños, `const` cuando sea posible y nombres en inglés consistentes con el código existente.
-- Los textos visibles de la aplicación están principalmente en español.
+## Navegación actual
 
-## Navegación
+| Ruta | Pantalla |
+|---|---|
+| `/intro` | Intro |
+| `/welcome` | Bienvenida |
+| `/login` | Inicio de sesión |
+| `/register` | Registro |
+| `/radar` | Radar |
+| `/explore` | Explorar reportes en mapa/lista |
+| `/reports` | Reportes |
+| `/reports/mine` | Reportes propios |
+| `/reports/:id` | Detalle de reporte |
+| `/reports/:id/sighting` | Formulario de avistamiento |
+| `/matches/:id` | Detalle de coincidencia |
+| `/activity` | Actividad |
+| `/profile` | Perfil |
 
-La navegación está en `lib/app/router.dart` y usa `GoRouter`. La ruta inicial es `/radar`.
+Flujo de creación:
 
-### Rutas principales
+```text
+/report/new
+→ /report/new/pet-info
+→ /report/new/photos
+→ /report/new/location
+→ /report/new/details
+→ /report/new/review
+→ /report/new/published
+```
 
-| Ruta | Pantalla | Propósito |
-|---|---|---|
-| `/radar` | `RadarScreen` | Resumen de reportes cercanos y coincidencias. |
-| `/explore` | `ExploreScreen` | Explorar reportes en el área y filtrarlos. |
-| `/reports` | `ReportsScreen` | Hub de reportes: crear, consultar propios y explorar comunidad. |
-| `/reports/:id` | `ReportDetailScreen` | Ver el detalle de un reporte. |
-| `/matches/:id` | `MatchDetailScreen` | Ver el detalle de una coincidencia. |
-| `/activity` | `ActivityScreen` | Actividad y novedades de reportes. |
-| `/profile` | `ProfileScreen` | Perfil y selección del tema. |
-| `/welcome` | `WelcomeScreen` | Entrada de usuarios no autenticados. |
-| `/login` | `LoginScreen` | Inicio de sesión mock. |
-| `/register` | `CreateAccountScreen` | Registro local/mock. |
-| `/forgot-password` | `ForgotPasswordScreen` | Recuperación visual/mock. |
+Dentro de rutas del `ShellRoute`, preferir `context.go('/radar')` o una ruta explícita al volver. Evitar `Navigator.pop()` cuando pueda dejar una pantalla sin ruta válida.
 
-### Flujo de creación de reportes
+## Backend y API
 
-Las rutas no están dentro del `ShellRoute` de la navegación inferior:
+El backend NestJS usa Prisma y JWT.
 
-`/report/new` → `/report/new/pet-info` → `/report/new/photos` → `/report/new/location` → `/report/new/details` → `/report/new/review` → `/report/new/published`.
+Endpoints principales:
 
-El botón central de la navegación inferior abre `/report/new`.
+- `POST /auth/register`
+- `POST /auth/login`
+- `GET /auth/me`
+- `GET /reports`
+- `GET /reports/mine`
+- `GET /reports/:id`
+- `POST /reports`
+- `PATCH /reports/:id`
+- `DELETE /reports/:id`
+- `POST /reports/:id/photos`
+- `GET /reports/:reportId/sightings`
+- `POST /reports/:reportId/sightings`
+- `DELETE /reports/:reportId/sightings/:id`
+- `GET /matches`
+- `GET /favorites`
+- `POST /favorites/:reportId`
+- `DELETE /favorites/:reportId`
+- `GET /activity`
+- `POST /ai/analyze-image` experimental
 
-## Estado y datos
+Los reportes propios se consultan mediante `/reports/mine`. Radar y Explorar muestran reportes públicos de la comunidad.
 
-Riverpod es la fuente de coordinación del estado:
+La eliminación está protegida en dos niveles:
 
-- `themeModeProvider`: modo claro, oscuro o sistema mediante `ThemeModeNotifier`.
-- `localeProvider`: idioma actual (`es` o `en`), español por defecto.
-- `authProvider`: estado de autenticación mock, usuario actual y estado de carga.
-- `reportDraftProvider`: borrador inmutable del formulario de creación, administrado por `ReportDraftNotifier`.
-- `reportsFilterProvider` y `myReportsProvider`: filtro y carga de reportes propios.
-- `reportByIdProvider`: carga de un reporte por ID.
-- `exploreFilterProvider`, `exploreReportsProvider` y `selectedReportProvider`: estado de Explorar.
-- `petReportRepositoryProvider`: implementación actual `MockPetReportRepository`.
-- `matchRepositoryProvider`, `matchesProvider` y `matchByIdProvider`: coincidencias.
-- `radarSummaryProvider`: resumen derivado de reportes y coincidencias.
+1. La interfaz solo muestra “Eliminar” si `isOwner` es verdadero.
+2. El backend verifica `ownerId` antes de eliminar.
 
-El `ReportDraft` ofrece validaciones de alto nivel mediante `isPetInfoComplete`, `isLocationComplete` e `isDetailsComplete`. Las pantallas de formulario deben conservar el borrador entre pasos y validar antes de avanzar.
+## Fotos y Supabase Storage
 
-## Modelos de dominio
+El bucket esperado es `pet-photos`. El backend recibe la foto en multipart con el campo `file`, la sube a Supabase Storage y persiste la URL en Prisma.
 
-En `shared/models/`:
+El bucket debe existir. La clave `SUPABASE_SERVICE_ROLE_KEY` solo puede vivir en el backend.
 
-- `Pet`: identidad y características de una mascota.
-- `PetReport`: reporte con mascota, tipo, estado, ubicación, fechas, descripción, distancia y avistamientos.
-- `ReportType`: `lost` o `found`.
-- `ReportStatus`: `active`, `possibleMatch`, `recovered` o `closed`.
-- `ReportDraft`: datos temporales del flujo de publicación.
-- `PetMatch`: relación entre un reporte perdido y uno encontrado, nivel de coincidencia, distancia, diferencia de tiempo y rasgos coincidentes.
-- `MatchLevel`: `low`, `medium` o `high`.
-- `Sighting`: avistamiento asociado a un reporte.
-- `PetStatus`: estados visuales `lost`, `found`, `match` y `recovered`.
+## Coincidencias
 
-Los modelos actuales son clases inmutables sencillas, sin serialización JSON ni generación de código.
+El backend calcula coincidencias reales entre reportes activos de tipos opuestos, usando especie, raza, color y distancia. Flutter usa `RemoteMatchRepository` cuando `API_BASE_URL` está configurada y usa mock únicamente sin backend configurado.
 
-## Repositorios y backend
+Las distancias visibles deben limitarse a dos decimales. No mostrar rasgos inventados: el detalle usa el color y `traits` registrados en el reporte; si no existen, mostrar “No especificado”.
 
-Las interfaces son:
+## Ubicación y permisos
 
-- `PetReportRepository`: reportes cercanos, propios, por ID y creación.
-- `MatchRepository`: coincidencias del usuario y coincidencia por ID.
+La aplicación usa ubicación en primer plano para Radar y Explorar. Si el usuario no concede permiso, no inventar una ciudad: mostrar “Ubicación no disponible”.
 
-Las implementaciones activas son `MockPetReportRepository` y `MockMatchRepository`, con demoras artificiales para simular red y datos fijos de Pasto. `createReport` también simula la publicación local.
+Permisos actuales:
 
-`core/network/api_client.dart` solo contiene:
+- Ubicación mientras se usa la aplicación.
+- Cámara.
+- Galería/fotos mediante `image_picker`.
+- Notificaciones mediante `permission_handler`.
 
-- base URL: `https://api.petlink.app/v1`;
-- timeout: 30 segundos.
+No pedir Wi-Fi, contactos, micrófono, Bluetooth ni ubicación en segundo plano salvo que una funcionalidad futura lo requiera.
 
-No hay cliente HTTP integrado, autenticación, manejo de tokens, serializadores ni persistencia local. Al conectar el backend, conservar las interfaces para que las pantallas sigan dependiendo de abstracciones y reemplazar la implementación mock mediante providers.
+El permiso de notificaciones está preparado, pero Firebase/FCM todavía no está integrado. Para push con la aplicación cerrada se necesitarán las configuraciones de Android/iOS y un proveedor push.
 
-## Sistema visual
+## IA
 
-La fuente de verdad visual está en `core/theme/` y `design_system/`.
+Está preparado un endpoint experimental `POST /api/v1/ai/analyze-image` compatible con OpenRouter para analizar una URL pública de imagen y devolver atributos JSON.
 
-- `PetColors`: colores de fondo, superficie, texto, borde, primario, acento y estados perdido/encontrado/coincidencia en claro y oscuro.
-- `PetSpacing`: `xs=4`, `sm=8`, `md=12`, `lg=16`, `xl=24`, `xxl=32`, `xxxl=48`.
-- `PetRadius`: radios de 6, 8, 12, 16 y 24.
-- `PetTypography`: estilos Manrope para display, heading, title, body, body pequeño, label y botones.
-- `PetThemeExtension`: colores semánticos adicionales por tema.
-- `PetTheme`: temas Material 3 claro y oscuro.
+La integración automática al publicar fotos todavía no debe considerarse terminada. La clave no debe exponerse. Si se requiere una solución sin API externa, evaluar un modelo local como Ollama/Qwen2.5-VL o un modelo on-device; ambos tienen compromisos de rendimiento y despliegue.
 
-Componentes existentes del design system:
+## Formularios
 
-- `PetButton`: variantes primary, secondary, accent, outline, lightOutline y danger; soporta icono, carga y etiqueta semántica.
-- `PetCard`: tarjeta base.
-- `PetChip`: chip seleccionable.
-- `PetInput`: entrada reutilizable con validación, iconos y modo solo lectura.
-- `StatusBadge`: insignias de estado.
+- Validar antes de avanzar entre pasos.
+- Hacer `trim()` en datos textuales antes de enviarlos.
+- No permitir espacios en contraseñas.
+- No aceptar campos obligatorios vacíos.
+- Mantener límites razonables de longitud.
+- Los datos no deben aparecer en la interfaz si no fueron introducidos por el usuario.
 
-Widgets compartidos:
+## Diseño
 
-- `StepIndicator`, `SectionHeader`, `PetSearchBar`, `PetCardCompact`, `MatchCard`, `EmptyState` y `ErrorState`.
-- `AnimalPatternField`: fondo decorativo animado con huellas de baja intensidad.
+Usar los tokens de `core/theme/` y los componentes de `design_system/`. Mantener compatibilidad con tema claro/oscuro, Material 3, áreas táctiles amplias y textos localizados.
 
-## Plataformas y archivos generados
+Los textos visibles deben agregarse a `lib/l10n/app_es.arb` y `app_en.arb`; actualizar los archivos generados cuando corresponda.
 
-Los directorios `android/`, `ios/`, `macos/`, `linux/`, `windows/` y `web/` son los runners generados por Flutter. Modificarlos solo cuando el cambio realmente sea específico de plataforma, configuración de compilación, permisos, identificadores o recursos nativos.
+## Git
 
-No editar manualmente archivos generados de Flutter salvo que sea imprescindible y se tenga claro cómo regenerarlos. Los archivos de `build/`, `.dart_tool/`, caches y artefactos locales no deben versionarse.
+No incluir:
 
-## Pruebas
+- `backend/.env`.
+- `.idea/` y caches del IDE.
+- `build/` y `.dart_tool/`.
+- Reportes generados de Gradle.
+- Registrantes generados de Flutter, salvo que un cambio de plugin requiera versionarlos.
 
-Actualmente existe `test/widget_test.dart`. Antes de cambiar un flujo importante, ampliar las pruebas para cubrir:
+Separar commits por responsabilidad, por ejemplo:
 
-- navegación y rutas;
-- estados loading, error, vacío y éxito de providers;
-- validación del `ReportDraft`;
-- creación y filtrado de reportes;
-- cambio entre tema claro y oscuro.
+```text
+feat(backend): ...
+feat(auth): ...
+feat(reports): ...
+feat(radar): ...
+feat(notifications): ...
+```
 
-No depender de tiempos artificiales en tests nuevos; inyectar repositorios fake o controlables cuando se agreguen pruebas de providers.
+Antes de cada commit revisar:
 
-## Limitaciones conocidas
+```powershell
+git diff --check
+git status --short
+git diff --cached --stat
+```
 
-- El backend real aún no está conectado.
-- Los datos de reportes y coincidencias son mocks.
-- La autenticación actual es mock y no persiste la sesión.
-- No hay integración real con mapas, geolocalización, cámara, galería o subida de imágenes; el flujo de fotos usa datos de demostración.
-- No hay persistencia local del borrador o de los reportes.
-- La actividad usa datos de demostración; falta conectarla a eventos reales del usuario.
-- La URL de API está declarada, pero no existe todavía una capa HTTP funcional.
-- Mantener la codificación UTF-8 y colocar los nuevos textos visibles en las localizaciones correspondientes.
+## Estado actual
 
-## Dirección actual de diseño
+Funcionando:
 
-La interfaz usa una identidad PetLink sobria y reconocible, orientada a personas de 18 a 60 años:
+- Autenticación real con JWT y Supabase/PostgreSQL.
+- Creación de reportes.
+- Subida y visualización de fotos.
+- Reportes propios separados por usuario.
+- Eliminación protegida por propietario.
+- Compartir reportes.
+- Contacto por correo.
+- Avistamientos.
+- Radar y Explorar.
+- Coincidencias conectadas al backend.
+- Ubicación y permisos principales.
+- Permiso de notificaciones.
 
-- composición editorial y clara, sin depender de tarjetas excesivas;
-- degradados y acentos usados con moderación;
-- huellas y referencias animales como recurso de marca, no como decoración infantil;
-- contraste revisado en claro y oscuro;
-- botones principales visibles y con áreas táctiles amplias;
-- no usar imágenes decorativas genéricas si un recurso nativo o vectorial resuelve mejor la identidad.
+Pendiente:
 
-La siguiente pantalla prioritaria es `ExploreScreen`: debe resolver la relación entre mapa, lista, filtros y estados vacío/error sin cambiar primero la lógica de providers.
-
-## Criterios para cambios
-
-- No introducir una dependencia nueva si Flutter o las dependencias actuales resuelven el problema.
-- No mezclar lógica de backend, navegación y estilos dentro de un mismo widget si puede separarse.
-- Mantener compatibilidad con tema oscuro y Material 3.
-- Para nuevos estados asíncronos, representar explícitamente loading, error, vacío y datos.
-- Para cambios de contrato, actualizar interfaces, mocks y providers en el mismo cambio.
-- Actualizar `DESING.md` si cambia arquitectura visual, tokens, navegación o componentes.
-- Mantener este archivo actualizado cuando cambien comandos, dependencias, estructura, rutas o limitaciones.
-
-## Estado del proyecto — octubre de 2026
-
-Estimación actual para un MVP:
-
-- Diseño e interfaz: 85%.
-- Navegación y flujo de pantallas: 85%.
-- Reportes y coincidencias con datos mock: 75%.
-- Estados de carga, error y vacío: 70%.
-- Persistencia local: 25%.
-- Backend y autenticación real: 10%.
-- Pruebas: 35%.
-
-Avance global estimado: 65% como MVP visual/funcional.
-
-### Próximos bloques prioritarios
-
-1. Conectar backend y base de datos sin romper las interfaces de repositorio.
-2. Implementar autenticación real y persistencia de sesión.
-3. Persistir reportes, borradores e imágenes.
-4. Integrar geolocalización, permisos y mapas de producción.
-5. Ampliar pruebas de navegación, providers, formularios y temas.
-6. Realizar la revisión final en Android, iOS y Web.
+- Convertir Actividad en notificaciones persistentes reales.
+- Push en segundo plano con FCM/APNs.
+- Integrar automáticamente el análisis de IA al subir fotos.
+- Mejorar el algoritmo de coincidencias con atributos visuales.
+- Pruebas automatizadas más completas.
+- Configuración de producción y despliegue del backend.
