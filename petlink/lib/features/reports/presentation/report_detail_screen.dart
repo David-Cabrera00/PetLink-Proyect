@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -16,6 +18,8 @@ import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/error_state.dart';
 import '../../../shared/widgets/section_header.dart';
 import '../providers/reports_providers.dart';
+import '../../radar/providers/radar_providers.dart';
+import '../../explore/providers/explore_providers.dart';
 
 class ReportDetailScreen extends ConsumerWidget {
   final String reportId;
@@ -47,15 +51,17 @@ class ReportDetailScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(PhosphorIconsRegular.shareNetwork),
             onPressed: () async {
-              await Clipboard.setData(
-                ClipboardData(text: 'https://petlink.app/reports/$reportId'),
+              await SharePlus.instance.share(
+                ShareParams(text: 'https://petlink.app/reports/$reportId'),
               );
-              if (context.mounted) {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text(l10n.shareAction)));
-              }
             },
           ),
+          if (reportAsync.valueOrNull?.isOwner == true)
+            IconButton(
+              icon: const Icon(PhosphorIconsRegular.trash),
+              tooltip: 'Eliminar reporte',
+              onPressed: () => _confirmDelete(context, ref),
+            ),
         ],
       ),
       body: reportAsync.when(
@@ -73,7 +79,7 @@ class ReportDetailScreen extends ConsumerWidget {
           onRetry: () => ref.invalidate(reportByIdProvider(reportId)),
         ),
       ),
-      bottomNavigationBar: _buildBottomBar(context),
+      bottomNavigationBar: _buildBottomBar(context, ref),
     );
   }
 
@@ -139,7 +145,7 @@ class ReportDetailScreen extends ConsumerWidget {
           const SizedBox(height: PetSpacing.lg),
           SectionHeader(title: l10n.reportDetailTraits),
           const SizedBox(height: PetSpacing.md),
-          _buildTraitsSection(context),
+          _buildTraitsSection(context, report),
           const SizedBox(height: PetSpacing.lg),
           SectionHeader(title: l10n.reportDetailHowItHappened),
           const SizedBox(height: PetSpacing.md),
@@ -283,13 +289,12 @@ class ReportDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTraitsSection(BuildContext context) {
+  Widget _buildTraitsSection(BuildContext context, dynamic report) {
     final l10n = AppLocalizations.of(context)!;
+    const unspecified = 'No especificado';
     final traits = [
-      (l10n.reportDetailColor, l10n.reportDetailSoftGold),
-      (l10n.reportDetailCollar, l10n.reportDetailBrownCollar),
-      (l10n.reportDetailPhysicalMark, l10n.reportDetailWhiteMark),
-      (l10n.reportDetailTemperament, l10n.reportDetailDocile),
+      (l10n.reportDetailColor, report.pet.color.trim().isEmpty ? unspecified : report.pet.color),
+      (l10n.reportDetailPhysicalMark, report.traits.trim().isEmpty ? unspecified : report.traits),
     ];
 
     return Column(
@@ -342,15 +347,17 @@ class ReportDetailScreen extends ConsumerWidget {
 
   Widget _buildMapPlaceholder(BuildContext context, dynamic report) {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
-      width: double.infinity,
-      height: 180,
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        borderRadius: PetRadius.lgAll,
-        border: Border.all(color: PetColors.border),
-      ),
-      child: Stack(
+    return GestureDetector(
+      onTap: () => _openMap(report),
+      child: Container(
+        width: double.infinity,
+        height: 180,
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          borderRadius: PetRadius.lgAll,
+          border: Border.all(color: PetColors.border),
+        ),
+        child: Stack(
         children: [
           FlutterMap(
             options: MapOptions(
@@ -415,6 +422,7 @@ class ReportDetailScreen extends ConsumerWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }
@@ -431,18 +439,14 @@ class ReportDetailScreen extends ConsumerWidget {
         const SizedBox(height: PetSpacing.md),
         PetButton(
           label: l10n.reportDetailReportSighting,
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(l10n.reportDetailReportSighting)),
-            );
-          },
+          onPressed: () => context.push('/reports/$reportId/sighting'),
           icon: PhosphorIconsRegular.mapPinPlus,
         ),
       ],
     );
   }
 
-  Widget _buildBottomBar(BuildContext context) {
+  Widget _buildBottomBar(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: Padding(
@@ -452,16 +456,9 @@ class ReportDetailScreen extends ConsumerWidget {
             Expanded(
               child: OutlinedButton.icon(
                 onPressed: () async {
-                  await Clipboard.setData(
-                    ClipboardData(
-                      text: 'https://petlink.app/reports/$reportId',
-                    ),
+                  await SharePlus.instance.share(
+                    ShareParams(text: 'https://petlink.app/reports/$reportId'),
                   );
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(SnackBar(content: Text(l10n.shareAction)));
-                  }
                 },
                 icon: const Icon(PhosphorIconsRegular.shareNetwork),
                 label: Text(l10n.shareAction),
@@ -474,11 +471,7 @@ class ReportDetailScreen extends ConsumerWidget {
             Expanded(
               child: PetButton(
                 label: l10n.contactAction,
-                onPressed: () {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text(l10n.contactAction)));
-                },
+                onPressed: () => _contactOwner(context, ref),
                 icon: PhosphorIconsRegular.phone,
               ),
             ),
@@ -486,5 +479,59 @@ class ReportDetailScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _openMap(dynamic report) async {
+    final uri = Uri.parse(
+      'https://www.google.com/maps/search/?api=1&query=${report.latitude},${report.longitude}',
+    );
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  Future<void> _contactOwner(BuildContext context, WidgetRef ref) async {
+    final report = await ref.read(reportByIdProvider(reportId).future);
+    final email = report?.ownerEmail;
+    if (email == null || email.trim().isEmpty) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No hay datos de contacto disponibles')),
+        );
+      }
+      return;
+    }
+    final uri = Uri(
+      scheme: 'mailto',
+      path: email,
+      queryParameters: {'subject': 'Sobre tu reporte en PetLink'},
+    );
+    if (!await launchUrl(uri) && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se pudo abrir el correo')),
+      );
+    }
+  }
+
+  Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Eliminar reporte'),
+        content: const Text('Esta acción no se puede deshacer.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancelar')),
+          FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Eliminar')),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    try {
+      await ref.read(petReportRepositoryProvider).deleteReport(reportId);
+      ref.invalidate(nearbyReportsProvider);
+      ref.invalidate(myReportsProvider);
+      ref.invalidate(exploreReportsProvider);
+      if (context.mounted) context.go('/reports');
+    } catch (error) {
+      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('No se pudo eliminar: $error')));
+    }
   }
 }
