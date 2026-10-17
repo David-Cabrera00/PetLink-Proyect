@@ -15,7 +15,7 @@
     }
   },
   "radarNearYou": "This is what is happening near you.",
-  "radarLocation": "La Aurora, Pasto",
+  "radarLocation": "Current location",
   "radarRadius": "5 km radius",
   "radarActive": "Active radar",
   "radarReportsCount": "{count} reports",

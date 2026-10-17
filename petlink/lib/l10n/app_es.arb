@@ -15,7 +15,7 @@
     }
   },
   "radarNearYou": "Esto está ocurriendo cerca de ti.",
-  "radarLocation": "La Aurora, Pasto",
+  "radarLocation": "Ubicación actual",
   "radarRadius": "Radio 5 km",
   "radarActive": "Radar activo",
   "radarReportsCount": "{count} reportes",
