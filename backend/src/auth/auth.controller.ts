@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { ChangePasswordDto, LoginDto, RegisterDto, UpdateProfileDto } from './dto';
@@ -11,5 +12,6 @@ export class AuthController {
   @Post('login') login(@Body() dto: LoginDto) { return this.auth.login(dto); }
   @ApiBearerAuth() @UseGuards(JwtAuthGuard) @Get('me') me(@Req() req: { user: { sub: string } }) { return this.auth.me(req.user.sub); }
   @ApiBearerAuth() @UseGuards(JwtAuthGuard) @Patch('me') updateProfile(@Req() req: { user: { sub: string } }, @Body() dto: UpdateProfileDto) { return this.auth.updateProfile(req.user.sub, dto); }
+  @ApiBearerAuth() @UseGuards(JwtAuthGuard) @Post('me/avatar') @UseInterceptors(FileInterceptor('file')) uploadAvatar(@Req() req: { user: { sub: string } }, @UploadedFile() file: { originalname: string; mimetype: string; buffer: Buffer }) { return this.auth.uploadAvatar(req.user.sub, file); }
   @ApiBearerAuth() @UseGuards(JwtAuthGuard) @Patch('password') changePassword(@Req() req: { user: { sub: string } }, @Body() dto: ChangePasswordDto) { return this.auth.changePassword(req.user.sub, dto); }
 }
