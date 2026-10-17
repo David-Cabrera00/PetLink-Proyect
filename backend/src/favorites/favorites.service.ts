@@ -1,0 +1,4 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma.service';
+@Injectable()
+export class FavoritesService { constructor(private readonly prisma: PrismaService) {} list(userId: string) { return this.prisma.favorite.findMany({ where: { userId }, include: { report: { include: { photos: true } } }, orderBy: { createdAt: 'desc' } }); } async add(userId: string, reportId: string) { const report = await this.prisma.petReport.findUnique({ where: { id: reportId } }); if (!report) throw new NotFoundException('Report not found'); return this.prisma.favorite.upsert({ where: { userId_reportId: { userId, reportId } }, create: { userId, reportId }, update: {} }); } async remove(userId: string, reportId: string) { await this.prisma.favorite.deleteMany({ where: { userId, reportId } }); return { success: true }; } }
