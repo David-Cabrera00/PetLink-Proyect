@@ -88,6 +88,7 @@ class MatchCard extends StatelessWidget {
 
   Widget _buildTraitChip(BuildContext context, String trait) {
     final extension = PetThemeExtension.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: PetSpacing.sm,
@@ -103,7 +104,7 @@ class MatchCard extends StatelessWidget {
           Icon(Icons.check, size: 12, color: extension.found),
           const SizedBox(width: PetSpacing.xs),
           Text(
-            trait,
+            _localizedTrait(l10n, trait),
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
@@ -113,6 +114,23 @@ class MatchCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _localizedTrait(AppLocalizations l10n, String trait) {
+    switch (trait.toLowerCase()) {
+      case 'species':
+        return l10n.matchDetailSpecies;
+      case 'breed':
+        return l10n.matchDetailBreed;
+      case 'color':
+        return l10n.matchDetailColor;
+      case 'size':
+        return l10n.matchDetailSize;
+      case 'sex':
+        return l10n.matchDetailSex;
+      default:
+        return trait;
+    }
   }
 
   PetStatus _matchLevelToStatus(MatchLevel level) {
