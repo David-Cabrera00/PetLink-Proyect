@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
@@ -46,7 +47,7 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: PetSpacing.xl),
           if (user != null) ...[
-            _buildUserSection(context, user),
+            _buildUserSection(context, ref, user),
             const SizedBox(height: PetSpacing.xl),
           ],
           _buildMyReportsTile(context),
@@ -113,7 +114,7 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildUserSection(BuildContext context, AuthUser user) {
+  Widget _buildUserSection(BuildContext context, WidgetRef ref, AuthUser user) {
     final theme = Theme.of(context);
     return Container(
       width: double.infinity,
@@ -124,13 +125,40 @@ class ProfileScreen extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 28,
-            backgroundColor: theme.colorScheme.primary,
-            child: Icon(
-              PhosphorIconsFill.user,
-              color: theme.colorScheme.onPrimary,
-            ),
+          Stack(
+            children: [
+              CircleAvatar(
+                radius: 32,
+                backgroundColor: theme.colorScheme.primary,
+                backgroundImage: user.avatarUrl == null ? null : NetworkImage(user.avatarUrl!),
+                child: user.avatarUrl == null
+                    ? Icon(PhosphorIconsFill.user, color: theme.colorScheme.onPrimary)
+                    : null,
+              ),
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: Tooltip(
+                  message: 'Cambiar foto',
+                  child: Material(
+                    color: theme.colorScheme.primary,
+                    shape: const CircleBorder(),
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: () => _pickAvatar(context, ref),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Icon(
+                          PhosphorIconsRegular.camera,
+                          size: 16,
+                          color: theme.colorScheme.onPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(width: PetSpacing.md),
           Expanded(
@@ -145,12 +173,52 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: PetSpacing.xs),
                 Text(user.email, style: theme.textTheme.bodyMedium),
+                const SizedBox(height: PetSpacing.sm),
+                TextButton.icon(
+                  onPressed: () => _editName(context, ref, user.name),
+                  icon: const Icon(PhosphorIconsRegular.pencilSimple, size: 16),
+                  label: const Text('Editar nombre'),
+                ),
               ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _pickAvatar(BuildContext context, WidgetRef ref) async {
+    final image = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 85, maxWidth: 800);
+    if (image == null) return;
+    try {
+      await ref.read(authProvider.notifier).uploadAvatar(image.path);
+      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Foto de perfil actualizada')));
+    } catch (error) {
+      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('No se pudo actualizar la foto: $error')));
+    }
+  }
+
+  Future<void> _editName(BuildContext context, WidgetRef ref, String currentName) async {
+    final controller = TextEditingController(text: currentName);
+    final name = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Cambiar nombre'),
+        content: TextField(controller: controller, autofocus: true, textCapitalization: TextCapitalization.words, maxLength: 60),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancelar')),
+          FilledButton(onPressed: () => Navigator.pop(dialogContext, controller.text.trim()), child: const Text('Guardar')),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (name == null || name.length < 2 || !context.mounted) return;
+    try {
+      await ref.read(authProvider.notifier).updateName(name);
+      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Nombre actualizado')));
+    } catch (error) {
+      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('No se pudo actualizar el nombre: $error')));
+    }
   }
 
   Widget _buildLanguageSection(
