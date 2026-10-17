@@ -84,7 +84,7 @@ class PetCardCompact extends StatelessWidget {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            '${report.distanceKm} km · ${report.address.split(',').first}',
+                            '${report.distanceKm.toStringAsFixed(2).replaceAll('.', ',')} km · ${report.address.split(',').first}',
                             style: Theme.of(context).textTheme.bodySmall,
                             overflow: TextOverflow.ellipsis,
                           ),
