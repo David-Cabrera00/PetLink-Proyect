@@ -241,9 +241,21 @@ Funcionando:
 - Ubicación y permisos principales.
 - Permiso de notificaciones.
 
+Cambios recientes ya implementados:
+
+- Actividad conectada al backend con reportes y notificaciones persistentes de avistamientos.
+- Las notificaciones de avistamiento muestran la descripción escrita por la persona.
+- El detalle del reporte muestra avistamientos con descripción, fecha, ubicación y foto.
+- Perfil con cambio de nombre y foto persistida en Supabase Storage.
+- Saludo del Radar dinámico según la hora local y el idioma.
+- Reportes propios identificados mediante `isOwner`; Radar excluye los propios y Explorar ofrece `Mis reportes`.
+- Los marcadores propios usan un color diferente y los propietarios no pueden enviarse avistamientos a sí mismos.
+- Las fotos principales del detalle se muestran completas con `BoxFit.contain`, sin recorte.
+
 Pendiente:
 
-- Convertir Actividad en notificaciones persistentes reales.
+- Marcar notificaciones como leídas y permitir abrirlas desde Actividad.
+
 - Push en segundo plano con FCM/APNs.
 - Integrar automáticamente el análisis de IA al subir fotos.
 - Mejorar el algoritmo de coincidencias con atributos visuales.
