@@ -2,13 +2,19 @@ import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/co
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma.service';
-import { ChangePasswordDto, LoginDto, RegisterDto } from './dto';
+import { ChangePasswordDto, LoginDto, RegisterDto, UpdateProfileDto } from './dto';
 
 @Injectable()
 export class AuthService {
   constructor(private readonly prisma: PrismaService, private readonly jwt: JwtService) {}
   private safe(user: { id: string; name: string; email: string }) { return { id: user.id, name: user.name, email: user.email }; }
-  private token(user: { id: string; email: string }) { return this.jwt.sign({ sub: user.id, email: user.email }, { secret: process.env.JWT_ACCESS_SECRET, expiresIn: process.env.JWT_ACCESS_TTL ?? '15m' }); }
+  private token(user: { id: string; email: string }) {
+    const ttl = process.env.JWT_ACCESS_TTL ?? '15m';
+    return this.jwt.sign(
+      { sub: user.id, email: user.email },
+      { secret: process.env.JWT_ACCESS_SECRET, expiresIn: ttl as any },
+    );
+  }
   async register(dto: RegisterDto) {
     const email = dto.email.trim().toLowerCase();
     if (await this.prisma.user.findUnique({ where: { email } })) throw new ConflictException('Email already registered');
@@ -27,4 +33,5 @@ export class AuthService {
     await this.prisma.user.update({ where: { id }, data: { passwordHash: await bcrypt.hash(dto.newPassword, 12) } });
     return { success: true };
   }
+  async updateProfile(id: string, dto: UpdateProfileDto) { const user = await this.prisma.user.update({ where: { id }, data: { name: dto.name.trim() } }); return this.safe(user); }
 }
