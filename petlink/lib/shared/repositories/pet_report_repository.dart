@@ -6,4 +6,5 @@ abstract class PetReportRepository {
   Future<List<PetReport>> getMyReports();
   Future<PetReport?> getReportById(String id);
   Future<PetReport> createReport(ReportDraft draft);
+  Future<void> deleteReport(String id);
 }

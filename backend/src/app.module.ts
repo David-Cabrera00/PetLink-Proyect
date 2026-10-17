@@ -1,19 +1,24 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
-import { PrismaService } from './prisma.service';
+import { PrismaModule } from './prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { ReportsModule } from './reports/reports.module';
 import { MatchesModule } from './matches/matches.module';
+import { SightingsModule } from './sightings/sightings.module';
+import { FavoritesModule } from './favorites/favorites.module';
+import { ActivityModule } from './activity/activity.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, validationSchema: Joi.object({ DATABASE_URL: Joi.string().required(), JWT_ACCESS_SECRET: Joi.string().min(16).required() }) }),
+    PrismaModule,
     AuthModule,
     ReportsModule,
     MatchesModule,
+    SightingsModule,
+    FavoritesModule,
+    ActivityModule,
   ],
-  providers: [PrismaService],
-  exports: [PrismaService],
 })
 export class AppModule {}

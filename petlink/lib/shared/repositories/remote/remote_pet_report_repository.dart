@@ -10,5 +10,29 @@ class RemotePetReportRepository implements PetReportRepository {
   @override Future<List<PetReport>> getNearbyReports() async => _list(await client.get('/reports'));
   @override Future<List<PetReport>> getMyReports() async => _list(await client.get('/reports/mine'));
   @override Future<PetReport?> getReportById(String id) async => PetReport.fromJson((await client.get('/reports/$id') as Map).cast<String, dynamic>());
-  @override Future<PetReport> createReport(ReportDraft draft) async => PetReport.fromJson((await client.post('/reports', body: {'type': draft.reportType == null ? 'LOST' : draft.reportType!.name.toUpperCase(), 'name': draft.name, 'species': draft.species, 'breed': draft.breed, 'sex': draft.sex, 'age': draft.age, 'size': draft.size, 'color': draft.color, 'description': draft.description, 'traits': draft.traits, 'latitude': draft.latitude, 'longitude': draft.longitude, 'address': draft.address, 'lastSeenAt': (draft.lastSeenAt ?? DateTime.now()).toIso8601String()} ) as Map).cast<String, dynamic>());
+  @override
+  Future<PetReport> createReport(ReportDraft draft) async {
+    final response = await client.post('/reports', body: {
+      'type': draft.reportType == null ? 'LOST' : draft.reportType!.name.toUpperCase(),
+      'name': draft.name,
+      'species': draft.species,
+      'breed': draft.breed,
+      'sex': draft.sex,
+      'age': draft.age,
+      'size': draft.size,
+      'color': draft.color,
+      'description': draft.description,
+      'traits': draft.traits,
+      'latitude': draft.latitude,
+      'longitude': draft.longitude,
+      'address': draft.address,
+      'lastSeenAt': (draft.lastSeenAt ?? DateTime.now()).toIso8601String(),
+    });
+    final report = PetReport.fromJson((response as Map).cast<String, dynamic>());
+    for (final path in draft.photos.where((photo) => !photo.startsWith('http'))) {
+      await client.uploadFile(path, '/reports/${report.id}/photos');
+    }
+    return report;
+  }
+  @override Future<void> deleteReport(String id) async { await client.delete('/reports/$id'); }
 }

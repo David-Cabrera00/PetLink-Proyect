@@ -17,6 +17,7 @@ import '../features/reports/presentation/report_location_screen.dart';
 import '../features/reports/presentation/report_details_screen.dart';
 import '../features/reports/presentation/report_review_screen.dart';
 import '../features/reports/presentation/report_published_screen.dart';
+import '../features/reports/presentation/report_sighting_screen.dart';
 import '../features/matches/presentation/match_detail_screen.dart';
 import '../features/activity/activity_screen.dart';
 import '../features/profile/profile_screen.dart';
@@ -156,6 +157,12 @@ class AppRouter {
               path: '/reports/mine',
               builder: (context, state) =>
                   const ReportsScreen(onlyMyReports: true),
+            ),
+            GoRoute(
+              path: '/reports/:id/sighting',
+              builder: (context, state) => ReportSightingScreen(
+                reportId: state.pathParameters['id']!,
+              ),
             ),
             GoRoute(
               path: '/reports/:id',

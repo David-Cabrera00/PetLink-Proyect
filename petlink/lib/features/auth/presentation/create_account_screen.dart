@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
@@ -34,9 +35,9 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
     await ref
         .read(authProvider.notifier)
         .register(
-          name: _nameController.text,
-          email: _emailController.text,
-          password: _passwordController.text,
+          name: _nameController.text.trim(),
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
         );
   }
 
@@ -163,6 +164,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
       label: l10n.authPassword,
       hint: l10n.authPasswordHint,
       controller: _passwordController,
+      inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
       obscureText: _obscurePassword,
       prefixIcon: const Icon(PhosphorIconsRegular.lockKey),
       suffixIcon: IconButton(
@@ -190,6 +192,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
       label: l10n.authConfirmPassword,
       hint: l10n.authConfirmPasswordHint,
       controller: _confirmPasswordController,
+      inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
       obscureText: _obscureConfirmation,
       prefixIcon: const Icon(PhosphorIconsRegular.lockKeyOpen),
       suffixIcon: IconButton(

@@ -42,7 +42,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get radarNearYou => 'This is what is happening near you.';
 
   @override
-  String get radarLocation => 'La Aurora, Pasto';
+  String get radarLocation => 'Current location';
 
   @override
   String get radarRadius => '5 km radius';

@@ -27,6 +27,21 @@ class ApiClient {
   Future<dynamic> get(String path, {Map<String, String>? query}) => _request('GET', path, query: query);
   Future<dynamic> post(String path, {Map<String, dynamic>? body}) => _request('POST', path, body: body);
   Future<dynamic> patch(String path, {Map<String, dynamic>? body}) => _request('PATCH', path, body: body);
+  Future<dynamic> delete(String path) => _request('DELETE', path);
+
+  Future<dynamic> uploadFile(String path, String endpoint) async {
+    final token = await _storage.read(key: _tokenKey);
+    final request = http.MultipartRequest('POST', Uri.parse('$baseUrl$endpoint'));
+    request.headers.addAll({if (token != null) 'Authorization': 'Bearer $token'});
+    request.files.add(await http.MultipartFile.fromPath('file', path));
+    final response = await request.send().timeout(timeout);
+    final body = await response.stream.bytesToString();
+    final decoded = body.isEmpty ? null : jsonDecode(body);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw ApiException(response.statusCode, decoded is Map ? decoded['message'].toString() : 'Error al subir la foto');
+    }
+    return decoded;
+  }
 
   Future<dynamic> _request(String method, String path, {Map<String, String>? query, Map<String, dynamic>? body}) async {
     final uri = Uri.parse('$baseUrl$path').replace(queryParameters: query);
@@ -35,6 +50,7 @@ class ApiClient {
     final response = switch (method) {
       'GET' => await http.get(uri, headers: headers).timeout(timeout),
       'POST' => await http.post(uri, headers: headers, body: jsonEncode(body ?? {})).timeout(timeout),
+      'DELETE' => await http.delete(uri, headers: headers).timeout(timeout),
       _ => await http.patch(uri, headers: headers, body: jsonEncode(body ?? {})).timeout(timeout),
     };
     final decoded = response.body.isEmpty ? null : jsonDecode(response.body);

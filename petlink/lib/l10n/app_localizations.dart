@@ -161,7 +161,7 @@ abstract class AppLocalizations {
   /// No description provided for @radarLocation.
   ///
   /// In es, this message translates to:
-  /// **'La Aurora, Pasto'**
+  /// **'Ubicación actual'**
   String get radarLocation;
 
   /// No description provided for @radarRadius.

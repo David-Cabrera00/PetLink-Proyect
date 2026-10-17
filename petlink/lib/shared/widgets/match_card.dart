@@ -67,7 +67,7 @@ class MatchCard extends StatelessWidget {
                   Icon(Icons.location_on, size: 16, color: cs.onSurfaceVariant),
                   const SizedBox(width: PetSpacing.xs),
                   Text(
-                    '${match.distanceKm} km',
+                    '${match.distanceKm.toStringAsFixed(2).replaceAll('.', ',')} km',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   const SizedBox(width: PetSpacing.md),

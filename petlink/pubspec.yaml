@@ -43,8 +43,11 @@ dependencies:
   phosphoricons_flutter: ^1.1.1
   shared_preferences: ^2.5.3
   http: ^1.5.0
-  flutter_secure_storage: ^9.2.4
+  flutter_secure_storage: 11.2.0
   image_picker: ^1.2.0
+  share_plus: ^13.3.1
+  url_launcher: ^6.3.2
+  permission_handler: ^12.0.1
 
 dev_dependencies:
   flutter_test:

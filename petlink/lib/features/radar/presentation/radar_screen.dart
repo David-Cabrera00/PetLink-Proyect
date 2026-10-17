@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/theme/pet_spacing.dart';
@@ -12,13 +13,46 @@ import '../../../shared/widgets/pet_card_compact.dart';
 import '../../../shared/widgets/section_header.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/error_state.dart';
+import '../../auth/providers/auth_provider.dart';
+import '../../explore/providers/explore_providers.dart';
 import '../providers/radar_providers.dart';
 
-class RadarScreen extends ConsumerWidget {
+class RadarScreen extends ConsumerStatefulWidget {
   const RadarScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RadarScreen> createState() => _RadarScreenState();
+}
+
+class _RadarScreenState extends ConsumerState<RadarScreen> {
+  String _locationLabel = 'Ubicación no disponible';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLocation();
+  }
+
+  Future<void> _loadLocation() async {
+    if (!await Geolocator.isLocationServiceEnabled()) return;
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      return;
+    }
+    try {
+      await Geolocator.getCurrentPosition();
+      if (mounted) setState(() => _locationLabel = 'Ubicación actual');
+    } catch (_) {
+      // Keep the neutral label when the device cannot provide a position.
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final nearbyAsync = ref.watch(nearbyReportsProvider);
     final matchesAsync = ref.watch(matchesProvider);
@@ -50,7 +84,7 @@ class RadarScreen extends ConsumerWidget {
               PetSpacing.xxl,
             ),
             children: [
-              _buildHeader(context),
+              _buildHeader(context, ref.watch(authProvider).user?.name),
               const SizedBox(height: PetSpacing.lg),
               _buildZoneSelector(context),
               const SizedBox(height: PetSpacing.xl),
@@ -66,7 +100,7 @@ class RadarScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, String? userName) {
     final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     final accent = PetThemeExtension.of(context).accent;
@@ -93,7 +127,9 @@ class RadarScreen extends ConsumerWidget {
         ),
         const SizedBox(height: PetSpacing.md),
         Text(
-          l10n.radarGreeting('David'),
+          l10n.radarGreeting(
+            (userName ?? '').trim().isEmpty ? 'PetLink' : userName!.trim(),
+          ),
           style: Theme.of(context).textTheme.headlineMedium
               ?.copyWith(color: cs.onSurface, fontWeight: FontWeight.w700),
         ),
@@ -110,14 +146,19 @@ class RadarScreen extends ConsumerWidget {
   Widget _buildZoneSelector(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(PetSpacing.md),
-      decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: PetRadius.xlAll,
-        border: Border.all(color: cs.outlineVariant),
-      ),
-      child: Row(
+    return GestureDetector(
+      onTap: () {
+        ref.read(exploreViewModeProvider.notifier).state = ExploreViewMode.map;
+        context.go('/explore');
+      },
+      child: Container(
+        padding: const EdgeInsets.all(PetSpacing.md),
+        decoration: BoxDecoration(
+          color: cs.surface,
+          borderRadius: PetRadius.xlAll,
+          border: Border.all(color: cs.outlineVariant),
+        ),
+        child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
@@ -134,7 +175,7 @@ class RadarScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  l10n.radarLocation,
+                  _locationLabel,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: PetSpacing.xs),
@@ -147,6 +188,7 @@ class RadarScreen extends ConsumerWidget {
           ),
           Icon(PhosphorIconsRegular.caretRight, color: cs.onSurfaceVariant),
         ],
+        ),
       ),
     );
   }

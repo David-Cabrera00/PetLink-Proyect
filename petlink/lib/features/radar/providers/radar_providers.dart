@@ -8,6 +8,7 @@ import '../../../shared/repositories/mock/mock_pet_report_repository.dart';
 import '../../../shared/repositories/mock/mock_match_repository.dart';
 import '../../../core/network/api_client.dart';
 import '../../../shared/repositories/remote/remote_pet_report_repository.dart';
+import '../../../shared/repositories/remote/remote_match_repository.dart';
 
 final petReportRepositoryProvider = Provider<PetReportRepository>((ref) {
   final client = ApiClient.instance;
@@ -15,7 +16,8 @@ final petReportRepositoryProvider = Provider<PetReportRepository>((ref) {
 });
 
 final matchRepositoryProvider = Provider<MatchRepository>((ref) {
-  return MockMatchRepository();
+  final client = ApiClient.instance;
+  return client.isConfigured ? RemoteMatchRepository(client) : MockMatchRepository();
 });
 
 final nearbyReportsProvider = FutureProvider<List<PetReport>>((ref) async {

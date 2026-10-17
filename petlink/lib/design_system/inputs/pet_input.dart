@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class PetInput extends StatelessWidget {
   final String? label;
@@ -13,6 +14,7 @@ class PetInput extends StatelessWidget {
   final FormFieldValidator<String>? validator;
   final VoidCallback? onTap;
   final bool readOnly;
+  final List<TextInputFormatter>? inputFormatters;
 
   const PetInput({
     super.key,
@@ -28,6 +30,7 @@ class PetInput extends StatelessWidget {
     this.validator,
     this.onTap,
     this.readOnly = false,
+    this.inputFormatters,
   });
 
   @override
@@ -52,6 +55,7 @@ class PetInput extends StatelessWidget {
           validator: validator,
           onTap: onTap,
           readOnly: readOnly,
+          inputFormatters: inputFormatters,
           decoration: InputDecoration(
             hintText: hint,
             errorText: errorText,
