@@ -26,11 +26,13 @@ model User {
   name String
   email String @unique
   passwordHash String
+  avatarUrl String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   reports PetReport[]
   sightings Sighting[]
   favorites Favorite[]
+  notifications Notification[]
 }
 
 model PetReport {
@@ -57,6 +59,7 @@ model PetReport {
   photos Photo[]
   sightings Sighting[]
   favorites Favorite[]
+  notifications Notification[]
   @@index([type, status, createdAt])
   @@index([latitude, longitude])
   @@index([ownerId, status])
@@ -95,4 +98,19 @@ model Favorite {
   report PetReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   @@id([userId, reportId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  reportId  String?
+  type      String
+  title     String
+  body      String?
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  report    PetReport? @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }
