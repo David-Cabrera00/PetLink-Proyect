@@ -186,11 +186,14 @@ class ReportDetailScreen extends ConsumerWidget {
       child: report.pet.primaryPhotoUrl != null
           ? ClipRRect(
               borderRadius: PetRadius.lgAll,
-              child: Image.network(
-                report.pet.primaryPhotoUrl!,
-                fit: BoxFit.cover,
-                width: double.infinity,
-                errorBuilder: (_, _, _) => _buildPlaceholderPhoto(),
+              child: ColoredBox(
+                color: Colors.black.withValues(alpha: 0.04),
+                child: Image.network(
+                  report.pet.primaryPhotoUrl!,
+                  fit: BoxFit.contain,
+                  width: double.infinity,
+                  errorBuilder: (_, _, _) => _buildPlaceholderPhoto(),
+                ),
               ),
             )
           : _buildPlaceholderPhoto(),
@@ -382,7 +385,7 @@ class ReportDetailScreen extends ConsumerWidget {
             const SizedBox(height: PetSpacing.sm),
             ClipRRect(
               borderRadius: PetRadius.mdAll,
-              child: Image.network(sighting.photoUrl!, height: 140, width: double.infinity, fit: BoxFit.cover),
+              child: Image.network(sighting.photoUrl!, height: 140, width: double.infinity, fit: BoxFit.contain),
             ),
           ],
         ],
