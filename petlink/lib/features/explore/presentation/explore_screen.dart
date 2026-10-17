@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
@@ -7,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -580,7 +580,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           ),
                           const SizedBox(width: PetSpacing.xs),
                           Text(
-                            '${report.distanceKm} km',
+                            '${report.distanceKm.toStringAsFixed(2).replaceAll('.', ',')} km',
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                           const SizedBox(width: PetSpacing.md),
@@ -656,16 +656,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 IconButton(
                   tooltip: l10n.shareAction,
                   onPressed: () async {
-                    await Clipboard.setData(
-                      ClipboardData(
-                        text: 'https://petlink.app/reports/${report.id}',
-                      ),
+                    await SharePlus.instance.share(
+                      ShareParams(text: 'https://petlink.app/reports/${report.id}'),
                     );
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(SnackBar(content: Text(l10n.shareAction)));
-                    }
                   },
                   icon: Icon(
                     PhosphorIconsRegular.shareNetwork,
