@@ -127,6 +127,15 @@ class ActivityScreen extends ConsumerWidget {
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
+                  if (item.body != null && item.body!.trim().isNotEmpty) ...[
+                    const SizedBox(height: PetSpacing.xs),
+                    Text(
+                      item.body!,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

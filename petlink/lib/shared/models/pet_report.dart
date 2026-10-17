@@ -1,5 +1,25 @@
 import 'pet.dart';
 
+class PetSighting {
+  final String id;
+  final double latitude;
+  final double longitude;
+  final String description;
+  final String? photoUrl;
+  final DateTime createdAt;
+
+  const PetSighting({required this.id, required this.latitude, required this.longitude, required this.description, this.photoUrl, required this.createdAt});
+
+  factory PetSighting.fromJson(Map<String, dynamic> json) => PetSighting(
+        id: json['id'] as String? ?? '',
+        latitude: (json['latitude'] as num?)?.toDouble() ?? 0,
+        longitude: (json['longitude'] as num?)?.toDouble() ?? 0,
+        description: json['description'] as String? ?? '',
+        photoUrl: json['photoUrl'] as String?,
+        createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
+      );
+}
+
 enum ReportType { lost, found }
 
 enum ReportStatus { active, possibleMatch, recovered, closed }
@@ -20,6 +40,7 @@ class PetReport {
   final int sightingsCount;
   final bool isOwner;
   final String? ownerEmail;
+  final List<PetSighting> sightings;
 
   const PetReport({
     required this.id,
@@ -37,6 +58,7 @@ class PetReport {
     required this.sightingsCount,
     this.isOwner = false,
     this.ownerEmail,
+    this.sightings = const [],
   });
 
   factory PetReport.fromJson(Map<String, dynamic> json) => PetReport(
@@ -49,5 +71,6 @@ class PetReport {
         distanceKm: (json['distanceKm'] as num?)?.toDouble() ?? 0, sightingsCount: json['sightingsCount'] as int? ?? 0,
         isOwner: json['isOwner'] as bool? ?? false,
         ownerEmail: json['ownerEmail'] as String?,
+        sightings: (json['sightings'] as List<dynamic>? ?? []).map((item) => PetSighting.fromJson((item as Map).cast<String, dynamic>())).toList(),
       );
 }
