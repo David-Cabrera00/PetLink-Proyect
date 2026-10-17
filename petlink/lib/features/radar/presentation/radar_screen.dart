@@ -127,9 +127,7 @@ class _RadarScreenState extends ConsumerState<RadarScreen> {
         ),
         const SizedBox(height: PetSpacing.md),
         Text(
-          l10n.radarGreeting(
-            (userName ?? '').trim().isEmpty ? 'PetLink' : userName!.trim(),
-          ),
+          _buildGreeting(context, userName),
           style: Theme.of(context).textTheme.headlineMedium
               ?.copyWith(color: cs.onSurface, fontWeight: FontWeight.w700),
         ),
@@ -141,6 +139,18 @@ class _RadarScreenState extends ConsumerState<RadarScreen> {
         ),
       ],
     );
+  }
+
+  String _buildGreeting(BuildContext context, String? userName) {
+    final name = (userName ?? '').trim().isEmpty ? 'PetLink' : userName!.trim();
+    final hour = DateTime.now().hour;
+    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
+    final greeting = hour < 12
+        ? (isEnglish ? 'Good morning' : 'Buenos días')
+        : hour < 18
+            ? (isEnglish ? 'Good afternoon' : 'Buenas tardes')
+            : (isEnglish ? 'Good evening' : 'Buenas noches');
+    return '$greeting, $name';
   }
 
   Widget _buildZoneSelector(BuildContext context) {

@@ -211,7 +211,6 @@ class ProfileScreen extends ConsumerWidget {
         ],
       ),
     );
-    controller.dispose();
     if (name == null || name.length < 2 || !context.mounted) return;
     try {
       await ref.read(authProvider.notifier).updateName(name);
