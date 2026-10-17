@@ -150,6 +150,12 @@ class ReportDetailScreen extends ConsumerWidget {
           SectionHeader(title: l10n.reportDetailHowItHappened),
           const SizedBox(height: PetSpacing.md),
           _buildDescriptionSection(context, report),
+          if (report.sightings.isNotEmpty) ...[
+            const SizedBox(height: PetSpacing.lg),
+            const SectionHeader(title: 'Avistamientos recibidos'),
+            const SizedBox(height: PetSpacing.md),
+            ...report.sightings.map<Widget>((sighting) => _buildSightingCard(context, sighting)),
+          ],
           const SizedBox(height: PetSpacing.lg),
           SectionHeader(title: l10n.reportDetailLastLocation),
           const SizedBox(height: PetSpacing.md),
@@ -343,6 +349,50 @@ class ReportDetailScreen extends ConsumerWidget {
         style: Theme.of(context).textTheme.bodyMedium,
       ),
     );
+  }
+
+  Widget _buildSightingCard(BuildContext context, PetSighting sighting) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: PetSpacing.md),
+      padding: const EdgeInsets.all(PetSpacing.md),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: PetRadius.lgAll,
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            sighting.description,
+            style: theme.textTheme.bodyMedium,
+          ),
+          const SizedBox(height: PetSpacing.sm),
+          Text(
+            'Ubicación: ${sighting.latitude.toStringAsFixed(5)}, ${sighting.longitude.toStringAsFixed(5)}',
+            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          ),
+          Text(
+            _formatSightingDate(sighting.createdAt),
+            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          ),
+          if (sighting.photoUrl != null) ...[
+            const SizedBox(height: PetSpacing.sm),
+            ClipRRect(
+              borderRadius: PetRadius.mdAll,
+              child: Image.network(sighting.photoUrl!, height: 140, width: double.infinity, fit: BoxFit.cover),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  String _formatSightingDate(DateTime date) {
+    final local = date.toLocal();
+    return 'Registrado: ${local.day.toString().padLeft(2, '0')}/${local.month.toString().padLeft(2, '0')}/${local.year}';
   }
 
   Widget _buildMapPlaceholder(BuildContext context, dynamic report) {

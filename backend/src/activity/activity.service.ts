@@ -5,6 +5,7 @@ type ActivityEvent = {
   id: string;
   type: string;
   title: string;
+  body?: string | null;
   status: string;
   reportType: string;
   createdAt: Date;
@@ -30,6 +31,7 @@ export class ActivityService {
           reportId: true,
           type: true,
           title: true,
+          body: true,
           createdAt: true,
           report: { select: { status: true, type: true } },
         },
@@ -51,6 +53,7 @@ export class ActivityService {
           id: notification.reportId!,
           type: notification.type,
           title: notification.title,
+          body: notification.body,
           status: notification.report!.status.toLowerCase(),
           reportType: notification.report!.type.toLowerCase(),
           createdAt: notification.createdAt,
