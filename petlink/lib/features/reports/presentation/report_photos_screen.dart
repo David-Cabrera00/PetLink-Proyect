@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
@@ -8,6 +9,7 @@ import '../../../core/theme/pet_spacing.dart';
 import '../../../core/theme/pet_radius.dart';
 import '../../../design_system/buttons/pet_button.dart';
 import '../../../shared/widgets/step_indicator.dart';
+import '../../../shared/widgets/photo_preview.dart';
 import '../providers/report_draft_provider.dart';
 
 class ReportPhotosScreen extends ConsumerStatefulWidget {
@@ -159,7 +161,14 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                     errorBuilder: (context, error, stackTrace) =>
                         _buildPlaceholder(context),
                   )
-                : _buildPlaceholder(context),
+                : buildLocalPhotoPreview(
+                    photo,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                    errorBuilder: (context, error, stackTrace) =>
+                        _buildPlaceholder(context),
+                  ),
           ),
         ),
         Positioned(
@@ -270,7 +279,7 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                         l10n.takePhoto,
                         () {
                           Navigator.pop(context);
-                          _simulatePhoto(ref);
+                          _pickPhoto(ref, ImageSource.camera);
                         },
                       ),
                     ),
@@ -282,7 +291,7 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                         l10n.gallery,
                         () {
                           Navigator.pop(context);
-                          _simulatePhoto(ref);
+                          _pickPhoto(ref, ImageSource.gallery);
                         },
                       ),
                     ),
@@ -332,15 +341,23 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
     );
   }
 
-  void _simulatePhoto(WidgetRef ref) {
-    final mockPhotos = [
-      'https://images.unsplash.com/photo-1552053831-71594a27632d?w=400',
-      'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400',
-      'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400',
-    ];
-    final currentCount = ref.read(reportDraftProvider).photos.length;
-    if (currentCount < 3) {
-      ref.read(reportDraftProvider.notifier).addPhoto(mockPhotos[currentCount]);
+  Future<void> _pickPhoto(WidgetRef ref, ImageSource source) async {
+    if (ref.read(reportDraftProvider).photos.length >= 3) return;
+
+    try {
+      final photo = await ImagePicker().pickImage(
+        source: source,
+        imageQuality: 85,
+        maxWidth: 2048,
+        maxHeight: 2048,
+      );
+      if (!mounted || photo == null) return;
+      ref.read(reportDraftProvider.notifier).addPhoto(photo.path);
+    } on Exception catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No se pudo seleccionar la foto: $error')),
+      );
     }
   }
 
