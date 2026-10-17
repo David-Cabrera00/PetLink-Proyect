@@ -61,7 +61,7 @@ class ActivityScreen extends ConsumerWidget {
               ),
               const SizedBox(height: PetSpacing.xl),
               if (items.isEmpty)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(PetSpacing.xl),
                   child: Center(child: Text(_localized(context, 'Todavía no hay actividad', 'There is no activity yet'))),
                 )
@@ -111,7 +111,7 @@ class ActivityScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item.title,
+                    _localizedTitle(context, item),
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
@@ -138,6 +138,19 @@ class ActivityScreen extends ConsumerWidget {
 
   String _localized(BuildContext context, String spanish, String english) =>
       Localizations.localeOf(context).languageCode == 'en' ? english : spanish;
+
+  String _localizedTitle(BuildContext context, ActivityItem item) {
+    final title = item.title;
+    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
+    if (!isEnglish) return title;
+    if (title.startsWith('Reporte de ')) {
+      return 'Report of ${title.substring('Reporte de '.length)}';
+    }
+    if (title.startsWith('Nuevo avistamiento de ')) {
+      return 'New sighting of ${title.substring('Nuevo avistamiento de '.length)}';
+    }
+    return title;
+  }
 
   String _localizedStatus(String status, bool english) {
     switch (status.toLowerCase()) {
