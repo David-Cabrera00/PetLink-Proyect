@@ -8,6 +8,7 @@ import { MatchesModule } from './matches/matches.module';
 import { SightingsModule } from './sightings/sightings.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { ActivityModule } from './activity/activity.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ActivityModule } from './activity/activity.module';
     SightingsModule,
     FavoritesModule,
     ActivityModule,
+    AiModule,
   ],
 })
 export class AppModule {}
