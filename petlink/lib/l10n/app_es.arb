@@ -296,6 +296,17 @@
   "authForgotPasswordTitle": "Recupera tu contraseña",
   "authForgotPasswordDescription": "Te enviaremos instrucciones para recuperar el acceso a tu cuenta.",
   "authSendInstructions": "Enviar instrucciones",
-  "authForgotPasswordConfirmation": "Si el correo está registrado, recibirás instrucciones para recuperar tu contraseña."
-  ,"profileLogout": "Cerrar sesión"
+  "authForgotPasswordConfirmation": "Si el correo está registrado, recibirás instrucciones para recuperar tu contraseña.",
+  "profileLogout": "Cerrar sesión",
+  "authRememberMe": "Recordarme",
+  "authOrContinueWith": "O continuar con",
+  "authNoAccount": "¿No tienes una cuenta?",
+  "authAlreadyHaveAccount": "¿Ya tienes una cuenta?",
+  "reportReviewSubtitle": "Verifica que la información sea correcta antes de publicar",
+  "unnamedPet": "Mascota sin nombre",
+  "foundPet": "Mascota encontrada",
+  "noPhotosAttached": "Sin fotografía adjunta",
+  "locationNotSpecified": "Ubicación no especificada",
+  "lastSeenAtPrefix": "Última vez vista",
+  "foundDatePrefix": "Fecha de hallazgo"
 }

@@ -296,6 +296,17 @@
   "authForgotPasswordTitle": "Reset your password",
   "authForgotPasswordDescription": "We will send instructions to help you regain access to your account.",
   "authSendInstructions": "Send instructions",
-  "authForgotPasswordConfirmation": "If the email is registered, you will receive instructions to reset your password."
-  ,"profileLogout": "Sign out"
+  "authForgotPasswordConfirmation": "If the email is registered, you will receive instructions to reset your password.",
+  "profileLogout": "Sign out",
+  "authRememberMe": "Remember me",
+  "authOrContinueWith": "Or continue with",
+  "authNoAccount": "Don't have an account?",
+  "authAlreadyHaveAccount": "Already have an account?",
+  "reportReviewSubtitle": "Verify that the information is correct before publishing",
+  "unnamedPet": "Unnamed pet",
+  "foundPet": "Found pet",
+  "noPhotosAttached": "No photo attached",
+  "locationNotSpecified": "Location not specified",
+  "lastSeenAtPrefix": "Last seen",
+  "foundDatePrefix": "Found date"
 }

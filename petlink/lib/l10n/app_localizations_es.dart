@@ -789,4 +789,38 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get profileLogout => 'Cerrar sesión';
+
+  @override
+  String get authRememberMe => 'Recordarme';
+
+  @override
+  String get authOrContinueWith => 'O continuar con';
+
+  @override
+  String get authNoAccount => '¿No tienes una cuenta?';
+
+  @override
+  String get authAlreadyHaveAccount => '¿Ya tienes una cuenta?';
+
+  @override
+  String get reportReviewSubtitle =>
+      'Verifica que la información sea correcta antes de publicar';
+
+  @override
+  String get unnamedPet => 'Mascota sin nombre';
+
+  @override
+  String get foundPet => 'Mascota encontrada';
+
+  @override
+  String get noPhotosAttached => 'Sin fotografía adjunta';
+
+  @override
+  String get locationNotSpecified => 'Ubicación no especificada';
+
+  @override
+  String get lastSeenAtPrefix => 'Última vez vista';
+
+  @override
+  String get foundDatePrefix => 'Fecha de hallazgo';
 }

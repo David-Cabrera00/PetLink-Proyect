@@ -1555,6 +1555,72 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Cerrar sesión'**
   String get profileLogout;
+
+  /// No description provided for @authRememberMe.
+  ///
+  /// In es, this message translates to:
+  /// **'Recordarme'**
+  String get authRememberMe;
+
+  /// No description provided for @authOrContinueWith.
+  ///
+  /// In es, this message translates to:
+  /// **'O continuar con'**
+  String get authOrContinueWith;
+
+  /// No description provided for @authNoAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'¿No tienes una cuenta?'**
+  String get authNoAccount;
+
+  /// No description provided for @authAlreadyHaveAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Ya tienes una cuenta?'**
+  String get authAlreadyHaveAccount;
+
+  /// No description provided for @reportReviewSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Verifica que la información sea correcta antes de publicar'**
+  String get reportReviewSubtitle;
+
+  /// No description provided for @unnamedPet.
+  ///
+  /// In es, this message translates to:
+  /// **'Mascota sin nombre'**
+  String get unnamedPet;
+
+  /// No description provided for @foundPet.
+  ///
+  /// In es, this message translates to:
+  /// **'Mascota encontrada'**
+  String get foundPet;
+
+  /// No description provided for @noPhotosAttached.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin fotografía adjunta'**
+  String get noPhotosAttached;
+
+  /// No description provided for @locationNotSpecified.
+  ///
+  /// In es, this message translates to:
+  /// **'Ubicación no especificada'**
+  String get locationNotSpecified;
+
+  /// No description provided for @lastSeenAtPrefix.
+  ///
+  /// In es, this message translates to:
+  /// **'Última vez vista'**
+  String get lastSeenAtPrefix;
+
+  /// No description provided for @foundDatePrefix.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha de hallazgo'**
+  String get foundDatePrefix;
 }
 
 class _AppLocalizationsDelegate
