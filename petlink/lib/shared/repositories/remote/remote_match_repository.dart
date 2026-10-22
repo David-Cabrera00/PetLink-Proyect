@@ -33,7 +33,6 @@ class RemoteMatchRepository implements MatchRepository {
     final found = PetReport.fromJson(
       (json['foundReport'] as Map).cast<String, dynamic>(),
     );
-    final score = (json['score'] as num?)?.toDouble() ?? 0;
     final level = switch ((json['level'] as String? ?? '').toLowerCase()) {
       'high' => MatchLevel.high,
       'medium' => MatchLevel.medium,
