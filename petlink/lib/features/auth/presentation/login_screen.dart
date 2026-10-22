@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
-import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/theme/pet_spacing.dart';
 import '../../../core/theme/pet_typography.dart';
@@ -17,31 +16,49 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen>
-    with SingleTickerProviderStateMixin {
-  static const _pill = BorderRadius.all(Radius.circular(100));
+    with TickerProviderStateMixin {
+  static const _fieldFill = Color(0xFFF4F5F7);
 
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
-  late final AnimationController _illustrationController;
-  late final Animation<double> _illustrationFloat;
+  /// Solo visual: todavía no existe persistencia de "Recordarme".
+  bool _rememberMe = false;
+
+  // Entrada del formulario (slide + fade).
+  late final AnimationController _controller;
+  late final Animation<Offset> _bodySlide;
+  late final Animation<double> _bodyFade;
+
+  // Balanceo continuo del perrito dentro de la cabecera.
+  late final AnimationController _dogIdleController;
 
   @override
   void initState() {
     super.initState();
-    _illustrationController = AnimationController(
+
+    _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 3000),
+      duration: const Duration(milliseconds: 750),
     );
-
-    // Flotado vertical muy sutil (8 px) en bucle suave.
-    _illustrationFloat = Tween<double>(begin: 0, end: -8).animate(
-      CurvedAnimation(parent: _illustrationController, curve: Curves.easeInOut),
+    final curved = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutCubic,
     );
+    _bodySlide = Tween<Offset>(
+      begin: const Offset(0.0, 0.25),
+      end: Offset.zero,
+    ).animate(curved);
+    _bodyFade = Tween<double>(begin: 0.0, end: 1.0).animate(curved);
 
-    _illustrationController.repeat(reverse: true);
+    _dogIdleController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2400),
+    )..repeat(reverse: true);
+
+    _controller.forward();
   }
 
   Future<void> _submit() async {
@@ -61,7 +78,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
   @override
   void dispose() {
-    _illustrationController.dispose();
+    _dogIdleController.dispose();
+    _controller.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -84,18 +102,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           return SingleChildScrollView(
             child: Column(
               children: [
-                _buildHero(context, l10n, horizontalPadding),
-                Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 480),
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(
-                        horizontalPadding,
-                        PetSpacing.xl,
-                        horizontalPadding,
-                        PetSpacing.xxl,
+                _buildHeader(context, l10n),
+                FadeTransition(
+                  opacity: _bodyFade,
+                  child: SlideTransition(
+                    position: _bodySlide,
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 480),
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(
+                            horizontalPadding,
+                            PetSpacing.xl,
+                            horizontalPadding,
+                            PetSpacing.xxl,
+                          ),
+                          child: _buildForm(context, l10n, isLoading),
+                        ),
                       ),
-                      child: _buildForm(context, l10n, isLoading),
                     ),
                   ),
                 ),
@@ -107,57 +131,82 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     );
   }
 
-  Widget _buildHero(
-    BuildContext context,
-    AppLocalizations l10n,
-    double horizontalPadding,
-  ) {
+  // ---------------------------------------------------------------------------
+  // Cabecera morada: marca a la izquierda, perrito (Hero) a la derecha.
+  // ---------------------------------------------------------------------------
+  Widget _buildHeader(BuildContext context, AppLocalizations l10n) {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final background = isDark ? cs.primaryContainer : cs.primary;
-    final foreground = isDark ? cs.onPrimaryContainer : cs.onPrimary;
+    final foreground = isDark ? cs.onPrimaryContainer : Colors.white;
 
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         color: background,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(40)),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 20,
+            spreadRadius: 1,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            PetSpacing.sm,
-            PetSpacing.sm,
-            horizontalPadding,
-            PetSpacing.xxl,
+          padding: const EdgeInsets.fromLTRB(
+            PetSpacing.xs,
+            PetSpacing.xs,
+            PetSpacing.lg,
+            PetSpacing.xl,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               IconButton(
-                icon: const Icon(PhosphorIconsRegular.arrowLeft),
+                icon: const Icon(Icons.arrow_back_rounded),
                 color: foreground,
+                tooltip: MaterialLocalizations.of(context).backButtonTooltip,
                 onPressed: () => context.go('/welcome'),
               ),
-              Center(child: _buildIllustration(foreground)),
-              const SizedBox(height: PetSpacing.xl),
               Padding(
-                padding: const EdgeInsets.only(left: PetSpacing.sm),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                padding: const EdgeInsets.only(left: PetSpacing.md),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      l10n.authLoginTitle,
-                      style: PetTypography.heading.copyWith(color: foreground),
-                    ),
-                    const SizedBox(height: PetSpacing.xs),
-                    Text(
-                      l10n.authLoginDescription,
-                      style: PetTypography.bodySmall.copyWith(
-                        color: foreground.withValues(alpha: 0.85),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'PetLink',
+                            style: PetTypography.heading.copyWith(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w800,
+                              color: foreground,
+                              letterSpacing: -0.4,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            l10n.authLoginDescription,
+                            style: PetTypography.bodySmall.copyWith(
+                              fontSize: 13,
+                              height: 1.35,
+                              color: foreground.withValues(alpha: 0.78),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
+                    const SizedBox(width: PetSpacing.md),
+                    _buildDog(foreground),
                   ],
                 ),
               ),
@@ -168,62 +217,73 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     );
   }
 
-  /// Ilustración del login (PNG) con entrada suave y flotado vertical sutil.
-  Widget _buildIllustration(Color foreground) {
-    final width = MediaQuery.sizeOf(context).width;
-    final height = (width * 0.5).clamp(160.0, 220.0).toDouble();
-
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 900),
-      curve: Curves.easeInOut,
-      builder: (context, value, child) => Opacity(
-        opacity: value,
-        child: Transform.translate(
-          offset: Offset(0, (1 - value) * 16),
-          child: child,
-        ),
-      ),
-      child: AnimatedBuilder(
-        animation: _illustrationFloat,
-        builder: (context, child) => Transform.translate(
-          offset: Offset(0, _illustrationFloat.value),
-          child: child,
-        ),
+  Widget _buildDog(Color foreground) {
+    return AnimatedBuilder(
+      animation: _dogIdleController,
+      builder: (context, child) {
+        final t = Curves.easeInOutSine.transform(_dogIdleController.value);
+        return Transform.translate(
+          offset: Offset(0, -4 * t),
+          child: Transform.rotate(
+            angle: -0.05 + 0.1 * t,
+            alignment: const Alignment(0, 0.7),
+            child: child,
+          ),
+        );
+      },
+      child: Hero(
+        tag: 'auth-illustration-hero',
         child: SizedBox(
-          height: height,
+          width: 110,
+          height: 110,
           child: Image.asset(
             'assets/illustrations/petlink_login_dog.png',
             fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) =>
-                Icon(PhosphorIconsRegular.pawPrint, size: height * 0.4, color: foreground),
+                Icon(Icons.pets_rounded, size: 56, color: foreground),
           ),
         ),
       ),
     );
   }
 
+  // ---------------------------------------------------------------------------
+  // Formulario.
+  // ---------------------------------------------------------------------------
   Widget _buildForm(
     BuildContext context,
     AppLocalizations l10n,
     bool isLoading,
   ) {
     final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final buttonColor = isDark ? cs.primaryContainer : cs.primary;
+    final buttonForeground = isDark ? cs.onPrimaryContainer : Colors.white;
 
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Text(
+            l10n.authLoginTitle,
+            style: PetTypography.heading.copyWith(
+              fontWeight: FontWeight.w800,
+              color: cs.onSurface,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: PetSpacing.xl),
+
+          // Correo
           TextFormField(
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
-            decoration: _pillDecoration(
+            decoration: _inputDecoration(
               context,
-              label: l10n.authEmail,
-              hint: l10n.authEmailHint,
-              prefixIcon: const Icon(PhosphorIconsRegular.envelope),
+              hint: l10n.authEmail,
+              prefixIcon: Icons.email_outlined,
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -235,24 +295,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               return null;
             },
           ),
-          const SizedBox(height: PetSpacing.lg),
+          const SizedBox(height: PetSpacing.md),
+
+          // Contraseña
           TextFormField(
             controller: _passwordController,
             inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
             obscureText: _obscurePassword,
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => _submit(),
-            decoration: _pillDecoration(
+            decoration: _inputDecoration(
               context,
-              label: l10n.authPassword,
-              hint: l10n.authPasswordHint,
-              prefixIcon: const Icon(PhosphorIconsRegular.lockKey),
+              hint: l10n.authPassword,
+              prefixIcon: Icons.lock_outline_rounded,
               suffixIcon: IconButton(
                 tooltip: l10n.authPasswordVisibility,
                 icon: Icon(
                   _obscurePassword
-                      ? PhosphorIconsRegular.eye
-                      : PhosphorIconsRegular.eyeSlash,
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
                 ),
                 onPressed: () {
                   setState(() {
@@ -268,83 +329,233 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               return null;
             },
           ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () => context.go('/forgot-password'),
-              child: Text(l10n.authForgotPassword),
-            ),
-          ),
           const SizedBox(height: PetSpacing.sm),
+
+          // Fila intermedia: Recordarme + Olvidé mi contraseña
+          Row(
+            children: [
+              SizedBox(
+                width: 24,
+                height: 24,
+                child: Checkbox(
+                  value: _rememberMe,
+                  activeColor: buttonColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  side: BorderSide(color: cs.outline, width: 1.4),
+                  onChanged: (value) =>
+                      setState(() => _rememberMe = value ?? false),
+                ),
+              ),
+              const SizedBox(width: PetSpacing.xs),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() => _rememberMe = !_rememberMe),
+                  child: Text(
+                    'Recordarme',
+                    style: PetTypography.bodySmall.copyWith(
+                      color: cs.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () => context.go('/forgot-password'),
+                style: TextButton.styleFrom(
+                  foregroundColor: buttonColor,
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  textStyle: PetTypography.bodySmall.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                child: Text(l10n.authForgotPassword),
+              ),
+            ],
+          ),
+          const SizedBox(height: PetSpacing.lg),
+
+          // Botón principal (píldora)
           FilledButton(
             onPressed: isLoading ? null : _submit,
             style: FilledButton.styleFrom(
               minimumSize: const Size.fromHeight(56),
-              shape: const RoundedRectangleBorder(borderRadius: _pill),
-              textStyle: PetTypography.button,
+              backgroundColor: buttonColor,
+              foregroundColor: buttonForeground,
+              disabledBackgroundColor: buttonColor.withValues(alpha: 0.7),
+              elevation: 3,
+              shadowColor: buttonColor.withValues(alpha: 0.4),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              textStyle: PetTypography.button.copyWith(
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.2,
+              ),
             ),
             child: isLoading
-                ? _buildLoader(cs.onPrimary)
+                ? const SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2.5,
+                    ),
+                  )
                 : Text(l10n.authLogin),
           ),
-          const SizedBox(height: PetSpacing.md),
-          OutlinedButton.icon(
-            onPressed: isLoading ? null : _continueWithGoogle,
-            style: OutlinedButton.styleFrom(
-              minimumSize: const Size.fromHeight(56),
-              shape: const RoundedRectangleBorder(borderRadius: _pill),
-              side: BorderSide(color: cs.outlineVariant),
-              foregroundColor: cs.onSurface,
-              textStyle: PetTypography.button,
-            ),
-            icon: isLoading
-                ? _buildLoader(cs.primary)
-                : Icon(PhosphorIconsRegular.googleLogo, size: 28, color: cs.primary),
-            label: Text(l10n.authContinueWithGoogle),
+          const SizedBox(height: PetSpacing.xl),
+
+          // Separador
+          Row(
+            children: [
+              Expanded(child: Divider(color: cs.outlineVariant)),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: PetSpacing.md),
+                child: Text(
+                  'O continuar con',
+                  style: PetTypography.bodySmall.copyWith(
+                    color: cs.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              Expanded(child: Divider(color: cs.outlineVariant)),
+            ],
+          ),
+          const SizedBox(height: PetSpacing.lg),
+
+          // Google
+          _buildGoogleButton(context, l10n, isLoading),
+          const SizedBox(height: PetSpacing.lg),
+
+          // Enlace a registro
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '¿No tienes una cuenta?',
+                style: PetTypography.bodySmall.copyWith(
+                  color: cs.onSurfaceVariant,
+                ),
+              ),
+              TextButton(
+                onPressed: () => context.go('/register'),
+                style: TextButton.styleFrom(
+                  foregroundColor: buttonColor,
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  textStyle: PetTypography.bodySmall.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                child: Text(l10n.authCreateAccount),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  InputDecoration _pillDecoration(
-    BuildContext context, {
-    required String label,
-    required String hint,
-    Widget? prefixIcon,
-    Widget? suffixIcon,
-  }) {
+  Widget _buildGoogleButton(
+    BuildContext context,
+    AppLocalizations l10n,
+    bool isLoading,
+  ) {
     final cs = Theme.of(context).colorScheme;
-    OutlineInputBorder border(Color color, [double width = 1]) =>
-        OutlineInputBorder(
-          borderRadius: _pill,
-          borderSide: BorderSide(color: color, width: width),
-        );
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return InputDecoration(
-      labelText: label,
-      hintText: hint,
-      prefixIcon: prefixIcon,
-      suffixIcon: suffixIcon,
-      filled: true,
-      fillColor: cs.surfaceContainerHighest,
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: PetSpacing.xl,
-        vertical: PetSpacing.lg,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      border: border(Colors.transparent),
-      enabledBorder: border(Colors.transparent),
-      focusedBorder: border(cs.primary, 1.5),
-      errorBorder: border(cs.error),
-      focusedErrorBorder: border(cs.error, 1.5),
+      child: Material(
+        color: isDark ? cs.surfaceContainerHighest : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: isLoading ? null : _continueWithGoogle,
+          child: Container(
+            height: 56,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: cs.outlineVariant.withValues(alpha: 0.6),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                isLoading
+                    ? SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: cs.primary,
+                        ),
+                      )
+                    : Icon(
+                        Icons.g_mobiledata_rounded,
+                        size: 32,
+                        color: cs.primary,
+                      ),
+                const SizedBox(width: PetSpacing.xs),
+                Text(
+                  l10n.authContinueWithGoogle,
+                  style: PetTypography.button.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: cs.onSurface,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildLoader(Color color) {
-    return SizedBox(
-      height: 22,
-      width: 22,
-      child: CircularProgressIndicator(strokeWidth: 2.5, color: color),
+  InputDecoration _inputDecoration(
+    BuildContext context, {
+    required String hint,
+    required IconData prefixIcon,
+    Widget? suffixIcon,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    OutlineInputBorder border([
+      Color color = Colors.transparent,
+      double w = 1,
+    ]) => OutlineInputBorder(
+      borderRadius: BorderRadius.circular(16),
+      borderSide: BorderSide(color: color, width: w),
+    );
+
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: TextStyle(color: cs.onSurfaceVariant.withValues(alpha: 0.8)),
+      prefixIcon: Icon(prefixIcon, color: cs.onSurfaceVariant),
+      suffixIcon: suffixIcon,
+      suffixIconColor: cs.onSurfaceVariant,
+      filled: true,
+      fillColor: isDark ? cs.surfaceContainerHighest : _fieldFill,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: PetSpacing.lg,
+        vertical: 18,
+      ),
+      border: border(),
+      enabledBorder: border(),
+      focusedBorder: border(cs.primary, 1.6),
+      errorBorder: border(cs.error),
+      focusedErrorBorder: border(cs.error, 1.6),
     );
   }
 }
