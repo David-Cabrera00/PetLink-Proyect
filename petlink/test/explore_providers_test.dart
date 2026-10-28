@@ -114,4 +114,7 @@ class _FakePetReportRepository implements PetReportRepository {
   Future<PetReport> createReport(ReportDraft draft) {
     throw UnimplementedError();
   }
+
+  @override
+  Future<void> deleteReport(String id) async {}
 }

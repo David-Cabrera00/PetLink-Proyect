@@ -13,7 +13,7 @@ void main() {
     expect(find.byType(Image), findsOneWidget);
     expect(find.text('Iniciar sesión'), findsNothing);
 
-    await tester.pump(const Duration(milliseconds: 2500));
+    await tester.pump(const Duration(milliseconds: 3100));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 600));
 

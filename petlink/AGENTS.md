@@ -251,10 +251,9 @@ Cambios recientes ya implementados:
 - Reportes propios identificados mediante `isOwner`; Radar excluye los propios y Explorar ofrece `Mis reportes`.
 - Los marcadores propios usan un color diferente y los propietarios no pueden enviarse avistamientos a sí mismos.
 - Las fotos principales del detalle se muestran completas con `BoxFit.contain`, sin recorte.
+- Marcar notificaciones como leídas y abrirlas desde Actividad hacia el reporte correspondiente, con indicador de no leídos en la barra de navegación y sincronización en backend.
 
 Pendiente:
-
-- Marcar notificaciones como leídas y permitir abrirlas desde Actividad.
 
 - Push en segundo plano con FCM/APNs.
 - Integrar automáticamente el análisis de IA al subir fotos.

@@ -144,6 +144,57 @@ class AppLocalizationsEs extends AppLocalizations {
       'Recibe notificaciones sobre coincidencias y actualizaciones.';
 
   @override
+  String get activityEmpty => 'Todavía no hay actividad';
+
+  @override
+  String get activityError => 'No se pudo cargar la actividad';
+
+  @override
+  String get activityRetry => 'Reintentar';
+
+  @override
+  String get activityMarkAllAsRead => 'Marcar todo como leído';
+
+  @override
+  String get activityAllRead => 'Al día';
+
+  @override
+  String get activityUnread => 'No leído';
+
+  @override
+  String get activityStatusActive => 'Activo';
+
+  @override
+  String get activityStatusRecovered => 'Recuperado';
+
+  @override
+  String get activityStatusPossibleMatch => 'Posible coincidencia';
+
+  @override
+  String get activityStatusClosed => 'Cerrado';
+
+  @override
+  String get activityStatusUnknown => 'Sin estado';
+
+  @override
+  String get activityTimeJustNow => 'Hace un momento';
+
+  @override
+  String activityTimeMinutesAgo(int minutes) {
+    return 'Hace $minutes min';
+  }
+
+  @override
+  String activityTimeHoursAgo(int hours) {
+    return 'Hace $hours h';
+  }
+
+  @override
+  String activityTimeDaysAgo(int days) {
+    return 'Hace $days d';
+  }
+
+  @override
   String get reportsTitle => 'Mis reportes';
 
   @override
@@ -789,4 +840,38 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get profileLogout => 'Cerrar sesión';
+
+  @override
+  String get authRememberMe => 'Recordarme';
+
+  @override
+  String get authOrContinueWith => 'O continuar con';
+
+  @override
+  String get authNoAccount => '¿No tienes una cuenta?';
+
+  @override
+  String get authAlreadyHaveAccount => '¿Ya tienes una cuenta?';
+
+  @override
+  String get reportReviewSubtitle =>
+      'Verifica que la información sea correcta antes de publicar';
+
+  @override
+  String get unnamedPet => 'Mascota sin nombre';
+
+  @override
+  String get foundPet => 'Mascota encontrada';
+
+  @override
+  String get noPhotosAttached => 'Sin fotografía adjunta';
+
+  @override
+  String get locationNotSpecified => 'Ubicación no especificada';
+
+  @override
+  String get lastSeenAtPrefix => 'Última vez vista';
+
+  @override
+  String get foundDatePrefix => 'Fecha de hallazgo';
 }

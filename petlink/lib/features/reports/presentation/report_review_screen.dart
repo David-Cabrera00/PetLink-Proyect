@@ -72,7 +72,7 @@ class _ReportReviewScreenState extends ConsumerState<ReportReviewScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Verifica que la información sea correcta antes de publicar',
+                      l10n.reportReviewSubtitle,
                       style: Theme.of(context).textTheme.bodyMedium
                           ?.copyWith(color: cs.onSurfaceVariant),
                     ),
@@ -111,6 +111,7 @@ class _ReportReviewScreenState extends ConsumerState<ReportReviewScreen> {
     ReportDraft draft,
     bool isLost,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final hasPhotos = draft.photos.isNotEmpty;
@@ -202,7 +203,7 @@ class _ReportReviewScreenState extends ConsumerState<ReportReviewScreen> {
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        isLost ? 'Pérdida' : 'Encontrada',
+                        isLost ? l10n.statusLost : l10n.statusFound,
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
@@ -263,7 +264,7 @@ class _ReportReviewScreenState extends ConsumerState<ReportReviewScreen> {
                 Text(
                   draft.name.trim().isNotEmpty
                       ? draft.name.trim()
-                      : (isLost ? 'Mascota sin nombre' : 'Mascota encontrada'),
+                      : (isLost ? l10n.unnamedPet : l10n.foundPet),
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontSize: 23,
                     fontWeight: FontWeight.w800,
@@ -305,6 +306,7 @@ class _ReportReviewScreenState extends ConsumerState<ReportReviewScreen> {
   }
 
   Widget _buildPhotoPlaceholder(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     return Container(
       color: cs.surfaceContainerHighest,
@@ -319,7 +321,7 @@ class _ReportReviewScreenState extends ConsumerState<ReportReviewScreen> {
             ),
             const SizedBox(height: 6),
             Text(
-              'Sin fotografía adjunta',
+              l10n.noPhotosAttached,
               style: TextStyle(
                 fontSize: 12,
                 color: cs.onSurfaceVariant.withValues(alpha: 0.6),
@@ -522,7 +524,7 @@ class _ReportReviewScreenState extends ConsumerState<ReportReviewScreen> {
                     Text(
                       draft.address.trim().isNotEmpty
                           ? draft.address.trim()
-                          : 'Ubicación no especificada',
+                          : l10n.locationNotSpecified,
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -578,8 +580,8 @@ class _ReportReviewScreenState extends ConsumerState<ReportReviewScreen> {
                     const SizedBox(height: 2),
                     Text(
                       isLost
-                          ? 'Última vez vista: $dateText'
-                          : 'Fecha de hallazgo: $dateText',
+                          ? '${l10n.lastSeenAtPrefix}: $dateText'
+                          : '${l10n.foundDatePrefix}: $dateText',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,

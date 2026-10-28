@@ -60,6 +60,36 @@
   "exploreViewReport": "View report",
   "activityRecent": "Recent Activity",
   "activityDescription": "Receive notifications about matches and updates.",
+  "activityEmpty": "There is no activity yet",
+  "activityError": "Could not load activity",
+  "activityRetry": "Retry",
+  "activityMarkAllAsRead": "Mark all as read",
+  "activityAllRead": "Up to date",
+  "activityUnread": "Unread",
+  "activityStatusActive": "Active",
+  "activityStatusRecovered": "Recovered",
+  "activityStatusPossibleMatch": "Possible match",
+  "activityStatusClosed": "Closed",
+  "activityStatusUnknown": "Unknown status",
+  "activityTimeJustNow": "Just now",
+  "activityTimeMinutesAgo": "{minutes}m ago",
+  "@activityTimeMinutesAgo": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "activityTimeHoursAgo": "{hours}h ago",
+  "@activityTimeHoursAgo": {
+    "placeholders": {
+      "hours": { "type": "int" }
+    }
+  },
+  "activityTimeDaysAgo": "{days}d ago",
+  "@activityTimeDaysAgo": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
   "reportsTitle": "My reports",
   "reportsFilterActive": "Active",
   "reportsFilterRecovered": "Recovered",
@@ -296,6 +326,17 @@
   "authForgotPasswordTitle": "Reset your password",
   "authForgotPasswordDescription": "We will send instructions to help you regain access to your account.",
   "authSendInstructions": "Send instructions",
-  "authForgotPasswordConfirmation": "If the email is registered, you will receive instructions to reset your password."
-  ,"profileLogout": "Sign out"
+  "authForgotPasswordConfirmation": "If the email is registered, you will receive instructions to reset your password.",
+  "profileLogout": "Sign out",
+  "authRememberMe": "Remember me",
+  "authOrContinueWith": "Or continue with",
+  "authNoAccount": "Don't have an account?",
+  "authAlreadyHaveAccount": "Already have an account?",
+  "reportReviewSubtitle": "Verify that the information is correct before publishing",
+  "unnamedPet": "Unnamed pet",
+  "foundPet": "Found pet",
+  "noPhotosAttached": "No photo attached",
+  "locationNotSpecified": "Location not specified",
+  "lastSeenAtPrefix": "Last seen",
+  "foundDatePrefix": "Found date"
 }

@@ -417,7 +417,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '¿Ya tienes una cuenta?',
+                l10n.authAlreadyHaveAccount,
                 style: PetTypography.bodySmall.copyWith(
                   color: cs.onSurfaceVariant,
                 ),

@@ -338,6 +338,96 @@ abstract class AppLocalizations {
   /// **'Recibe notificaciones sobre coincidencias y actualizaciones.'**
   String get activityDescription;
 
+  /// No description provided for @activityEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no hay actividad'**
+  String get activityEmpty;
+
+  /// No description provided for @activityError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo cargar la actividad'**
+  String get activityError;
+
+  /// No description provided for @activityRetry.
+  ///
+  /// In es, this message translates to:
+  /// **'Reintentar'**
+  String get activityRetry;
+
+  /// No description provided for @activityMarkAllAsRead.
+  ///
+  /// In es, this message translates to:
+  /// **'Marcar todo como leído'**
+  String get activityMarkAllAsRead;
+
+  /// No description provided for @activityAllRead.
+  ///
+  /// In es, this message translates to:
+  /// **'Al día'**
+  String get activityAllRead;
+
+  /// No description provided for @activityUnread.
+  ///
+  /// In es, this message translates to:
+  /// **'No leído'**
+  String get activityUnread;
+
+  /// No description provided for @activityStatusActive.
+  ///
+  /// In es, this message translates to:
+  /// **'Activo'**
+  String get activityStatusActive;
+
+  /// No description provided for @activityStatusRecovered.
+  ///
+  /// In es, this message translates to:
+  /// **'Recuperado'**
+  String get activityStatusRecovered;
+
+  /// No description provided for @activityStatusPossibleMatch.
+  ///
+  /// In es, this message translates to:
+  /// **'Posible coincidencia'**
+  String get activityStatusPossibleMatch;
+
+  /// No description provided for @activityStatusClosed.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrado'**
+  String get activityStatusClosed;
+
+  /// No description provided for @activityStatusUnknown.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin estado'**
+  String get activityStatusUnknown;
+
+  /// No description provided for @activityTimeJustNow.
+  ///
+  /// In es, this message translates to:
+  /// **'Hace un momento'**
+  String get activityTimeJustNow;
+
+  /// No description provided for @activityTimeMinutesAgo.
+  ///
+  /// In es, this message translates to:
+  /// **'Hace {minutes} min'**
+  String activityTimeMinutesAgo(int minutes);
+
+  /// No description provided for @activityTimeHoursAgo.
+  ///
+  /// In es, this message translates to:
+  /// **'Hace {hours} h'**
+  String activityTimeHoursAgo(int hours);
+
+  /// No description provided for @activityTimeDaysAgo.
+  ///
+  /// In es, this message translates to:
+  /// **'Hace {days} d'**
+  String activityTimeDaysAgo(int days);
+
   /// No description provided for @reportsTitle.
   ///
   /// In es, this message translates to:
@@ -1555,6 +1645,72 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Cerrar sesión'**
   String get profileLogout;
+
+  /// No description provided for @authRememberMe.
+  ///
+  /// In es, this message translates to:
+  /// **'Recordarme'**
+  String get authRememberMe;
+
+  /// No description provided for @authOrContinueWith.
+  ///
+  /// In es, this message translates to:
+  /// **'O continuar con'**
+  String get authOrContinueWith;
+
+  /// No description provided for @authNoAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'¿No tienes una cuenta?'**
+  String get authNoAccount;
+
+  /// No description provided for @authAlreadyHaveAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Ya tienes una cuenta?'**
+  String get authAlreadyHaveAccount;
+
+  /// No description provided for @reportReviewSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Verifica que la información sea correcta antes de publicar'**
+  String get reportReviewSubtitle;
+
+  /// No description provided for @unnamedPet.
+  ///
+  /// In es, this message translates to:
+  /// **'Mascota sin nombre'**
+  String get unnamedPet;
+
+  /// No description provided for @foundPet.
+  ///
+  /// In es, this message translates to:
+  /// **'Mascota encontrada'**
+  String get foundPet;
+
+  /// No description provided for @noPhotosAttached.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin fotografía adjunta'**
+  String get noPhotosAttached;
+
+  /// No description provided for @locationNotSpecified.
+  ///
+  /// In es, this message translates to:
+  /// **'Ubicación no especificada'**
+  String get locationNotSpecified;
+
+  /// No description provided for @lastSeenAtPrefix.
+  ///
+  /// In es, this message translates to:
+  /// **'Última vez vista'**
+  String get lastSeenAtPrefix;
+
+  /// No description provided for @foundDatePrefix.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha de hallazgo'**
+  String get foundDatePrefix;
 }
 
 class _AppLocalizationsDelegate

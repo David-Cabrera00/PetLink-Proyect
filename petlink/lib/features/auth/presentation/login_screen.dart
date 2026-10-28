@@ -353,7 +353,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                 child: GestureDetector(
                   onTap: () => setState(() => _rememberMe = !_rememberMe),
                   child: Text(
-                    'Recordarme',
+                    l10n.authRememberMe,
                     style: PetTypography.bodySmall.copyWith(
                       color: cs.onSurfaceVariant,
                     ),
@@ -413,7 +413,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: PetSpacing.md),
                 child: Text(
-                  'O continuar con',
+                  l10n.authOrContinueWith,
                   style: PetTypography.bodySmall.copyWith(
                     color: cs.onSurfaceVariant,
                   ),
@@ -433,7 +433,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '¿No tienes una cuenta?',
+                l10n.authNoAccount,
                 style: PetTypography.bodySmall.copyWith(
                   color: cs.onSurfaceVariant,
                 ),
