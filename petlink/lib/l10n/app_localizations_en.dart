@@ -143,6 +143,57 @@ class AppLocalizationsEn extends AppLocalizations {
       'Receive notifications about matches and updates.';
 
   @override
+  String get activityEmpty => 'There is no activity yet';
+
+  @override
+  String get activityError => 'Could not load activity';
+
+  @override
+  String get activityRetry => 'Retry';
+
+  @override
+  String get activityMarkAllAsRead => 'Mark all as read';
+
+  @override
+  String get activityAllRead => 'Up to date';
+
+  @override
+  String get activityUnread => 'Unread';
+
+  @override
+  String get activityStatusActive => 'Active';
+
+  @override
+  String get activityStatusRecovered => 'Recovered';
+
+  @override
+  String get activityStatusPossibleMatch => 'Possible match';
+
+  @override
+  String get activityStatusClosed => 'Closed';
+
+  @override
+  String get activityStatusUnknown => 'Unknown status';
+
+  @override
+  String get activityTimeJustNow => 'Just now';
+
+  @override
+  String activityTimeMinutesAgo(int minutes) {
+    return '${minutes}m ago';
+  }
+
+  @override
+  String activityTimeHoursAgo(int hours) {
+    return '${hours}h ago';
+  }
+
+  @override
+  String activityTimeDaysAgo(int days) {
+    return '${days}d ago';
+  }
+
+  @override
   String get reportsTitle => 'My reports';
 
   @override

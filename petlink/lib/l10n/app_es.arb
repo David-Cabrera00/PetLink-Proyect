@@ -60,6 +60,36 @@
   "exploreViewReport": "Ver reporte",
   "activityRecent": "Actividad Reciente",
   "activityDescription": "Recibe notificaciones sobre coincidencias y actualizaciones.",
+  "activityEmpty": "Todavía no hay actividad",
+  "activityError": "No se pudo cargar la actividad",
+  "activityRetry": "Reintentar",
+  "activityMarkAllAsRead": "Marcar todo como leído",
+  "activityAllRead": "Al día",
+  "activityUnread": "No leído",
+  "activityStatusActive": "Activo",
+  "activityStatusRecovered": "Recuperado",
+  "activityStatusPossibleMatch": "Posible coincidencia",
+  "activityStatusClosed": "Cerrado",
+  "activityStatusUnknown": "Sin estado",
+  "activityTimeJustNow": "Hace un momento",
+  "activityTimeMinutesAgo": "Hace {minutes} min",
+  "@activityTimeMinutesAgo": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "activityTimeHoursAgo": "Hace {hours} h",
+  "@activityTimeHoursAgo": {
+    "placeholders": {
+      "hours": { "type": "int" }
+    }
+  },
+  "activityTimeDaysAgo": "Hace {days} d",
+  "@activityTimeDaysAgo": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
   "reportsTitle": "Mis reportes",
   "reportsFilterActive": "Activos",
   "reportsFilterRecovered": "Recuperados",

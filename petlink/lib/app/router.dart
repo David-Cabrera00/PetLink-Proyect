@@ -20,6 +20,7 @@ import '../features/reports/presentation/report_published_screen.dart';
 import '../features/reports/presentation/report_sighting_screen.dart';
 import '../features/matches/presentation/match_detail_screen.dart';
 import '../features/activity/activity_screen.dart';
+import '../features/activity/providers/activity_providers.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/create_account_screen.dart';
@@ -255,7 +256,7 @@ class _AuthRouterRefresh extends ChangeNotifier {
   }
 }
 
-class ScaffoldWithNav extends StatelessWidget {
+class ScaffoldWithNav extends ConsumerWidget {
   final Widget child;
 
   const ScaffoldWithNav({super.key, required this.child});
@@ -270,11 +271,12 @@ class ScaffoldWithNav extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final location = GoRouterState.of(context).uri.toString();
     final currentIndex = _indexFromLocation(location);
     final cs = Theme.of(context).colorScheme;
+    final unreadCount = ref.watch(unreadActivityCountProvider);
     final selectionAlignment = switch (currentIndex) {
       0 => Alignment.centerLeft,
       1 => const Alignment(-0.5, 0),
@@ -406,6 +408,7 @@ class ScaffoldWithNav extends StatelessWidget {
                                     selectedIcon: PhosphorIconsFill.bell,
                                     label: l10n.navigationActivity,
                                     selected: currentIndex == 3,
+                                    badgeCount: unreadCount,
                                     onTap: () => context.go('/activity'),
                                   ),
                                   _LiquidNavItem(
@@ -439,6 +442,7 @@ class _LiquidNavItem extends StatefulWidget {
   final String label;
   final bool selected;
   final bool isPrimary;
+  final int badgeCount;
   final VoidCallback onTap;
 
   const _LiquidNavItem({
@@ -448,6 +452,7 @@ class _LiquidNavItem extends StatefulWidget {
     required this.selected,
     required this.onTap,
     this.isPrimary = false,
+    this.badgeCount = 0,
   });
 
   @override
@@ -498,18 +503,40 @@ class _LiquidNavItemState extends State<_LiquidNavItem> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 180),
-                    transitionBuilder: (child, animation) =>
-                        ScaleTransition(scale: animation, child: child),
-                    child: Icon(
-                      widget.selected ? widget.selectedIcon : widget.icon,
-                      key: ValueKey(widget.selected),
-                      size: 22,
-                      color: widget.selected
-                          ? selectedForeground
-                          : cs.onSurfaceVariant,
-                    ),
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 180),
+                        transitionBuilder: (child, animation) =>
+                            ScaleTransition(scale: animation, child: child),
+                        child: Icon(
+                          widget.selected ? widget.selectedIcon : widget.icon,
+                          key: ValueKey(widget.selected),
+                          size: 22,
+                          color: widget.selected
+                              ? selectedForeground
+                              : cs.onSurfaceVariant,
+                        ),
+                      ),
+                      if (widget.badgeCount > 0)
+                        Positioned(
+                          top: -1,
+                          right: -5,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: cs.primary,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Theme.of(context).colorScheme.surface,
+                                width: 1.5,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 2),
                   Text(

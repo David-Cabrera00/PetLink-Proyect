@@ -144,6 +144,57 @@ class AppLocalizationsEs extends AppLocalizations {
       'Recibe notificaciones sobre coincidencias y actualizaciones.';
 
   @override
+  String get activityEmpty => 'Todavía no hay actividad';
+
+  @override
+  String get activityError => 'No se pudo cargar la actividad';
+
+  @override
+  String get activityRetry => 'Reintentar';
+
+  @override
+  String get activityMarkAllAsRead => 'Marcar todo como leído';
+
+  @override
+  String get activityAllRead => 'Al día';
+
+  @override
+  String get activityUnread => 'No leído';
+
+  @override
+  String get activityStatusActive => 'Activo';
+
+  @override
+  String get activityStatusRecovered => 'Recuperado';
+
+  @override
+  String get activityStatusPossibleMatch => 'Posible coincidencia';
+
+  @override
+  String get activityStatusClosed => 'Cerrado';
+
+  @override
+  String get activityStatusUnknown => 'Sin estado';
+
+  @override
+  String get activityTimeJustNow => 'Hace un momento';
+
+  @override
+  String activityTimeMinutesAgo(int minutes) {
+    return 'Hace $minutes min';
+  }
+
+  @override
+  String activityTimeHoursAgo(int hours) {
+    return 'Hace $hours h';
+  }
+
+  @override
+  String activityTimeDaysAgo(int days) {
+    return 'Hace $days d';
+  }
+
+  @override
   String get reportsTitle => 'Mis reportes';
 
   @override

@@ -60,6 +60,36 @@
   "exploreViewReport": "View report",
   "activityRecent": "Recent Activity",
   "activityDescription": "Receive notifications about matches and updates.",
+  "activityEmpty": "There is no activity yet",
+  "activityError": "Could not load activity",
+  "activityRetry": "Retry",
+  "activityMarkAllAsRead": "Mark all as read",
+  "activityAllRead": "Up to date",
+  "activityUnread": "Unread",
+  "activityStatusActive": "Active",
+  "activityStatusRecovered": "Recovered",
+  "activityStatusPossibleMatch": "Possible match",
+  "activityStatusClosed": "Closed",
+  "activityStatusUnknown": "Unknown status",
+  "activityTimeJustNow": "Just now",
+  "activityTimeMinutesAgo": "{minutes}m ago",
+  "@activityTimeMinutesAgo": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "activityTimeHoursAgo": "{hours}h ago",
+  "@activityTimeHoursAgo": {
+    "placeholders": {
+      "hours": { "type": "int" }
+    }
+  },
+  "activityTimeDaysAgo": "{days}d ago",
+  "@activityTimeDaysAgo": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
   "reportsTitle": "My reports",
   "reportsFilterActive": "Active",
   "reportsFilterRecovered": "Recovered",
