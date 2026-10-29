@@ -7,5 +7,11 @@ Widget buildLocalPhotoPreview(
   required double height,
   required Widget Function(BuildContext, Object, StackTrace?) errorBuilder,
 }) {
-  return Image.network(path, fit: fit, width: width, height: height, errorBuilder: errorBuilder);
+  return Image.network(
+    path,
+    fit: fit,
+    width: width,
+    height: height,
+    errorBuilder: errorBuilder,
+  );
 }
