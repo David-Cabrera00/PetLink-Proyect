@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 Widget buildLocalPhotoPreview(
@@ -8,5 +9,11 @@ Widget buildLocalPhotoPreview(
   required double height,
   required Widget Function(BuildContext, Object, StackTrace?) errorBuilder,
 }) {
-  return Image.file(File(path), fit: fit, width: width, height: height, errorBuilder: errorBuilder);
+  return Image.file(
+    File(path),
+    fit: fit,
+    width: width,
+    height: height,
+    errorBuilder: errorBuilder,
+  );
 }
