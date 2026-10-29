@@ -12,12 +12,16 @@ import '../../../shared/repositories/remote/remote_match_repository.dart';
 
 final petReportRepositoryProvider = Provider<PetReportRepository>((ref) {
   final client = ApiClient.instance;
-  return client.isConfigured ? RemotePetReportRepository(client) : MockPetReportRepository();
+  return client.isConfigured
+      ? RemotePetReportRepository(client)
+      : MockPetReportRepository();
 });
 
 final matchRepositoryProvider = Provider<MatchRepository>((ref) {
   final client = ApiClient.instance;
-  return client.isConfigured ? RemoteMatchRepository(client) : MockMatchRepository();
+  return client.isConfigured
+      ? RemoteMatchRepository(client)
+      : MockMatchRepository();
 });
 
 final nearbyReportsProvider = FutureProvider<List<PetReport>>((ref) async {
