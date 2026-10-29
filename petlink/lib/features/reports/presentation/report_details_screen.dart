@@ -4,14 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../../core/theme/pet_colors.dart';
-import '../../../core/theme/pet_spacing.dart';
-import '../../../core/theme/pet_radius.dart';
-import '../../../design_system/buttons/pet_button.dart';
-import '../../../design_system/inputs/pet_input.dart';
+import '../../../core/theme/pet_tokens.dart';
 import '../../../shared/models/pet_report.dart';
-import '../../../shared/widgets/step_indicator.dart';
 import '../providers/report_draft_provider.dart';
+import 'widgets/report_flow_stepper.dart';
 
 class ReportDetailsScreen extends ConsumerStatefulWidget {
   const ReportDetailsScreen({super.key});
@@ -25,8 +21,9 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _traitsController;
   late final TextEditingController _descriptionController;
-  late final TextEditingController _dateTimeController;
-  DateTime? _selectedDateTime;
+
+  DateTime _selectedDate = DateTime.now();
+  TimeOfDay _selectedTime = TimeOfDay.now();
 
   @override
   void initState() {
@@ -34,18 +31,97 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
     final draft = ref.read(reportDraftProvider);
     _traitsController = TextEditingController(text: draft.traits);
     _descriptionController = TextEditingController(text: draft.description);
-    _selectedDateTime = draft.lastSeenAt;
-    _dateTimeController = TextEditingController(
-      text: draft.lastSeenAt != null ? _formatDateTime(draft.lastSeenAt!) : '',
-    );
+    if (draft.lastSeenAt != null) {
+      _selectedDate = draft.lastSeenAt!;
+      _selectedTime = TimeOfDay.fromDateTime(draft.lastSeenAt!);
+    }
   }
 
   @override
   void dispose() {
     _traitsController.dispose();
     _descriptionController.dispose();
-    _dateTimeController.dispose();
     super.dispose();
+  }
+
+  void _saveDetails() {
+    final combinedDateTime = DateTime(
+      _selectedDate.year,
+      _selectedDate.month,
+      _selectedDate.day,
+      _selectedTime.hour,
+      _selectedTime.minute,
+    );
+
+    final notifier = ref.read(reportDraftProvider.notifier);
+    notifier.setTraits(_traitsController.text.trim());
+    notifier.setDescription(_descriptionController.text.trim());
+    notifier.setLastSeenAt(combinedDateTime);
+  }
+
+  void _onContinue() {
+    if (_formKey.currentState?.validate() ?? true) {
+      _saveDetails();
+      context.push('/report/new/review');
+    }
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: PetTokens.plum,
+              onPrimary: Colors.white,
+              surface: PetTokens.surface,
+              onSurface: PetTokens.ink,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() => _selectedDate = picked);
+    }
+  }
+
+  Future<void> _pickTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _selectedTime,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: PetTokens.plum,
+              onPrimary: Colors.white,
+              surface: PetTokens.surface,
+              onSurface: PetTokens.ink,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() => _selectedTime = picked);
+    }
+  }
+
+  String _formatDate(DateTime dt) {
+    return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}';
+  }
+
+  String _formatTime(TimeOfDay t) {
+    final hour = t.hourOfPeriod == 0 ? 12 : t.hourOfPeriod;
+    final period = t.period == DayPeriod.am ? 'AM' : 'PM';
+    return '$hour:${t.minute.toString().padLeft(2, '0')} $period';
   }
 
   @override
@@ -53,273 +129,374 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
     final l10n = AppLocalizations.of(context)!;
     final draft = ref.watch(reportDraftProvider);
     final isLost = draft.reportType == ReportType.lost;
-    final isFound = draft.reportType == ReportType.found;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.reportDetailsTitle),
-        leading: IconButton(
-          icon: const Icon(PhosphorIconsRegular.arrowLeft),
-          onPressed: () => context.go('/report/new/location'),
-        ),
-      ),
+      backgroundColor: PetTokens.bgOf(context),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(PetSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const StepIndicator(current: 5, total: 6),
-              const SizedBox(height: PetSpacing.xl),
-              Text(
-                l10n.reportDetailsHeading,
-                style: Theme.of(context).textTheme.displaySmall,
-              ),
-              const SizedBox(height: PetSpacing.xs),
-              Text(
-                l10n.reportDetailsDescription,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: PetSpacing.xl),
-              Expanded(
+        bottom: false,
+        child: Column(
+          children: [
+            // Stepper oficial Paso 5 de 6
+            ReportFlowStepper(
+              currentStep: 5,
+              stepTitle: l10n.reportDetailsTitle,
+              onBack: () {
+                _saveDetails();
+                context.pop();
+              },
+            ),
+
+            // Contenido escroleable
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(
+                  PetTokens.gutter,
+                  12,
+                  PetTokens.gutter,
+                  110,
+                ),
                 child: Form(
                   key: _formKey,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        PetInput(
-                          label: l10n.reportDetailsTraits,
-                          hint: l10n.reportDetailsTraitsHint,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Título según Paso5Detalles.dc.html
+                      Text(
+                        l10n.reportDetailsHeading,
+                        style: PetTokens.displayThemed(context, 34),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        l10n.reportDetailsDescription,
+                        style: PetTokens.bodyThemed(context, 15, color: PetTokens.mutedOf(context)),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Estructura timeline con 3 nodos
+                      _TimelineFormRow(
+                        icon: PhosphorIconsBold.star,
+                        nodeColor: PetTokens.plum,
+                        isLast: false,
+                        label: l10n.reportDetailsTraits,
+                        child: TextFormField(
                           controller: _traitsController,
-                          maxLines: 3,
+                          maxLines: 2,
+                          style: PetTokens.body(15, color: PetTokens.ink),
+                          decoration: InputDecoration(
+                            hintText: l10n.reportDetailsTraitsHint,
+                            hintStyle: PetTokens.body(
+                              14,
+                              color: PetTokens.placeholder,
+                            ),
+                            filled: true,
+                            fillColor: PetTokens.surface,
+                            contentPadding: const EdgeInsets.all(14),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(
+                                color: PetTokens.border,
+                                width: 1.5,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(
+                                color: PetTokens.plum,
+                                width: 2.0,
+                              ),
+                            ),
+                          ),
                         ),
-                        const SizedBox(height: PetSpacing.md),
-                        PetInput(
-                          label: isLost
-                              ? l10n.reportDetailsLostQuestion
-                              : l10n.reportDetailsFoundQuestion,
-                          hint: l10n.reportDetailsDescriptionHint,
+                      ),
+                      const SizedBox(height: 18),
+
+                      _TimelineFormRow(
+                        icon: PhosphorIconsBold.chatText,
+                        nodeColor: PetTokens.plum,
+                        isLast: false,
+                        label: isLost
+                            ? l10n.reportDetailsLostQuestion
+                            : l10n.reportDetailsFoundQuestion,
+                        child: TextFormField(
                           controller: _descriptionController,
-                          maxLines: 4,
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return l10n.requiredField;
-                            }
-                            return null;
-                          },
+                          maxLines: 3,
+                          style: PetTokens.body(15, color: PetTokens.ink),
+                          decoration: InputDecoration(
+                            hintText: l10n.reportDetailsDescriptionHint,
+                            hintStyle: PetTokens.body(
+                              14,
+                              color: PetTokens.placeholder,
+                            ),
+                            filled: true,
+                            fillColor: PetTokens.surface,
+                            contentPadding: const EdgeInsets.all(14),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(
+                                color: PetTokens.border,
+                                width: 1.5,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(
+                                color: PetTokens.plum,
+                                width: 2.0,
+                              ),
+                            ),
+                          ),
                         ),
-                        const SizedBox(height: PetSpacing.md),
-                        _buildDateTimePicker(context, ref, isLost),
-                        const SizedBox(height: PetSpacing.md),
-                        if (isFound) _buildIsPetWithFinder(context, ref),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 18),
+
+                      _TimelineFormRow(
+                        icon: PhosphorIconsBold.clock,
+                        nodeColor: PetTokens.clay,
+                        isHighlight: true,
+                        isLast: true,
+                        label: isLost
+                            ? l10n.reportDetailsDateLost
+                            : l10n.reportDetailsDateFound,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: InkWell(
+                                onTap: _pickDate,
+                                borderRadius: BorderRadius.circular(16),
+                                child: Container(
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: PetTokens.surface,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: PetTokens.border,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        PhosphorIconsRegular.calendar,
+                                        size: 18,
+                                        color: PetTokens.muted,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        _formatDate(_selectedDate),
+                                        style: PetTokens.body(
+                                          14,
+                                          color: PetTokens.ink,
+                                          weight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: InkWell(
+                                onTap: _pickTime,
+                                borderRadius: BorderRadius.circular(16),
+                                child: Container(
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: PetTokens.surface,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: PetTokens.border,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        PhosphorIconsRegular.clock,
+                                        size: 18,
+                                        color: PetTokens.muted,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        _formatTime(_selectedTime),
+                                        style: PetTokens.body(
+                                          14,
+                                          color: PetTokens.ink,
+                                          weight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(height: PetSpacing.lg),
-              _buildActionButtons(context, ref),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDateTimePicker(
-    BuildContext context,
-    WidgetRef ref,
-    bool isLost,
-  ) {
-    final l10n = AppLocalizations.of(context)!;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        PetInput(
-          label: isLost
-              ? l10n.reportDetailsDateLost
-              : l10n.reportDetailsDateFound,
-          hint: l10n.selectDateTime,
-          readOnly: true,
-          onTap: () => _pickDateTime(context, ref),
-          controller: _dateTimeController,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildIsPetWithFinder(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context)!;
-    final draft = ref.watch(reportDraftProvider);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          l10n.reportDetailsWithPet,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: PetColors.textSecondary,
-          ),
-        ),
-        const SizedBox(height: PetSpacing.md),
-        Row(
-          children: [
-            Expanded(
-              child: GestureDetector(
-                onTap: () => ref
-                    .read(reportDraftProvider.notifier)
-                    .setIsPetWithFinder(true),
-                child: _buildOptionCard(
-                  context,
-                  l10n.yes,
-                  PhosphorIconsRegular.checkCircle,
-                  draft.isPetWithFinder == true,
-                ),
-              ),
             ),
-            const SizedBox(width: PetSpacing.md),
-            Expanded(
-              child: GestureDetector(
-                onTap: () => ref
-                    .read(reportDraftProvider.notifier)
-                    .setIsPetWithFinder(false),
-                child: _buildOptionCard(
-                  context,
-                  l10n.no,
-                  PhosphorIconsRegular.xCircle,
-                  draft.isPetWithFinder == false,
-                ),
+
+            // Botones inferiores (Volver + Revisar)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                PetTokens.gutter,
+                0,
+                PetTokens.gutter,
+                24,
+              ),
+              child: Row(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      _saveDetails();
+                      context.pop();
+                    },
+                    borderRadius: BorderRadius.circular(18),
+                    child: Container(
+                      width: 110,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: PetTokens.plum, width: 1.5),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        l10n.backAction,
+                        style: PetTokens.body(
+                          15,
+                          color: PetTokens.plum,
+                          weight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: InkWell(
+                      onTap: _onContinue,
+                      borderRadius: BorderRadius.circular(18),
+                      child: Container(
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: PetTokens.plum,
+                          borderRadius: BorderRadius.circular(18),
+                          boxShadow: PetTokens.shadowButton,
+                        ),
+                        alignment: Alignment.center,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              l10n.continueAction,
+                              style: PetTokens.body(
+                                16,
+                                color: Colors.white,
+                                weight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Icon(
+                              Icons.arrow_forward_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
-      ],
-    );
-  }
-
-  Widget _buildOptionCard(
-    BuildContext context,
-    String label,
-    IconData icon,
-    bool selected,
-  ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: PetSpacing.md),
-      decoration: BoxDecoration(
-        color: selected ? PetColors.primarySoft : PetColors.surface,
-        borderRadius: PetRadius.lgAll,
-        border: Border.all(
-          color: selected ? PetColors.primary : PetColors.border,
-          width: selected ? 2 : 1,
-        ),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            icon,
-            color: selected ? PetColors.primary : PetColors.textSecondary,
-            size: 28,
-          ),
-          const SizedBox(height: PetSpacing.xs),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-              color: selected ? PetColors.primary : PetColors.textPrimary,
-            ),
-          ),
-        ],
       ),
     );
   }
+}
 
-  Widget _buildActionButtons(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context)!;
-    return Row(
+// -----------------------------------------------------------------------------
+// FILA TIMELINE CON NODO (Paso5Detalles.dc.html)
+// -----------------------------------------------------------------------------
+class _TimelineFormRow extends StatelessWidget {
+  const _TimelineFormRow({
+    required this.icon,
+    required this.nodeColor,
+    required this.label,
+    required this.child,
+    this.isHighlight = false,
+    this.isLast = false,
+  });
+
+  final IconData icon;
+  final Color nodeColor;
+  final String label;
+  final Widget child;
+  final bool isHighlight;
+  final bool isLast;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
       children: [
-        Expanded(
-          child: OutlinedButton(
-            onPressed: () => context.go('/report/new/location'),
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: PetSpacing.md),
+        if (!isLast)
+          Positioned(
+            left: 13,
+            top: 24,
+            bottom: -20,
+            child: Container(
+              width: 2,
+              color: PetTokens.plum.withValues(alpha: 0.3),
             ),
-            child: Text(l10n.backAction),
+          ),
+        Padding(
+          padding: const EdgeInsets.only(left: 38),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: PetTokens.body(
+                  14,
+                  color: PetTokens.ink,
+                  weight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 8),
+              child,
+            ],
           ),
         ),
-        const SizedBox(width: PetSpacing.md),
-        Expanded(
-          child: PetButton(
-            label: l10n.continueAction,
-            onPressed: () {
-              if (_formKey.currentState?.validate() ?? false) {
-                if (_selectedDateTime == null) {
-                  _showError(context, l10n.selectDateTimeError);
-                  return;
-                }
-                _saveDetails(ref);
-                context.go('/report/new/review');
-              }
-            },
-            icon: PhosphorIconsRegular.arrowRight,
+        Positioned(
+          left: 0,
+          top: 0,
+          child: Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: isHighlight ? nodeColor : PetTokens.cream,
+              shape: BoxShape.circle,
+              border: Border.all(color: nodeColor, width: 2),
+            ),
+            alignment: Alignment.center,
+            child: Icon(
+              icon,
+              size: 14,
+              color: isHighlight ? Colors.white : nodeColor,
+            ),
           ),
         ),
       ],
-    );
-  }
-
-  void _saveDetails(WidgetRef ref) {
-    final notifier = ref.read(reportDraftProvider.notifier);
-    notifier.setTraits(_traitsController.text.trim());
-    notifier.setDescription(_descriptionController.text.trim());
-    notifier.setLastSeenAt(_selectedDateTime!);
-  }
-
-  String _formatDateTime(DateTime dt) {
-    return '${dt.day}/${dt.month}/${dt.year} ${dt.hour}:${dt.minute.toString().padLeft(2, '0')}';
-  }
-
-  Future<void> _pickDateTime(BuildContext context, WidgetRef ref) async {
-    final initialDate = _selectedDateTime ?? DateTime.now();
-
-    final date = await showDatePicker(
-      context: context,
-      initialDate: initialDate,
-      firstDate: DateTime.now().subtract(const Duration(days: 365)),
-      lastDate: DateTime.now(),
-    );
-
-    if (date != null && context.mounted) {
-      final time = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.fromDateTime(initialDate),
-      );
-
-      if (time != null && context.mounted) {
-        final newDateTime = DateTime(
-          date.year,
-          date.month,
-          date.day,
-          time.hour,
-          time.minute,
-        );
-        _selectedDateTime = newDateTime;
-        _dateTimeController.text = _formatDateTime(newDateTime);
-        ref.read(reportDraftProvider.notifier).setLastSeenAt(newDateTime);
-      }
-    }
-  }
-
-  void _showError(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: PetColors.lost,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: PetRadius.lgAll),
-      ),
     );
   }
 }
