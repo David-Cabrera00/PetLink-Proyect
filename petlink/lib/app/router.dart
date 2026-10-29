@@ -1,11 +1,11 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
+import '../core/theme/pet_tokens.dart';
+import 'widgets/pet_nav_bar.dart';
 import '../features/radar/presentation/radar_screen.dart';
 import '../features/explore/presentation/explore_screen.dart';
 import '../features/reports/presentation/reports_screen.dart';
@@ -261,12 +261,18 @@ class ScaffoldWithNav extends ConsumerWidget {
 
   const ScaffoldWithNav({super.key, required this.child});
 
+  static const _routes = [
+    '/radar',
+    '/explore',
+    '/reports',
+    '/activity',
+    '/profile',
+  ];
+
   static int _indexFromLocation(String location) {
-    if (location.startsWith('/radar')) return 0;
-    if (location.startsWith('/explore')) return 1;
-    if (location.startsWith('/reports')) return 2;
-    if (location.startsWith('/activity')) return 3;
-    if (location.startsWith('/profile')) return 4;
+    for (var i = 0; i < _routes.length; i++) {
+      if (location.startsWith(_routes[i])) return i;
+    }
     return 0;
   }
 
@@ -275,288 +281,58 @@ class ScaffoldWithNav extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final location = GoRouterState.of(context).uri.toString();
     final currentIndex = _indexFromLocation(location);
-    final cs = Theme.of(context).colorScheme;
     final unreadCount = ref.watch(unreadActivityCountProvider);
-    final selectionAlignment = switch (currentIndex) {
-      0 => Alignment.centerLeft,
-      1 => const Alignment(-0.5, 0),
-      2 => Alignment.center,
-      3 => const Alignment(0.5, 0),
-      _ => Alignment.centerRight,
-    };
 
     return Scaffold(
       body: Stack(
         children: [
-          // The navigation bar floats above the shell content. Reserve its
-          // space so the last controls on long screens remain reachable.
-          Padding(padding: const EdgeInsets.only(bottom: 96), child: child),
+          // La barra flota sobre el contenido: se reserva espacio inferior
+          // para que los últimos controles sigan accesibles.
+          Padding(
+            padding: const EdgeInsets.only(
+              bottom: PetTokens.contentBottomPadding,
+            ),
+            child: child,
+          ),
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(28),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Theme.of(context).colorScheme.surface
-                                .withValues(alpha: 0.52),
-                            Theme.of(context)
-                                .colorScheme
-                                .surfaceContainerHighest
-                                .withValues(alpha: 0.34),
-                            Theme.of(context).colorScheme.primaryContainer
-                                .withValues(alpha: 0.20),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(28),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.34),
-                          width: 1.2,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.18),
-                            blurRadius: 26,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 7,
-                        ),
-                        child: SizedBox(
-                          height: 58,
-                          child: Stack(
-                            children: [
-                              IgnorePointer(
-                                child: AnimatedAlign(
-                                  alignment: selectionAlignment,
-                                  duration: const Duration(milliseconds: 360),
-                                  curve: Curves.easeOutBack,
-                                  child: FractionallySizedBox(
-                                    widthFactor: 0.2,
-                                    heightFactor: 1,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(2),
-                                      child: DecoratedBox(
-                                        decoration: BoxDecoration(
-                                          color: currentIndex == 2
-                                              ? cs.primary
-                                              : cs.primaryContainer,
-                                          borderRadius: BorderRadius.circular(
-                                            22,
-                                          ),
-                                          border: Border.all(
-                                            color: Colors.white.withValues(
-                                              alpha: 0.24,
-                                            ),
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: cs.primary.withValues(
-                                                alpha: 0.22,
-                                              ),
-                                              blurRadius: 12,
-                                              offset: const Offset(0, 4),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  _LiquidNavItem(
-                                    icon: PhosphorIconsRegular.broadcast,
-                                    selectedIcon: PhosphorIconsFill.broadcast,
-                                    label: l10n.navigationRadar,
-                                    selected: currentIndex == 0,
-                                    onTap: () => context.go('/radar'),
-                                  ),
-                                  _LiquidNavItem(
-                                    icon: PhosphorIconsRegular.mapTrifold,
-                                    selectedIcon: PhosphorIconsFill.mapTrifold,
-                                    label: l10n.navigationExplore,
-                                    selected: currentIndex == 1,
-                                    onTap: () => context.go('/explore'),
-                                  ),
-                                  _LiquidNavItem(
-                                    icon: PhosphorIconsRegular.plusCircle,
-                                    selectedIcon: PhosphorIconsFill.plusCircle,
-                                    label: l10n.navigationReport,
-                                    selected: currentIndex == 2,
-                                    isPrimary: true,
-                                    onTap: () => context.go('/reports'),
-                                  ),
-                                  _LiquidNavItem(
-                                    icon: PhosphorIconsRegular.bell,
-                                    selectedIcon: PhosphorIconsFill.bell,
-                                    label: l10n.navigationActivity,
-                                    selected: currentIndex == 3,
-                                    badgeCount: unreadCount,
-                                    onTap: () => context.go('/activity'),
-                                  ),
-                                  _LiquidNavItem(
-                                    icon: PhosphorIconsRegular.userCircle,
-                                    selectedIcon: PhosphorIconsFill.userCircle,
-                                    label: l10n.navigationProfile,
-                                    selected: currentIndex == 4,
-                                    onTap: () => context.go('/profile'),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+            child: PetNavBar(
+              currentIndex: currentIndex,
+              onSelected: (i) => context.go(_routes[i]),
+              destinations: [
+                PetNavDestination(
+                  icon: PhosphorIconsRegular.broadcast,
+                  selectedIcon: PhosphorIconsFill.broadcast,
+                  label: l10n.navigationRadar,
                 ),
-              ),
+                PetNavDestination(
+                  icon: PhosphorIconsRegular.mapTrifold,
+                  selectedIcon: PhosphorIconsFill.mapTrifold,
+                  label: l10n.navigationExplore,
+                ),
+                PetNavDestination(
+                  icon: PhosphorIconsRegular.plus,
+                  selectedIcon: PhosphorIconsFill.plus,
+                  label: l10n.navigationReport,
+                  isPrimary: true,
+                ),
+                PetNavDestination(
+                  icon: PhosphorIconsRegular.bell,
+                  selectedIcon: PhosphorIconsFill.bell,
+                  label: l10n.navigationActivity,
+                  badge: unreadCount > 0,
+                ),
+                PetNavDestination(
+                  icon: PhosphorIconsRegular.userCircle,
+                  selectedIcon: PhosphorIconsFill.userCircle,
+                  label: l10n.navigationProfile,
+                ),
+              ],
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _LiquidNavItem extends StatefulWidget {
-  final IconData icon;
-  final IconData selectedIcon;
-  final String label;
-  final bool selected;
-  final bool isPrimary;
-  final int badgeCount;
-  final VoidCallback onTap;
-
-  const _LiquidNavItem({
-    required this.icon,
-    required this.selectedIcon,
-    required this.label,
-    required this.selected,
-    required this.onTap,
-    this.isPrimary = false,
-    this.badgeCount = 0,
-  });
-
-  @override
-  State<_LiquidNavItem> createState() => _LiquidNavItemState();
-}
-
-class _LiquidNavItemState extends State<_LiquidNavItem> {
-  bool _pressed = false;
-
-  void _setPressed(bool value) {
-    if (mounted && _pressed != value) {
-      setState(() => _pressed = value);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final selectedForeground = widget.isPrimary
-        ? cs.onPrimary
-        : cs.onPrimaryContainer;
-
-    return Expanded(
-      child: Semantics(
-        button: true,
-        selected: widget.selected,
-        label: widget.label,
-        child: InkWell(
-          onTap: widget.onTap,
-          onTapDown: (_) => _setPressed(true),
-          onTapUp: (_) => _setPressed(false),
-          onTapCancel: () => _setPressed(false),
-          borderRadius: BorderRadius.circular(22),
-          splashColor: cs.primary.withValues(alpha: 0.16),
-          highlightColor: cs.primary.withValues(alpha: 0.08),
-          child: AnimatedScale(
-            scale: _pressed ? 0.94 : 1,
-            duration: const Duration(milliseconds: 110),
-            curve: Curves.easeOutCubic,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 220),
-              curve: Curves.easeOutCubic,
-              padding: const EdgeInsets.symmetric(vertical: 7),
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(22),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 180),
-                        transitionBuilder: (child, animation) =>
-                            ScaleTransition(scale: animation, child: child),
-                        child: Icon(
-                          widget.selected ? widget.selectedIcon : widget.icon,
-                          key: ValueKey(widget.selected),
-                          size: 22,
-                          color: widget.selected
-                              ? selectedForeground
-                              : cs.onSurfaceVariant,
-                        ),
-                      ),
-                      if (widget.badgeCount > 0)
-                        Positioned(
-                          top: -1,
-                          right: -5,
-                          child: Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: cs.primary,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Theme.of(context).colorScheme.surface,
-                                width: 1.5,
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    widget.label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: widget.selected
-                          ? selectedForeground
-                          : cs.onSurfaceVariant,
-                      fontWeight: widget.selected
-                          ? FontWeight.w700
-                          : FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }
