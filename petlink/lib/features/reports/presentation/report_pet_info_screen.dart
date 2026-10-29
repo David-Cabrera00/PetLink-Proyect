@@ -2,14 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
-import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../../core/theme/pet_spacing.dart';
-import '../../../design_system/buttons/pet_button.dart';
-import '../../../design_system/inputs/pet_input.dart';
+import '../../../core/theme/pet_tokens.dart';
 import '../../../shared/models/pet_report.dart';
-import '../../../shared/widgets/step_indicator.dart';
 import '../providers/report_draft_provider.dart';
+import 'widgets/report_flow_stepper.dart';
 
 class ReportPetInfoScreen extends ConsumerStatefulWidget {
   const ReportPetInfoScreen({super.key});
@@ -22,36 +19,79 @@ class ReportPetInfoScreen extends ConsumerStatefulWidget {
 class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
-  late final TextEditingController _speciesController;
   late final TextEditingController _breedController;
-  late final TextEditingController _sexController;
   late final TextEditingController _ageController;
-  late final TextEditingController _sizeController;
   late final TextEditingController _colorController;
+
+  String _species = 'Perro';
+  String? _sex;
+  String _size = 'Mediano';
 
   @override
   void initState() {
     super.initState();
     final draft = ref.read(reportDraftProvider);
     _nameController = TextEditingController(text: draft.name);
-    _speciesController = TextEditingController(text: draft.species);
     _breedController = TextEditingController(text: draft.breed);
-    _sexController = TextEditingController(text: draft.sex);
     _ageController = TextEditingController(text: draft.age);
-    _sizeController = TextEditingController(text: draft.size);
     _colorController = TextEditingController(text: draft.color);
+
+    if (draft.species.isNotEmpty) _species = draft.species;
+    if (draft.sex.isNotEmpty) _sex = draft.sex;
+    if (draft.size.isNotEmpty) _size = draft.size;
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _speciesController.dispose();
     _breedController.dispose();
-    _sexController.dispose();
     _ageController.dispose();
-    _sizeController.dispose();
     _colorController.dispose();
     super.dispose();
+  }
+
+  void _saveDraft() {
+    final notifier = ref.read(reportDraftProvider.notifier);
+    notifier.setName(_nameController.text.trim());
+    notifier.setSpecies(_species);
+    notifier.setBreed(_breedController.text.trim());
+    if (_sex != null) notifier.setSex(_sex!);
+    notifier.setSize(_size);
+    notifier.setAge(_ageController.text.trim());
+    notifier.setColor(_colorController.text.trim());
+  }
+
+  void _onContinue() {
+    if (_formKey.currentState?.validate() ?? true) {
+      _saveDraft();
+      context.push('/report/new/photos');
+    }
+  }
+
+  Color _resolveTint(String colorText) {
+    final key = colorText.trim().toLowerCase().split(' ').first;
+    switch (key) {
+      case 'dorado':
+      case 'amarillo':
+        return const Color(0xFFE3A857);
+      case 'negro':
+        return const Color(0xFF3A2E33);
+      case 'blanco':
+        return const Color(0xFFF4EEE6);
+      case 'gris':
+        return const Color(0xFFA9A1A6);
+      case 'cafe':
+      case 'caf\u00E9':
+      case 'marron':
+      case 'marr\u00F3n':
+        return const Color(0xFF8A5A3B);
+      case 'crema':
+        return const Color(0xFFF0D9B5);
+      case 'naranja':
+        return const Color(0xFFE0894A);
+      default:
+        return PetTokens.dogTan;
+    }
   }
 
   @override
@@ -59,281 +99,277 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
     final l10n = AppLocalizations.of(context)!;
     final draft = ref.watch(reportDraftProvider);
     final isFound = draft.reportType == ReportType.found;
+    final petName = _nameController.text.trim();
+    final displayName = petName.isNotEmpty
+        ? petName
+        : (isFound ? l10n.foundPet : l10n.unnamedPet);
+
+    final summaryParts = [
+      _species,
+      if (_sex != null) _sex,
+      _size,
+      if (_colorController.text.trim().isNotEmpty)
+        _colorController.text.trim(),
+    ];
+    final summary = summaryParts.join(' \u00B7 ');
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.reportPetInfoTitle),
-        leading: IconButton(
-          icon: const Icon(PhosphorIconsRegular.arrowLeft),
-          onPressed: () => context.go('/report/new'),
-        ),
-      ),
+      backgroundColor: PetTokens.bgOf(context),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(PetSpacing.lg),
-          child: Column(
-            children: [
-              const StepIndicator(current: 2, total: 6),
-              const SizedBox(height: PetSpacing.xl),
-              Expanded(
+        bottom: false,
+        child: Column(
+          children: [
+            // Stepper oficial Paso 2 de 6
+            ReportFlowStepper(
+              currentStep: 2,
+              stepTitle: l10n.reportPetInfoTitle,
+              onBack: () {
+                _saveDraft();
+                context.pop();
+              },
+            ),
+
+            // Contenido del formulario
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(
+                  PetTokens.gutter,
+                  12,
+                  PetTokens.gutter,
+                  110,
+                ),
                 child: Form(
                   key: _formKey,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 1. Nombre
-                        if (!isFound) ...[
-                          PetInput(
-                            label: l10n.reportPetInfoName,
-                            hint: l10n.reportPetInfoNameHint,
-                            controller: _nameController,
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return l10n.requiredName;
-                              }
-                              return null;
-                            },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Tarjeta de previsualización reactiva (Paso2Datos.dc.html)
+                      _PetIdCardPreview(
+                        species: _species,
+                        displayName: displayName,
+                        summary: summary,
+                        tintColor: _resolveTint(_colorController.text),
+                      ),
+                      const SizedBox(height: 18),
+
+                      // Nombre
+                      _buildFieldLabel(
+                        isFound
+                            ? l10n.reportPetInfoNameOptional
+                            : l10n.reportPetInfoName,
+                      ),
+                      _buildTextInput(
+                        controller: _nameController,
+                        hintText: isFound ? 'Ej. Desconocido o Placa' : 'Ej. Luna',
+                        onChanged: (_) => setState(() {}),
+                        validator: isFound
+                            ? null
+                            : (v) {
+                                if (v == null || v.trim().isEmpty) {
+                                  return l10n.requiredName;
+                                }
+                                return null;
+                              },
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Especie y Sexo en fila
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildFieldLabel(l10n.reportPetInfoSpecies),
+                                Row(
+                                  children: [
+                                    _buildSelectChip(
+                                      label: 'Perro',
+                                      isSelected: _species == 'Perro',
+                                      onTap: () => setState(() => _species = 'Perro'),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    _buildSelectChip(
+                                      label: 'Gato',
+                                      isSelected: _species == 'Gato',
+                                      onTap: () => setState(() => _species = 'Gato'),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: PetSpacing.md),
-                        ] else ...[
-                          PetInput(
-                            label: l10n.reportPetInfoNameOptional,
-                            hint: l10n.reportPetInfoNameHint,
-                            controller: _nameController,
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildFieldLabel(l10n.reportPetInfoSex),
+                                Row(
+                                  children: [
+                                    _buildSelectChip(
+                                      label: 'Macho \u2642',
+                                      isSelected: _sex == 'Macho',
+                                      onTap: () => setState(() => _sex = 'Macho'),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    _buildSelectChip(
+                                      label: 'Hembra \u2640',
+                                      isSelected: _sex == 'Hembra',
+                                      onTap: () => setState(() => _sex = 'Hembra'),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: PetSpacing.md),
                         ],
+                      ),
+                      const SizedBox(height: 14),
 
-                        // 2. Especie con selector rápido
-                        Text(
-                          l10n.reportPetInfoSpecies,
-                          style: Theme.of(context).textTheme.labelLarge
-                              ?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                        ),
-                        const SizedBox(height: PetSpacing.xs),
-                        Row(
-                          children: [
-                            _buildChoiceChip(
-                              label: 'Perro',
-                              icon: PhosphorIconsRegular.dog,
-                              selectedColor: const Color(0xFFE3A07F),
-                              isSelected:
-                                  _speciesController.text.toLowerCase() ==
-                                  'perro',
-                              onSelected: () => setState(
-                                () => _speciesController.text = 'Perro',
-                              ),
-                            ),
-                            const SizedBox(width: PetSpacing.sm),
-                            _buildChoiceChip(
-                              label: 'Gato',
-                              icon: PhosphorIconsRegular.cat,
-                              selectedColor: const Color(0xFF9D83A7),
-                              isSelected:
-                                  _speciesController.text.toLowerCase() ==
-                                  'gato',
-                              onSelected: () => setState(
-                                () => _speciesController.text = 'Gato',
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: PetSpacing.md),
+                      // Raza
+                      _buildFieldLabel(l10n.reportPetInfoBreed),
+                      _buildTextInput(
+                        controller: _breedController,
+                        hintText: 'Ej. Golden Retriever o Mestizo',
+                        onChanged: (_) => setState(() {}),
+                      ),
+                      const SizedBox(height: 14),
 
-                        // 3. Raza
-                        PetInput(
-                          label: l10n.reportPetInfoBreed,
-                          hint: l10n.reportPetInfoBreedHint,
-                          controller: _breedController,
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return l10n.requiredBreed;
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: PetSpacing.md),
-
-                        // 4. Sexo con selector rápido
-                        Text(
-                          l10n.reportPetInfoSex,
-                          style: Theme.of(context).textTheme.labelLarge
-                              ?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                        ),
-                        const SizedBox(height: PetSpacing.xs),
-                        Row(
-                          children: [
-                            _buildChoiceChip(
-                              label: 'Macho',
-                              icon: PhosphorIconsRegular.genderMale,
-                              selectedColor: const Color(0xFF7D9BB2),
-                              isSelected:
-                                  _sexController.text.toLowerCase() == 'macho',
-                              onSelected: () =>
-                                  setState(() => _sexController.text = 'Macho'),
-                            ),
-                            const SizedBox(width: PetSpacing.sm),
-                            _buildChoiceChip(
-                              label: 'Hembra',
-                              icon: PhosphorIconsRegular.genderFemale,
-                              selectedColor: const Color(0xFFD98C9A),
-                              isSelected:
-                                  _sexController.text.toLowerCase() == 'hembra',
-                              onSelected: () => setState(
-                                () => _sexController.text = 'Hembra',
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: PetSpacing.md),
-
-                        // 5. Tamaño con selector rápido
-                        Text(
-                          l10n.reportPetInfoSize,
-                          style: Theme.of(context).textTheme.labelLarge
-                              ?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                        ),
-                        const SizedBox(height: PetSpacing.xs),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              _buildChoiceChip(
-                                label: 'Pequeño',
-                                isSelected:
-                                    _sizeController.text.toLowerCase() ==
-                                    'pequeño',
-                                onSelected: () => setState(
-                                  () => _sizeController.text = 'Pequeño',
-                                ),
-                              ),
-                              const SizedBox(width: PetSpacing.sm),
-                              _buildChoiceChip(
-                                label: 'Mediano',
-                                isSelected:
-                                    _sizeController.text.toLowerCase() ==
-                                    'mediano',
-                                onSelected: () => setState(
-                                  () => _sizeController.text = 'Mediano',
-                                ),
-                              ),
-                              const SizedBox(width: PetSpacing.sm),
-                              _buildChoiceChip(
-                                label: 'Grande',
-                                isSelected:
-                                    _sizeController.text.toLowerCase() ==
-                                    'grande',
-                                onSelected: () => setState(
-                                  () => _sizeController.text = 'Grande',
-                                ),
-                              ),
-                            ],
+                      // Tamaño
+                      _buildFieldLabel(l10n.reportPetInfoSize),
+                      Row(
+                        children: [
+                          _buildSelectChip(
+                            label: 'Peque\u00F1o',
+                            isSelected: _size == 'Peque\u00F1o',
+                            onTap: () => setState(() => _size = 'Peque\u00F1o'),
                           ),
-                        ),
-                        const SizedBox(height: PetSpacing.md),
+                          const SizedBox(width: 8),
+                          _buildSelectChip(
+                            label: 'Mediano',
+                            isSelected: _size == 'Mediano',
+                            onTap: () => setState(() => _size = 'Mediano'),
+                          ),
+                          const SizedBox(width: 8),
+                          _buildSelectChip(
+                            label: 'Grande',
+                            isSelected: _size == 'Grande',
+                            onTap: () => setState(() => _size = 'Grande'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
 
-                        // 6. Edad y Color
-                        Row(
-                          children: [
-                            Expanded(
-                              child: PetInput(
-                                label: l10n.reportPetInfoAge,
-                                hint: l10n.reportPetInfoAgeHint,
-                                controller: _ageController,
-                                validator: (value) {
-                                  if (value == null || value.trim().isEmpty) {
-                                    return l10n.requiredField;
-                                  }
-                                  return null;
-                                },
-                              ),
+                      // Edad y Color en 2 columnas
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildFieldLabel('Edad aprox.'),
+                                _buildTextInput(
+                                  controller: _ageController,
+                                  hintText: 'Ej. 3 a\u00F1os / Cachorro',
+                                  onChanged: (_) => setState(() {}),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: PetSpacing.md),
-                            Expanded(
-                              child: PetInput(
-                                label: l10n.reportPetInfoColor,
-                                hint: l10n.reportPetInfoColorHint,
-                                controller: _colorController,
-                                validator: (value) {
-                                  if (value == null || value.trim().isEmpty) {
-                                    return l10n.requiredField;
-                                  }
-                                  return null;
-                                },
-                              ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildFieldLabel('Color'),
+                                _buildTextInput(
+                                  controller: _colorController,
+                                  hintText: 'Ej. Dorado / Blanco',
+                                  onChanged: (_) => setState(() {}),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(height: PetSpacing.lg),
-              _buildActionButtons(context, ref),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+            ),
 
-  Widget _buildChoiceChip({
-    required String label,
-    IconData? icon,
-    Color? selectedColor,
-    required bool isSelected,
-    required VoidCallback onSelected,
-  }) {
-    final cs = Theme.of(context).colorScheme;
-    final activeColor = selectedColor ?? cs.primary;
-    final activeForeground = activeColor.computeLuminance() > 0.45
-        ? cs.onSurface
-        : Colors.white;
-
-    return GestureDetector(
-      onTap: onSelected,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(
-          horizontal: PetSpacing.md,
-          vertical: PetSpacing.sm + 2,
-        ),
-        decoration: BoxDecoration(
-          color: isSelected ? activeColor : cs.surface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? activeColor : cs.outlineVariant,
-            width: isSelected ? 1.5 : 1,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (icon != null) ...[
-              Icon(
-                icon,
-                size: 16,
-                color: isSelected ? activeForeground : cs.onSurfaceVariant,
+            // Botones inferiores (Volver + Continuar)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                PetTokens.gutter,
+                0,
+                PetTokens.gutter,
+                24,
               ),
-              const SizedBox(width: PetSpacing.xs),
-            ],
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? activeForeground : cs.onSurface,
+              child: Row(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      _saveDraft();
+                      context.pop();
+                    },
+                    borderRadius: BorderRadius.circular(18),
+                    child: Container(
+                      width: 110,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: PetTokens.plum, width: 1.5),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Volver',
+                        style: PetTokens.body(
+                          15,
+                          color: PetTokens.plum,
+                          weight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: InkWell(
+                      onTap: _onContinue,
+                      borderRadius: BorderRadius.circular(18),
+                      child: Container(
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: PetTokens.plum,
+                          borderRadius: BorderRadius.circular(18),
+                          boxShadow: PetTokens.shadowButton,
+                        ),
+                        alignment: Alignment.center,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              l10n.continueAction,
+                              style: PetTokens.body(
+                                16,
+                                color: Colors.white,
+                                weight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Icon(
+                              Icons.arrow_forward_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -342,44 +378,237 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context)!;
-    return Row(
-      children: [
-        Expanded(
-          child: OutlinedButton(
-            onPressed: () => context.go('/report/new'),
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: PetSpacing.md),
-            ),
-            child: Text(l10n.backAction),
-          ),
+  Widget _buildFieldLabel(String label) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 2, bottom: 6),
+      child: Text(
+        label,
+        style: PetTokens.bodyThemed(
+          context,
+          13,
+          color: PetTokens.inkOf(context),
+          weight: FontWeight.w700,
         ),
-        const SizedBox(width: PetSpacing.md),
-        Expanded(
-          child: PetButton(
-            label: l10n.continueAction,
-            onPressed: () {
-              if (_formKey.currentState?.validate() ?? false) {
-                _saveDraft(ref);
-                context.go('/report/new/photos');
-              }
-            },
-            icon: PhosphorIconsRegular.arrowRight,
-          ),
-        ),
-      ],
+      ),
     );
   }
 
-  void _saveDraft(WidgetRef ref) {
-    final notifier = ref.read(reportDraftProvider.notifier);
-    notifier.setName(_nameController.text.trim());
-    notifier.setSpecies(_speciesController.text.trim());
-    notifier.setBreed(_breedController.text.trim());
-    notifier.setSex(_sexController.text.trim());
-    notifier.setAge(_ageController.text.trim());
-    notifier.setSize(_sizeController.text.trim());
-    notifier.setColor(_colorController.text.trim());
+  Widget _buildTextInput({
+    required TextEditingController controller,
+    required String hintText,
+    ValueChanged<String>? onChanged,
+    FormFieldValidator<String>? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      onChanged: onChanged,
+      validator: validator,
+      style: PetTokens.bodyThemed(context, 15, color: PetTokens.inkOf(context)),
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: PetTokens.body(15, color: PetTokens.placeholder),
+        filled: true,
+        fillColor: PetTokens.surfaceOf(context),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: PetTokens.borderOf(context), width: 1.5),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: PetTokens.plum, width: 2.0),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: PetTokens.clay, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: PetTokens.clay, width: 2.0),
+        ),
+      ),
+    );
   }
+
+  Widget _buildSelectChip({
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: AnimatedContainer(
+          duration: PetTokens.dFast,
+          height: 44,
+          decoration: BoxDecoration(
+            color: isSelected ? PetTokens.plum : PetTokens.surfaceOf(context),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isSelected ? PetTokens.plum : PetTokens.borderOf(context),
+              width: 1.5,
+            ),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: PetTokens.bodyThemed(
+              context,
+              13,
+              color: isSelected ? Colors.white : PetTokens.inkOf(context),
+              weight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// -----------------------------------------------------------------------------
+// FICHA DE PREVISUALIZACIÓN REACTIVA (Paso2Datos.dc.html)
+// -----------------------------------------------------------------------------
+class _PetIdCardPreview extends StatelessWidget {
+  const _PetIdCardPreview({
+    required this.species,
+    required this.displayName,
+    required this.summary,
+    required this.tintColor,
+  });
+
+  final String species;
+  final String displayName;
+  final String summary;
+  final Color tintColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: PetTokens.plum,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x334A2D4A),
+            offset: Offset(0, 10),
+            blurRadius: 24,
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          // Silueta ilustrada reactiva
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: PetTokens.plumDeep,
+              borderRadius: BorderRadius.circular(18),
+            ),
+            alignment: Alignment.center,
+            child: CustomPaint(
+              size: const Size(48, 48),
+              painter: _PetSilhouettePainter(
+                species: species,
+                tintColor: tintColor,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+
+          // Títulos y datos reactivos
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'FICHA DE B\u00DASQUEDA',
+                  style: PetTokens.body(
+                    10,
+                    color: const Color(0xFFF3B79F),
+                    weight: FontWeight.w800,
+                    letterSpacing: 0.14,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  displayName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: PetTokens.display(
+                    24,
+                    color: PetTokens.cream,
+                    italic: true,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  summary,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: PetTokens.body(12, color: const Color(0xFFD9C8D3)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PetSilhouettePainter extends CustomPainter {
+  const _PetSilhouettePainter({
+    required this.species,
+    required this.tintColor,
+  });
+
+  final String species;
+  final Color tintColor;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final isCat = species.toLowerCase().contains('gato');
+
+    final bodyPaint = Paint()..color = tintColor;
+    final earPaint = Paint()..color = isCat ? tintColor : PetTokens.dogEar;
+
+    if (isCat) {
+      // Orejas triangulares
+      final earPath = Path()
+        ..moveTo(center.dx - 14, center.dy - 6)
+        ..lineTo(center.dx - 12, center.dy - 20)
+        ..lineTo(center.dx, center.dy - 10)
+        ..close()
+        ..moveTo(center.dx + 14, center.dy - 6)
+        ..lineTo(center.dx + 12, center.dy - 20)
+        ..lineTo(center.dx, center.dy - 10)
+        ..close();
+      canvas.drawPath(earPath, earPaint);
+      canvas.drawCircle(center, 14, bodyPaint);
+    } else {
+      // Orejas caídas de perro
+      final earPaintStroke = Paint()
+        ..color = earPaint.color
+        ..strokeWidth = 4.5
+        ..strokeCap = StrokeCap.round
+        ..style = PaintingStyle.stroke;
+      canvas.drawLine(Offset(center.dx - 12, center.dy - 8), Offset(center.dx - 15, center.dy + 8), earPaintStroke);
+      canvas.drawLine(Offset(center.dx + 12, center.dy - 8), Offset(center.dx + 15, center.dy + 8), earPaintStroke);
+      canvas.drawCircle(center, 13, bodyPaint);
+    }
+
+    // Ojos y nariz
+    final featurePaint = Paint()..color = PetTokens.ink;
+    canvas.drawCircle(Offset(center.dx - 4, center.dy - 2), 1.8, featurePaint);
+    canvas.drawCircle(Offset(center.dx + 4, center.dy - 2), 1.8, featurePaint);
+    canvas.drawCircle(Offset(center.dx, center.dy + 3), 2.2, featurePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _PetSilhouettePainter oldDelegate) =>
+      oldDelegate.species != species || oldDelegate.tintColor != tintColor;
 }

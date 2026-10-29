@@ -24,10 +24,15 @@ class Pet {
   });
 
   factory Pet.fromJson(Map<String, dynamic> json) => Pet(
-        id: json['id'] as String? ?? '', name: json['name'] as String? ?? '',
-        species: json['species'] as String? ?? '', breed: json['breed'] as String? ?? '',
-        sex: json['sex'] as String? ?? '', age: json['age'] as String? ?? '',
-        size: json['size'] as String? ?? '', color: json['color'] as String? ?? '',
-        description: json['description'] as String? ?? '', primaryPhotoUrl: json['primaryPhotoUrl'] as String?,
-      );
+    id: json['id'] as String? ?? '',
+    name: json['name'] as String? ?? '',
+    species: json['species'] as String? ?? '',
+    breed: json['breed'] as String? ?? '',
+    sex: json['sex'] as String? ?? '',
+    age: json['age'] as String? ?? '',
+    size: json['size'] as String? ?? '',
+    color: json['color'] as String? ?? '',
+    description: json['description'] as String? ?? '',
+    primaryPhotoUrl: json['primaryPhotoUrl'] as String?,
+  );
 }

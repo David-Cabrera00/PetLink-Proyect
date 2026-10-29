@@ -154,7 +154,9 @@ class ReportDetailScreen extends ConsumerWidget {
             const SizedBox(height: PetSpacing.lg),
             const SectionHeader(title: 'Avistamientos recibidos'),
             const SizedBox(height: PetSpacing.md),
-            ...report.sightings.map<Widget>((sighting) => _buildSightingCard(context, sighting)),
+            ...report.sightings.map<Widget>(
+              (sighting) => _buildSightingCard(context, sighting),
+            ),
           ],
           const SizedBox(height: PetSpacing.lg),
           SectionHeader(title: l10n.reportDetailLastLocation),
@@ -302,8 +304,14 @@ class ReportDetailScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     const unspecified = 'No especificado';
     final traits = [
-      (l10n.reportDetailColor, report.pet.color.trim().isEmpty ? unspecified : report.pet.color),
-      (l10n.reportDetailPhysicalMark, report.traits.trim().isEmpty ? unspecified : report.traits),
+      (
+        l10n.reportDetailColor,
+        report.pet.color.trim().isEmpty ? unspecified : report.pet.color,
+      ),
+      (
+        l10n.reportDetailPhysicalMark,
+        report.traits.trim().isEmpty ? unspecified : report.traits,
+      ),
     ];
 
     return Column(
@@ -368,24 +376,30 @@ class ReportDetailScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            sighting.description,
-            style: theme.textTheme.bodyMedium,
-          ),
+          Text(sighting.description, style: theme.textTheme.bodyMedium),
           const SizedBox(height: PetSpacing.sm),
           Text(
             'Ubicación: ${sighting.latitude.toStringAsFixed(5)}, ${sighting.longitude.toStringAsFixed(5)}',
-            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
           Text(
             _formatSightingDate(sighting.createdAt),
-            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
           if (sighting.photoUrl != null) ...[
             const SizedBox(height: PetSpacing.sm),
             ClipRRect(
               borderRadius: PetRadius.mdAll,
-              child: Image.network(sighting.photoUrl!, height: 140, width: double.infinity, fit: BoxFit.contain),
+              child: Image.network(
+                sighting.photoUrl!,
+                height: 140,
+                width: double.infinity,
+                fit: BoxFit.contain,
+              ),
             ),
           ],
         ],
@@ -411,70 +425,72 @@ class ReportDetailScreen extends ConsumerWidget {
           border: Border.all(color: PetColors.border),
         ),
         child: Stack(
-        children: [
-          FlutterMap(
-            options: MapOptions(
-              initialCenter: LatLng(report.latitude, report.longitude),
-              initialZoom: 13,
-              interactionOptions: const InteractionOptions(
-                flags: InteractiveFlag.none,
+          children: [
+            FlutterMap(
+              options: MapOptions(
+                initialCenter: LatLng(report.latitude, report.longitude),
+                initialZoom: 13,
+                interactionOptions: const InteractionOptions(
+                  flags: InteractiveFlag.none,
+                ),
               ),
-            ),
-            children: [
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.petlink.app',
-              ),
-              MarkerLayer(
-                markers: [
-                  Marker(
-                    point: LatLng(report.latitude, report.longitude),
-                    width: 48,
-                    height: 48,
-                    child: Icon(
-                      PhosphorIconsFill.mapPin,
-                      size: 42,
-                      color: PetColors.primary,
+              children: [
+                TileLayer(
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  fallbackUrl:
+                      'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'com.example.petlink',
+                ),
+                MarkerLayer(
+                  markers: [
+                    Marker(
+                      point: LatLng(report.latitude, report.longitude),
+                      width: 48,
+                      height: 48,
+                      child: Icon(
+                        PhosphorIconsFill.mapPin,
+                        size: 42,
+                        color: PetColors.primary,
+                      ),
                     ),
+                  ],
+                ),
+              ],
+            ),
+            Positioned(
+              top: PetSpacing.sm,
+              right: PetSpacing.sm,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface
+                      .withValues(alpha: 0.9),
+                  borderRadius: PetRadius.smAll,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: PetSpacing.sm,
+                    vertical: PetSpacing.xs,
                   ),
-                ],
-              ),
-            ],
-          ),
-          Positioned(
-            top: PetSpacing.sm,
-            right: PetSpacing.sm,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface
-                    .withValues(alpha: 0.9),
-                borderRadius: PetRadius.smAll,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: PetSpacing.sm,
-                  vertical: PetSpacing.xs,
-                ),
-                child: Text(
-                  l10n.reportDetailMapTitle,
-                  style: Theme.of(context).textTheme.bodySmall,
+                  child: Text(
+                    l10n.reportDetailMapTitle,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
                 ),
               ),
             ),
-          ),
-          Positioned(
-            bottom: PetSpacing.xs,
-            right: PetSpacing.sm,
-            child: Text(
-              '\u00A9 OpenStreetMap contributors',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-                backgroundColor: Theme.of(context).colorScheme.surface
-                    .withValues(alpha: 0.85),
+            Positioned(
+              bottom: PetSpacing.xs,
+              right: PetSpacing.sm,
+              child: Text(
+                '\u00A9 OpenStreetMap contributors',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  backgroundColor: Theme.of(context).colorScheme.surface
+                      .withValues(alpha: 0.85),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
         ),
       ),
     );
@@ -571,8 +587,14 @@ class ReportDetailScreen extends ConsumerWidget {
         title: const Text('Eliminar reporte'),
         content: const Text('Esta acción no se puede deshacer.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancelar')),
-          FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Eliminar')),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Eliminar'),
+          ),
         ],
       ),
     );
@@ -582,9 +604,15 @@ class ReportDetailScreen extends ConsumerWidget {
       ref.invalidate(nearbyReportsProvider);
       ref.invalidate(myReportsProvider);
       ref.invalidate(exploreReportsProvider);
-      if (context.mounted) context.go('/reports');
+      if (context.mounted) {
+        context.go('/reports');
+      }
     } catch (error) {
-      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('No se pudo eliminar: $error')));
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No se pudo eliminar: $error')));
+      }
     }
   }
 }

@@ -1,12 +1,14 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../core/theme/pet_radius.dart';
-import '../../core/theme/pet_spacing.dart';
+import '../../core/theme/pet_tokens.dart';
 import '../../shared/models/activity_item.dart';
+import '../../shared/widgets/pet_paw_painters.dart';
 import 'providers/activity_providers.dart';
 
 class ActivityScreen extends ConsumerWidget {
@@ -15,354 +17,684 @@ class ActivityScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
     final activityAsync = ref.watch(activityProvider);
     final unreadCount = ref.watch(unreadActivityCountProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.navigationActivity),
-        actions: [
-          if (unreadCount > 0)
-            Padding(
-              padding: const EdgeInsets.only(right: PetSpacing.sm),
-              child: TextButton.icon(
-                onPressed: () =>
-                    ref.read(activityProvider.notifier).markAllAsRead(),
-                icon: const Icon(Icons.done_all_rounded, size: 18),
-                label: Text(
-                  l10n.activityMarkAllAsRead,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-              ),
-            ),
-        ],
-      ),
-      body: activityAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(PetSpacing.xl),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.error_outline_rounded,
-                  size: 44,
-                  color: cs.error,
-                ),
-                const SizedBox(height: PetSpacing.md),
-                Text(
-                  l10n.activityError,
-                  style: theme.textTheme.titleMedium,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: PetSpacing.md),
-                FilledButton.tonal(
-                  onPressed: () =>
-                      ref.read(activityProvider.notifier).refresh(),
-                  child: Text(l10n.activityRetry),
-                ),
-              ],
-            ),
-          ),
-        ),
-        data: (items) => RefreshIndicator(
+      backgroundColor: PetTokens.bgOf(context),
+      body: SafeArea(
+        bottom: false,
+        child: RefreshIndicator(
+          color: PetTokens.plum,
+          backgroundColor: PetTokens.surfaceOf(context),
           onRefresh: () => ref.read(activityProvider.notifier).refresh(),
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(
-              PetSpacing.lg,
-              PetSpacing.md,
-              PetSpacing.lg,
-              PetSpacing.xxl,
+          child: activityAsync.when(
+            loading: () => const Center(
+              child: CircularProgressIndicator(color: PetTokens.plum),
             ),
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.activityRecent,
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        const SizedBox(height: PetSpacing.xs),
-                        Text(
-                          l10n.activityDescription,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: cs.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: PetSpacing.xl),
-              if (items.isEmpty)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: PetSpacing.xl,
-                    vertical: PetSpacing.xxl,
-                  ),
-                  decoration: BoxDecoration(
-                    color: cs.surfaceContainerHighest.withValues(alpha: 0.3),
-                    borderRadius: PetRadius.xlAll,
-                    border: Border.all(
-                      color: cs.outlineVariant.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          PhosphorIconsRegular.bellSlash,
-                          size: 40,
-                          color: cs.onSurfaceVariant.withValues(alpha: 0.6),
-                        ),
-                        const SizedBox(height: PetSpacing.md),
-                        Text(
-                          l10n.activityEmpty,
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: cs.onSurfaceVariant,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              else
-                ...items.map((item) => _buildItem(context, ref, item, l10n)),
-            ],
+            error: (error, _) => _buildErrorState(context, ref, l10n),
+            data: (items) {
+              return SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(
+                  0,
+                  16,
+                  0,
+                  PetTokens.contentBottomPadding,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Header segun Actividad.dc.html
+                    _buildHeader(context, ref, unreadCount, l10n),
+                    const SizedBox(height: 24),
+
+                    if (items.isEmpty)
+                      const _EmptyActivityState()
+                    else
+                      _buildTimelineList(context, ref, items, l10n),
+                  ],
+                ),
+              );
+            },
           ),
         ),
       ),
     );
   }
 
-  Widget _buildItem(
+  // ---------------------------------------------------------------------------
+  // HEADER
+  // ---------------------------------------------------------------------------
+  Widget _buildHeader(
     BuildContext context,
     WidgetRef ref,
-    ActivityItem item,
+    int unreadCount,
     AppLocalizations l10n,
   ) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    final isUnread = !item.isRead;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: PetTokens.gutter + 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                l10n.navigationActivity.toUpperCase(),
+                style: PetTokens.body(
+                  12,
+                  color: PetTokens.muted,
+                  weight: FontWeight.w700,
+                  letterSpacing: 0.14,
+                ),
+              ),
+              if (unreadCount > 0)
+                InkWell(
+                  onTap: () =>
+                      ref.read(activityProvider.notifier).markAllAsRead(),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.done_all_rounded,
+                          size: 16,
+                          color: PetTokens.clayText,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          l10n.activityMarkAllAsRead,
+                          style: PetTokens.body(
+                            12,
+                            color: PetTokens.clayText,
+                            weight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            l10n.activityRecent,
+            style: PetTokens.displayThemed(context, 34),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            l10n.activityDescription,
+            style: PetTokens.bodyThemed(context, 15, color: PetTokens.mutedOf(context)),
+          ),
+        ],
+      ),
+    );
+  }
 
-    // Colores e icono según el tipo de actividad
-    final (IconData icon, Color iconColor, Color iconBg) = switch (item.type) {
+  // ---------------------------------------------------------------------------
+  // TIMELINE
+  // ---------------------------------------------------------------------------
+  Widget _buildTimelineList(
+    BuildContext context,
+    WidgetRef ref,
+    List<ActivityItem> items,
+    AppLocalizations l10n,
+  ) {
+    // Agrupar items por fecha relativa
+    final grouped = <String, List<ActivityItem>>{};
+    for (final item in items) {
+      final key = _groupDateLabel(context, item.createdAt);
+      grouped.putIfAbsent(key, () => []).add(item);
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: PetTokens.gutter),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (final entry in grouped.entries) ...[
+            Padding(
+              padding: const EdgeInsets.only(top: 14, bottom: 12),
+              child: Text(
+                entry.key.toUpperCase(),
+                style: PetTokens.bodyThemed(
+                  context,
+                  12,
+                  color: PetTokens.mutedOf(context),
+                  weight: FontWeight.w800,
+                  letterSpacing: 0.14,
+                ),
+              ),
+            ),
+            _TimelineGroup(
+              items: entry.value,
+              onTapItem: (item) {
+                if (!item.isRead) {
+                  ref.read(activityProvider.notifier).markAsRead(item.id);
+                }
+                context.push('/reports/${item.targetReportId}');
+              },
+            ),
+            const SizedBox(height: 12),
+          ],
+        ],
+      ),
+    );
+  }
+
+  String _groupDateLabel(BuildContext context, DateTime date) {
+    final now = DateTime.now();
+    final diff = now.difference(date);
+    final isEn = Localizations.localeOf(context).languageCode == 'en';
+
+    if (diff.inDays == 0) {
+      return isEn ? 'Today' : 'Hoy';
+    } else if (diff.inDays == 1) {
+      return isEn ? 'Yesterday' : 'Ayer';
+    } else if (diff.inDays < 7) {
+      return isEn ? '${diff.inDays} days ago' : 'Hace ${diff.inDays} días';
+    } else if (diff.inDays < 30) {
+      final weeks = (diff.inDays / 7).floor();
+      if (isEn) {
+        return weeks == 1 ? '1 week ago' : '$weeks weeks ago';
+      }
+      return weeks == 1 ? 'Hace 1 semana' : 'Hace $weeks semanas';
+    } else {
+      final months = (diff.inDays / 30).floor();
+      if (isEn) {
+        return months == 1 ? '1 month ago' : '$months months ago';
+      }
+      return months == 1 ? 'Hace 1 mes' : 'Hace $months meses';
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // ERROR STATE
+  // ---------------------------------------------------------------------------
+  Widget _buildErrorState(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.error_outline_rounded,
+              size: 44,
+              color: PetTokens.clay,
+            ),
+            const SizedBox(height: 14),
+            Text(
+              l10n.activityError,
+              style: PetTokens.display(18, color: PetTokens.ink),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: PetTokens.plum,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              onPressed: () => ref.read(activityProvider.notifier).refresh(),
+              child: Text(
+                l10n.activityRetry,
+                style: PetTokens.body(14, color: PetTokens.cream, weight: FontWeight.w700),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// -----------------------------------------------------------------------------
+// GRUPO TIMELINE CON LÍNEA VERTICAL CONECTORA
+// -----------------------------------------------------------------------------
+class _TimelineGroup extends StatelessWidget {
+  const _TimelineGroup({required this.items, required this.onTapItem});
+
+  final List<ActivityItem> items;
+  final ValueChanged<ActivityItem> onTapItem;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        // Línea vertical discontinua conectora
+        Positioned(
+          left: 21,
+          top: 22,
+          bottom: 22,
+          child: CustomPaint(
+            size: const Size(2, double.infinity),
+            painter: _DashedLinePainter(color: PetTokens.borderDark),
+          ),
+        ),
+
+        // Lista de items con su nodo correspondiente
+        Column(
+          children: [
+            for (int i = 0; i < items.length; i++) ...[
+              _TimelineRow(item: items[i], onTap: () => onTapItem(items[i])),
+              if (i < items.length - 1) const SizedBox(height: 12),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _TimelineRow extends StatelessWidget {
+  const _TimelineRow({required this.item, required this.onTap});
+
+  final ActivityItem item;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final isUnread = !item.isRead;
+    final isEn = Localizations.localeOf(context).languageCode == 'en';
+
+    // Configuración del nodo según el tipo de actividad en Actividad.dc.html
+    final (Color dotBg, Color dotColor, Widget icon) = switch (item.type) {
       'sighting' => (
-        PhosphorIconsFill.binoculars,
-        cs.primary,
-        cs.primary.withValues(alpha: 0.12),
+        PetTokens.clay,
+        Colors.white,
+        const Icon(PhosphorIconsBold.binoculars, size: 20, color: Colors.white),
       ),
       'report' => (
-        PhosphorIconsFill.pawPrint,
-        cs.secondary,
-        cs.secondary.withValues(alpha: 0.12),
+        const Color(0xFFEFE3EC),
+        PetTokens.plum,
+        PetPaw(size: 18, color: PetTokens.plum),
       ),
       'match' => (
-        PhosphorIconsFill.sparkle,
-        const Color(0xFFE65100),
-        const Color(0xFFFFF3E0),
+        PetTokens.mint,
+        Colors.white,
+        const Icon(PhosphorIconsBold.sparkle, size: 20, color: Colors.white),
       ),
       _ => (
-        PhosphorIconsFill.bell,
-        cs.primary,
-        cs.primary.withValues(alpha: 0.12),
+        PetTokens.plum,
+        Colors.white,
+        const Icon(PhosphorIconsBold.bell, size: 20, color: Colors.white),
       ),
     };
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: PetSpacing.md),
-      child: Material(
-        color: isUnread
-            ? cs.primaryContainer.withValues(alpha: 0.28)
-            : cs.surface,
-        borderRadius: PetRadius.xlAll,
-        child: InkWell(
-          borderRadius: PetRadius.xlAll,
-          onTap: () {
-            if (isUnread) {
-              ref.read(activityProvider.notifier).markAsRead(item.id);
-            }
-            context.push('/reports/${item.targetReportId}');
-          },
-          child: Container(
-            padding: const EdgeInsets.all(PetSpacing.md),
-            decoration: BoxDecoration(
-              borderRadius: PetRadius.xlAll,
-              border: Border.all(
-                color: isUnread
-                    ? cs.primary.withValues(alpha: 0.45)
-                    : cs.outlineVariant.withValues(alpha: 0.35),
-                width: isUnread ? 1.5 : 1.0,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Nodo squircle de la línea de tiempo (44x44, radius 15)
+        Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: dotBg,
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(color: PetTokens.bgOf(context), width: 3),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x142A1A29),
+                offset: Offset(0, 3),
+                blurRadius: 8,
               ),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Ícono del tipo de evento
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: iconBg,
-                    borderRadius: PetRadius.lgAll,
-                  ),
-                  child: Icon(icon, color: iconColor, size: 22),
-                ),
-                const SizedBox(width: PetSpacing.md),
+            ],
+          ),
+          alignment: Alignment.center,
+          child: icon,
+        ),
+        const SizedBox(width: 10),
 
-                // Contenido textual
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+        // Tarjeta de la actividad
+        Expanded(
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(22),
+            child: AnimatedContainer(
+              duration: PetTokens.dNormal,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: PetTokens.surfaceOf(context),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(
+                  color: isUnread ? const Color(0xFFE9B6A5) : PetTokens.borderOf(context),
+                  width: isUnread ? 1.5 : 1.0,
+                ),
+                boxShadow: [
+                  if (isUnread)
+                    const BoxShadow(
+                      color: Color(0x1FE07A5F),
+                      offset: Offset(0, 8),
+                      blurRadius: 20,
+                    )
+                  else
+                    const BoxShadow(
+                      color: Color(0x0A2A1A29),
+                      offset: Offset(0, 3),
+                      blurRadius: 10,
+                    ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Título y tiempo relativo
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
                     children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              _localizedTitle(context, item),
-                              style: theme.textTheme.titleSmall?.copyWith(
-                                fontWeight: isUnread
-                                    ? FontWeight.w800
-                                    : FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: PetSpacing.xs),
-                          Text(
-                            _formatRelativeTime(item.createdAt, l10n),
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: cs.onSurfaceVariant,
-                              fontSize: 11,
-                            ),
-                          ),
-                          if (isUnread) ...[
-                            const SizedBox(width: PetSpacing.xs),
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: cs.primary,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          ],
-                        ],
+                      Expanded(
+                        child: _buildItemTitle(context, item.title),
                       ),
-                      const SizedBox(height: PetSpacing.xs),
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: cs.surfaceContainerHighest.withValues(
-                                alpha: 0.6,
-                              ),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              _localizedStatus(item.status, l10n),
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: cs.onSurfaceVariant,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 11,
-                              ),
-                            ),
-                          ),
-                          if (isUnread) ...[
-                            const SizedBox(width: PetSpacing.xs),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: cs.primary.withValues(alpha: 0.14),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                l10n.activityUnread,
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  color: cs.primary,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 10,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                      if (item.body != null &&
-                          item.body!.trim().isNotEmpty) ...[
-                        const SizedBox(height: PetSpacing.xs),
-                        Text(
-                          item.body!,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: cs.onSurfaceVariant,
-                            height: 1.35,
-                          ),
+                      const SizedBox(width: 8),
+                      Text(
+                        _formatShortTime(item.createdAt),
+                        style: PetTokens.bodyThemed(
+                          context,
+                          12,
+                          color: PetTokens.mutedOf(context),
+                          weight: FontWeight.w700,
                         ),
-                      ],
+                      ),
                     ],
                   ),
-                ),
-              ],
+
+                  // Cuerpo descriptivo
+                  if (item.body != null && item.body!.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      item.body!,
+                      style: PetTokens.bodyThemed(context, 14, color: PetTokens.mutedOf(context)),
+                    ),
+                  ],
+                  const SizedBox(height: 8),
+
+                  // Badges de estado (Nuevo / Activo / etc.)
+                  Row(
+                    children: [
+                      if (isUnread) ...[
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 9,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: PetTokens.lostBg,
+                            borderRadius: BorderRadius.circular(9),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const _PulsingClayDot(),
+                              const SizedBox(width: 5),
+                              Text(
+                                isEn ? 'New' : 'Nuevo',
+                                style: PetTokens.body(
+                                  11,
+                                  color: PetTokens.clayText,
+                                  weight: FontWeight.w800,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      if (item.status == 'active')
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 9,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: PetTokens.mintBg,
+                            borderRadius: BorderRadius.circular(9),
+                          ),
+                          child: Text(
+                            isEn ? 'Active' : 'Activo',
+                            style: PetTokens.body(
+                              11,
+                              color: PetTokens.mintText,
+                              weight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 
-  String _formatRelativeTime(DateTime time, AppLocalizations l10n) {
-    final diff = DateTime.now().difference(time);
-    if (diff.inMinutes < 1) return l10n.activityTimeJustNow;
-    if (diff.inMinutes < 60) return l10n.activityTimeMinutesAgo(diff.inMinutes);
-    if (diff.inHours < 24) return l10n.activityTimeHoursAgo(diff.inHours);
-    return l10n.activityTimeDaysAgo(diff.inDays);
+  Widget _buildItemTitle(BuildContext context, String title) {
+    // Si contiene "de [Nombre]", resaltar el nombre con tipografía Fraunces itálica
+    final match = RegExp(r'^(.*?\bde\s+)([A-ZÁÉÍÓÚÑa-záéíóúñ]+)(.*)$').firstMatch(title);
+    if (match != null) {
+      return Text.rich(
+        TextSpan(
+          style: PetTokens.bodyThemed(context, 15, color: PetTokens.inkOf(context), weight: FontWeight.w700),
+          children: [
+            TextSpan(text: match.group(1)),
+            TextSpan(
+              text: match.group(2),
+              style: PetTokens.displayThemed(
+                context,
+                16,
+                color: PetTokens.inkOf(context),
+                italic: true,
+              ),
+            ),
+            TextSpan(text: match.group(3)),
+          ],
+        ),
+      );
+    }
+
+    return Text(
+      title,
+      style: PetTokens.bodyThemed(context, 15, color: PetTokens.inkOf(context), weight: FontWeight.w700),
+    );
   }
 
-  String _localizedTitle(BuildContext context, ActivityItem item) {
-    final title = item.title;
-    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
-    if (!isEnglish) return title;
-    if (title.startsWith('Reporte de ')) {
-      return 'Report of ${title.substring('Reporte de '.length)}';
+  String _formatShortTime(DateTime date) {
+    final now = DateTime.now();
+    final diff = now.difference(date);
+
+    if (diff.inMinutes < 60) {
+      return '${diff.inMinutes.clamp(1, 59)} m';
+    } else if (diff.inHours < 24) {
+      return '${diff.inHours} h';
+    } else if (diff.inDays < 30) {
+      return '${diff.inDays} d';
+    } else {
+      return '${(diff.inDays / 30).floor()} m';
     }
-    if (title.startsWith('Nuevo avistamiento de ')) {
-      return 'New sighting of ${title.substring('Nuevo avistamiento de '.length)}';
+  }
+}
+
+// -----------------------------------------------------------------------------
+// PIN DOTTED LINE PAINTER
+// -----------------------------------------------------------------------------
+class _DashedLinePainter extends CustomPainter {
+  const _DashedLinePainter({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke;
+
+    const dashHeight = 4.0;
+    const dashSpace = 5.0;
+    double startY = 0;
+
+    while (startY < size.height) {
+      canvas.drawLine(
+        Offset(0, startY),
+        Offset(0, math.min(startY + dashHeight, size.height)),
+        paint,
+      );
+      startY += dashHeight + dashSpace;
     }
-    return title;
   }
 
-  String _localizedStatus(String status, AppLocalizations l10n) {
-    switch (status.toLowerCase()) {
-      case 'active':
-        return l10n.activityStatusActive;
-      case 'recovered':
-        return l10n.activityStatusRecovered;
-      case 'possible_match':
-      case 'possiblematch':
-        return l10n.activityStatusPossibleMatch;
-      case 'closed':
-        return l10n.activityStatusClosed;
-      default:
-        return l10n.activityStatusUnknown;
-    }
+  @override
+  bool shouldRepaint(covariant _DashedLinePainter oldDelegate) =>
+      oldDelegate.color != color;
+}
+
+// -----------------------------------------------------------------------------
+// PUNTO CLAY PULSANTE
+// -----------------------------------------------------------------------------
+class _PulsingClayDot extends StatefulWidget {
+  const _PulsingClayDot();
+
+  @override
+  State<_PulsingClayDot> createState() => _PulsingClayDotState();
+}
+
+class _PulsingClayDotState extends State<_PulsingClayDot>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 8,
+      height: 8,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          final t = _controller.value;
+          final scale = 0.8 + 1.2 * t;
+          final opacity = (1.0 - t).clamp(0.0, 1.0);
+
+          return Stack(
+            alignment: Alignment.center,
+            children: [
+              Transform.scale(
+                scale: scale,
+                child: Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: PetTokens.clay.withValues(alpha: opacity * 0.7),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+              Container(
+                width: 6,
+                height: 6,
+                decoration: const BoxDecoration(
+                  color: PetTokens.clay,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+// -----------------------------------------------------------------------------
+// EMPTY STATE DE ACTIVIDAD
+// -----------------------------------------------------------------------------
+class _EmptyActivityState extends StatefulWidget {
+  const _EmptyActivityState();
+
+  @override
+  State<_EmptyActivityState> createState() => _EmptyActivityStateState();
+}
+
+class _EmptyActivityStateState extends State<_EmptyActivityState>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              final angle = math.sin(_controller.value * math.pi) * 0.12;
+              return Transform.rotate(
+                angle: angle,
+                alignment: const Alignment(0, 0.9),
+                child: child,
+              );
+            },
+            child: PetPaw(size: 64, color: PetTokens.trackOf(context)),
+          ),
+          const SizedBox(height: 18),
+          Text(
+            l10n.activityEmpty,
+            style: PetTokens.displayThemed(context, 20),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            l10n.activityDescription,
+            style: PetTokens.bodyThemed(context, 14, color: PetTokens.mutedOf(context)),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -1,25 +1,17 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:petlink/l10n/app_localizations.dart';
-import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
-import 'package:share_plus/share_plus.dart';
 
-import '../../../core/theme/pet_colors.dart';
-import '../../../core/theme/pet_spacing.dart';
-import '../../../core/theme/pet_radius.dart';
-import '../../../design_system/badges/status_badge.dart';
-import '../../../design_system/buttons/pet_button.dart';
+import '../../../core/theme/pet_tokens.dart';
 import '../../../shared/models/pet_report.dart';
-import '../../../shared/widgets/pet_card_compact.dart';
-import '../../../shared/widgets/search_bar.dart';
-import '../../../shared/widgets/empty_state.dart';
-import '../../../shared/widgets/error_state.dart';
+import '../../../shared/widgets/pet_paw_painters.dart';
 import '../providers/explore_providers.dart';
-import '../../reports/providers/reports_providers.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({super.key});
@@ -49,9 +41,73 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     super.dispose();
   }
 
+  Future<void> _useCurrentLocation() async {
+    final l10n = AppLocalizations.of(context)!;
+    setState(() => _isLocating = true);
+
+    try {
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        if (!mounted) {
+          return;
+        }
+        _showToast(l10n.locationServiceDisabled);
+        return;
+      }
+
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied) {
+        if (!mounted) {
+          return;
+        }
+        _showToast(l10n.locationPermissionDenied);
+        return;
+      }
+      if (permission == LocationPermission.deniedForever) {
+        if (!mounted) {
+          return;
+        }
+        _showToast(l10n.locationPermissionPermanentlyDenied);
+        return;
+      }
+
+      final position = await Geolocator.getCurrentPosition();
+      if (!mounted) {
+        return;
+      }
+      final location = LatLng(position.latitude, position.longitude);
+      ref.read(exploreLocationProvider.notifier).state = location;
+      _mapController.move(location, 14.5);
+    } catch (_) {
+      if (mounted) {
+        _showToast(l10n.locationFetchError);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLocating = false);
+      }
+    }
+  }
+
+  void _showToast(String message) {
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final reportsAsync = ref.watch(exploreReportsProvider);
     final selectedReport = ref.watch(selectedReportProvider);
     final filter = ref.watch(exploreFilterProvider);
@@ -74,664 +130,992 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     });
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.navigationExplore),
-        actions: [
-          IconButton(
-            tooltip: viewMode == ExploreViewMode.map
-                ? 'Ver en lista'
-                : 'Ver en mapa',
-            icon: Icon(
-              viewMode == ExploreViewMode.map
-                  ? PhosphorIconsRegular.list
-                  : PhosphorIconsRegular.mapTrifold,
-            ),
-            onPressed: () {
-              ref
-                  .read(exploreViewModeProvider.notifier)
-                  .state = viewMode == ExploreViewMode.map
-                  ? ExploreViewMode.list
-                  : ExploreViewMode.map;
-            },
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
+      backgroundColor: PetTokens.bgOf(context),
+      body: viewMode == ExploreViewMode.map
+          ? _buildMapView(context, reportsAsync, selectedReport, filter)
+          : _buildListView(context, reportsAsync, filter),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // VISTA LISTA (Explorar.dc.html)
+  // ---------------------------------------------------------------------------
+  Widget _buildListView(
+    BuildContext context,
+    AsyncValue<List<PetReport>> reportsAsync,
+    ExploreFilter currentFilter,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    return SafeArea(
+      bottom: false,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(
+          0,
+          16,
+          0,
+          PetTokens.contentBottomPadding,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+          // Header con título "Explora tu zona" y botón a mapa
           Padding(
-            padding: const EdgeInsets.all(PetSpacing.lg),
-            child: Column(
+            padding: const EdgeInsets.symmetric(
+              horizontal: PetTokens.gutter + 4,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                PetSearchBar(
-                  hint: l10n.exploreSearchHint,
-                  controller: _searchController,
-                  onChanged: (value) {
-                    ref.read(exploreSearchQueryProvider.notifier).state = value;
-                  },
+                Expanded(
+                  child: Text.rich(
+                    TextSpan(
+                      style: PetTokens.displayThemed(context, 36),
+                      children: [
+                        TextSpan(
+                          text: l10n.navigationExplore,
+                          style: PetTokens.display(
+                            36,
+                            color: PetTokens.clayText,
+                            italic: true,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                const SizedBox(height: PetSpacing.md),
-                _buildFilters(context, ref, filter),
+                InkWell(
+                  onTap: () {
+                    ref.read(exploreViewModeProvider.notifier).state =
+                        ExploreViewMode.map;
+                  },
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: PetTokens.plum,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: PetTokens.shadowButton,
+                    ),
+                    child: const Icon(
+                      Icons.map_outlined,
+                      color: PetTokens.cream,
+                      size: 22,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
-          Expanded(
-            child: viewMode == ExploreViewMode.map
-                ? Stack(
-                    children: [
-                      _buildMapPlaceholder(context, reportsAsync, ref),
-                      if (selectedReport != null)
-                        Positioned(
-                          left: PetSpacing.lg,
-                          right: PetSpacing.lg,
-                          bottom: PetSpacing.lg,
-                          child: _buildReportPreview(
-                            context,
-                            selectedReport,
-                            ref,
-                          ),
-                        ),
-                    ],
-                  )
-                : _buildListView(context, reportsAsync, ref),
-          ),
-        ],
-      ),
-    );
-  }
+          const SizedBox(height: 18),
 
-  Widget _buildFilters(
-    BuildContext context,
-    WidgetRef ref,
-    ExploreFilter currentFilter,
-  ) {
-    final l10n = AppLocalizations.of(context)!;
-    return SingleChildScrollView(
-      controller: _filterScrollController,
-      scrollDirection: Axis.horizontal,
-      physics: const BouncingScrollPhysics(),
-      child: Row(
-        children: [
-          _buildFilterChip(
-            context,
-            ref,
-            l10n.exploreAll,
-            ExploreFilter.all,
-            currentFilter,
-            PhosphorIconsRegular.list,
+          // Buscador
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: PetTokens.gutter,
+            ),
+            child: _buildSearchBar(l10n),
           ),
-          const SizedBox(width: PetSpacing.sm),
-          _buildFilterChip(
-            context,
-            ref,
-            l10n.exploreLost,
-            ExploreFilter.lost,
-            currentFilter,
-            PhosphorIconsRegular.warning,
-          ),
-          const SizedBox(width: PetSpacing.sm),
-          _buildFilterChip(
-            context,
-            ref,
-            l10n.exploreFound,
-            ExploreFilter.found,
-            currentFilter,
-            PhosphorIconsRegular.checkCircle,
-          ),
-          const SizedBox(width: PetSpacing.sm),
-          _buildFilterChip(
-            context,
-            ref,
-            l10n.exploreNearby,
-            ExploreFilter.nearby,
-            currentFilter,
-            PhosphorIconsRegular.navigationArrow,
-          ),
-          const SizedBox(width: PetSpacing.sm),
-          _buildFilterChip(
-            context,
-            ref,
-            Localizations.localeOf(context).languageCode == 'en'
-                ? 'My reports'
-                : 'Mis reportes',
-            ExploreFilter.mine,
-            currentFilter,
-            PhosphorIconsRegular.user,
-          ),
-        ],
-      ),
-    );
-  }
+          const SizedBox(height: 12),
 
-  Widget _buildFilterChip(
-    BuildContext context,
-    WidgetRef ref,
-    String label,
-    ExploreFilter value,
-    ExploreFilter currentFilter,
-    IconData icon,
-  ) {
-    final cs = Theme.of(context).colorScheme;
-    final isSelected = value == currentFilter;
+          // Chips de filtro
+          _buildFilterChips(currentFilter, l10n: l10n),
+          const SizedBox(height: 14),
 
-    return Semantics(
-      button: true,
-      selected: isSelected,
-      label: label,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: PetRadius.xxlAll,
-          onTap: () => ref.read(exploreFilterProvider.notifier).state = value,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 48),
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: PetSpacing.md,
-                vertical: PetSpacing.md,
-              ),
-              decoration: BoxDecoration(
-                color: isSelected ? cs.primary : cs.surface,
-                borderRadius: PetRadius.xxlAll,
-                border: Border.all(
-                  color: isSelected ? cs.primary : cs.outlineVariant,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
+          // Contador de resultados y lista
+          reportsAsync.when(
+            data: (reports) {
+              if (reports.isEmpty) {
+                return const _EmptyStateSwaying();
+              }
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Icon(
-                    icon,
-                    size: 16,
-                    color: isSelected ? cs.onPrimary : cs.onSurfaceVariant,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: PetTokens.gutter + 4,
+                    ),
+                    child: Text(
+                      l10n.radarReportsCount(reports.length),
+                      style: PetTokens.body(
+                        13,
+                        color: PetTokens.muted,
+                        weight: FontWeight.w600,
+                      ),
+                    ),
                   ),
-                  const SizedBox(width: PetSpacing.xs),
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: isSelected
-                          ? FontWeight.w600
-                          : FontWeight.w400,
-                      color: isSelected ? cs.onPrimary : cs.onSurface,
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: PetTokens.gutter,
+                    ),
+                    child: Column(
+                      children: [
+                        for (final report in reports) ...[
+                          _PetListCard(
+                            report: report,
+                            onTap: () => context.go('/reports/${report.id}'),
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+                      ],
                     ),
                   ),
                 ],
+              );
+            },
+            loading: () => const Padding(
+              padding: EdgeInsets.all(40),
+              child: Center(
+                child: CircularProgressIndicator(color: PetTokens.plum),
               ),
             ),
+            error: (err, st) => const _EmptyStateSwaying(),
           ),
-        ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildMapPlaceholder(
+  // ---------------------------------------------------------------------------
+  // VISTA MAPA (ExplorarMapa.dc.html)
+  // ---------------------------------------------------------------------------
+  Widget _buildMapView(
     BuildContext context,
-    AsyncValue reportsAsync,
-    WidgetRef ref,
+    AsyncValue<List<PetReport>> reportsAsync,
+    PetReport? selectedReport,
+    ExploreFilter currentFilter,
   ) {
+    final top = MediaQuery.of(context).padding.top;
+    final userLocation = ref.watch(exploreLocationProvider);
     final l10n = AppLocalizations.of(context)!;
-    return Container(
-      color: Theme.of(context).colorScheme.surface,
-      child: reportsAsync.when(
-        data: (reports) {
-          if (reports.isEmpty) {
-            return EmptyState(
-              icon: PhosphorIconsRegular.mapTrifold,
-              title: l10n.exploreNoReports,
-              subtitle: l10n.exploreNoReportsDescription,
-            );
-          }
-          return Stack(
-            children: [
-              FlutterMap(
-                mapController: _mapController,
-                options: MapOptions(
-                  initialCenter: const LatLng(1.2136, -77.2811),
-                  initialZoom: 12,
-                  onTap: (_, _) {
-                    if (ref.read(selectedReportProvider) != null) {
-                      ref.read(selectedReportProvider.notifier).state = null;
-                    }
-                  },
-                  interactionOptions: const InteractionOptions(
-                    flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
-                  ),
-                ),
-                children: [
-                  TileLayer(
-                    urlTemplate:
-                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'com.petlink.app',
-                  ),
-                  MarkerLayer(
-                    markers: [
-                      for (final report in reports)
-                        Marker(
-                          point: LatLng(report.latitude, report.longitude),
-                          width: 44,
-                          height: 44,
-                          child: Tooltip(
-                            message: report.isOwner
-                                ? '${report.pet.name} · ${Localizations.localeOf(context).languageCode == 'en' ? 'My report' : 'Tu reporte'}'
-                                : report.pet.name,
-                            child: GestureDetector(
-                              onTap: () =>
-                                  ref
-                                          .read(selectedReportProvider.notifier)
-                                          .state =
-                                      report,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: report.isOwner
-                                      ? Theme.of(context).colorScheme.primary
-                                      : report.type == ReportType.lost
-                                      ? PetColors.lost
-                                      : PetColors.found,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: PetColors.surface,
-                                    width: 3,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(
-                                        alpha: 0.2,
-                                      ),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Icon(
-                                  report.type == ReportType.lost
-                                      ? PhosphorIconsFill.pawPrint
-                                      : PhosphorIconsRegular.pawPrint,
-                                  size: 22,
-                                  color: PetColors.surface,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // 1. Mapa OpenStreetMap con flutter_map (siempre activo en segundo plano)
+        FlutterMap(
+          mapController: _mapController,
+          options: MapOptions(
+            initialCenter: userLocation ?? const LatLng(1.2136, -77.2811),
+            initialZoom: 13,
+            minZoom: 3,
+            maxZoom: 19,
+            onTap: (_, _) {
+              if (ref.read(selectedReportProvider) != null) {
+                ref.read(selectedReportProvider.notifier).state = null;
+              }
+            },
+            interactionOptions: const InteractionOptions(
+              flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+            ),
+          ),
+          children: [
+            TileLayer(
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              fallbackUrl:
+                  'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+              userAgentPackageName: 'com.example.petlink',
+              maxZoom: 19,
+            ),
+            // Marcador del usuario con pulso
+            if (userLocation != null)
+              MarkerLayer(
+                markers: [
+                  Marker(
+                    point: userLocation,
+                    width: 70,
+                    height: 70,
+                    child: const _UserPulseMarker(),
                   ),
                 ],
               ),
-              Positioned(
-                left: PetSpacing.md,
-                top: PetSpacing.md,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface
-                            .withValues(alpha: 0.92),
-                        borderRadius: PetRadius.mdAll,
-                        border: Border.all(
-                          color: Theme.of(context).colorScheme.outlineVariant,
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: PetSpacing.md,
-                          vertical: PetSpacing.sm,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              PhosphorIconsRegular.mapTrifold,
-                              size: 16,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            const SizedBox(width: PetSpacing.xs),
-                            Text(
-                              l10n.exploreMapTitle,
-                              style: Theme.of(context).textTheme.labelLarge
-                                  ?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface,
-                                  ),
-                            ),
-                          ],
-                        ),
+            // Pines en forma de gota con huella
+            MarkerLayer(
+              markers: [
+                for (final report in reportsAsync.valueOrNull ?? const <PetReport>[])
+                  Marker(
+                    point: LatLng(report.latitude, report.longitude),
+                    width: 52,
+                    height: 62,
+                    alignment: Alignment.topCenter,
+                    child: GestureDetector(
+                      onTap: () {
+                        ref.read(selectedReportProvider.notifier).state =
+                            report;
+                        _mapController.move(
+                          LatLng(report.latitude, report.longitude),
+                          15,
+                        );
+                      },
+                      child: PetMapPin(
+                        color: report.type == ReportType.lost
+                            ? PetTokens.pinLost
+                            : PetTokens.mint,
+                        isSelected: selectedReport?.id == report.id,
                       ),
                     ),
-                    const SizedBox(height: PetSpacing.xs),
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface
-                            .withValues(alpha: 0.85),
-                        borderRadius: PetRadius.smAll,
+                  ),
+              ],
+            ),
+          ],
+        ),
+
+        // Indicador sutil de carga de reportes si esta consultando la red
+        if (reportsAsync.isLoading)
+          Positioned(
+            top: top + 175,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: PetTokens.surface.withValues(alpha: 0.92),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: PetTokens.border),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x1F2A1A29),
+                      offset: Offset(0, 4),
+                      blurRadius: 12,
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(
+                      width: 12,
+                      height: 12,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: PetTokens.plum,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: PetSpacing.sm,
-                          vertical: PetSpacing.xs,
-                        ),
-                        child: Text(
-                          '\u00A9 OpenStreetMap contributors',
-                          style: Theme.of(context).textTheme.labelSmall,
-                        ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Buscando reportes...',
+                      style: PetTokens.body(
+                        12,
+                        color: PetTokens.muted,
+                        weight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
               ),
-              Positioned(
-                right: PetSpacing.sm,
-                top: PetSpacing.sm,
-                child: IconButton.filled(
-                  tooltip: l10n.useCurrentLocation,
-                  onPressed: _isLocating ? null : () => _useCurrentLocation(),
-                  icon: _isLocating
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(PhosphorIconsRegular.crosshair),
-                ),
+            ),
+          ),
+
+        // 2. Barra de búsqueda y alternador de lista flotante superior
+        Positioned(
+          left: 14,
+          right: 14,
+          top: top + 10,
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: PetTokens.surfaceOf(context).withValues(alpha: 0.95),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: PetTokens.borderOf(context)),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x1F2A1A29),
+                            offset: Offset(0, 8),
+                            blurRadius: 22,
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.search_rounded,
+                            size: 20,
+                            color: PetTokens.muted2,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: TextField(
+                              controller: _searchController,
+                              style: PetTokens.body(15, color: PetTokens.ink),
+                              decoration: InputDecoration(
+                                hintText: l10n.exploreSearchHint,
+                                hintStyle: PetTokens.body(
+                                  15,
+                                  color: PetTokens.placeholder,
+                                ),
+                                border: InputBorder.none,
+                                isDense: true,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                              onChanged: (v) {
+                                ref.read(exploreSearchQueryProvider.notifier).state =
+                                    v;
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  // botón "Ver lista"
+                  InkWell(
+                    onTap: () {
+                      ref.read(exploreViewModeProvider.notifier).state =
+                          ExploreViewMode.list;
+                    },
+                    borderRadius: BorderRadius.circular(18),
+                    child: Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: PetTokens.plum,
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x404A2D4A),
+                            offset: Offset(0, 8),
+                            blurRadius: 18,
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.view_list_rounded,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                    ),
+                  ),
+                ],
               ),
+              const SizedBox(height: 10),
+              // Chips de filtro flotantes
+              _buildFilterChips(currentFilter, isFloating: true, l10n: l10n),
             ],
-          );
-        },
-        loading: () =>
-            Center(child: CircularProgressIndicator(color: PetColors.primary)),
-        error: (Object _, StackTrace _) => ErrorState(
-          title: l10n.exploreMapLoadError,
-          subtitle: l10n.connectionRetryDescription,
-          onRetry: () => ref.invalidate(exploreReportsProvider),
+          ),
         ),
+
+        // 3. botón flotante para centrar en mi ubicación
+        Positioned(
+          right: 14,
+          top: top + 130,
+          child: InkWell(
+            onTap: _isLocating ? null : _useCurrentLocation,
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: PetTokens.surface.withValues(alpha: 0.95),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: PetTokens.border),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x1F2A1A29),
+                    offset: Offset(0, 6),
+                    blurRadius: 16,
+                  ),
+                ],
+              ),
+              child: _isLocating
+                  ? const Center(
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: PetTokens.mint,
+                        ),
+                      ),
+                    )
+                  : const Icon(
+                      Icons.my_location_rounded,
+                      color: PetTokens.mint,
+                      size: 22,
+                    ),
+            ),
+          ),
+        ),
+
+        // 4. Tarjeta inferior flotante (cuando se selecciona un pin)
+        if (selectedReport != null)
+          Positioned(
+            left: 14,
+            right: 14,
+            bottom: PetTokens.contentBottomPadding + 8,
+            child: _SelectedReportSheet(
+              report: selectedReport,
+              onTap: () => context.go('/reports/${selectedReport.id}'),
+              onClose: () {
+                ref.read(selectedReportProvider.notifier).state = null;
+              },
+            ),
+          ),
+      ],
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // COMPONENTES COMUNES
+  // ---------------------------------------------------------------------------
+  Widget _buildSearchBar(AppLocalizations l10n) {
+    return Container(
+      height: 52,
+      decoration: BoxDecoration(
+        color: PetTokens.surface,
+        borderRadius: BorderRadius.circular(PetTokens.rInput),
+        border: Border.all(color: PetTokens.border, width: 1.5),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.search_rounded,
+            size: 20,
+            color: PetTokens.muted2,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: TextField(
+              controller: _searchController,
+              style: PetTokens.body(15, color: PetTokens.ink),
+              decoration: InputDecoration(
+                hintText: l10n.exploreSearchHint,
+                hintStyle: PetTokens.body(15, color: PetTokens.placeholder),
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
+              ),
+              onChanged: (v) {
+                ref.read(exploreSearchQueryProvider.notifier).state = v;
+              },
+            ),
+          ),
+          if (_searchController.text.isNotEmpty)
+            GestureDetector(
+              onTap: () {
+                _searchController.clear();
+                ref.read(exploreSearchQueryProvider.notifier).state = '';
+              },
+              child: const Icon(
+                Icons.close_rounded,
+                size: 18,
+                color: PetTokens.muted2,
+              ),
+            ),
+        ],
       ),
     );
   }
 
-  Future<void> _useCurrentLocation() async {
-    final l10n = AppLocalizations.of(context)!;
-    setState(() => _isLocating = true);
+  Widget _buildFilterChips(
+    ExploreFilter currentFilter, {
+    bool isFloating = false,
+    required AppLocalizations l10n,
+  }) {
+    final filters = [
+      (ExploreFilter.all, l10n.exploreAll, null),
+      (ExploreFilter.lost, l10n.exploreLost, PetTokens.clay),
+      (ExploreFilter.found, l10n.exploreFound, PetTokens.mint),
+      (ExploreFilter.nearby, l10n.exploreNearby, null),
+      (ExploreFilter.mine, l10n.reportsTitle, null),
+    ];
 
-    try {
-      if (!await Geolocator.isLocationServiceEnabled()) {
-        if (!mounted) return;
-        _showLocationMessage(l10n.locationServiceDisabled);
-        return;
-      }
-
-      var permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-      if (permission == LocationPermission.denied) {
-        if (!mounted) return;
-        _showLocationMessage(l10n.locationPermissionDenied);
-        return;
-      }
-      if (permission == LocationPermission.deniedForever) {
-        if (!mounted) return;
-        _showLocationMessage(l10n.locationPermissionPermanentlyDenied);
-        return;
-      }
-
-      final position = await Geolocator.getCurrentPosition();
-      if (!mounted) return;
-      final location = LatLng(position.latitude, position.longitude);
-      ref.read(exploreLocationProvider.notifier).state = location;
-      _mapController.move(location, 14);
-    } catch (_) {
-      if (mounted) _showLocationMessage(l10n.locationFetchError);
-    } finally {
-      if (mounted) setState(() => _isLocating = false);
-    }
+    return SingleChildScrollView(
+      controller: isFloating ? null : _filterScrollController,
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
+      padding: EdgeInsets.symmetric(
+        horizontal: isFloating ? 0 : PetTokens.gutter,
+      ),
+      child: Row(
+        children: [
+          for (final (f, label, dotColor) in filters) ...[
+            _FilterChip(
+              label: label,
+              isSelected: currentFilter == f,
+              dotColor: dotColor,
+              isFloating: isFloating,
+              onTap: () => ref.read(exploreFilterProvider.notifier).state = f,
+            ),
+            const SizedBox(width: 8),
+          ],
+        ],
+      ),
+    );
   }
+}
 
-  void _showLocationMessage(String message) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(message)));
-  }
+class _FilterChip extends StatelessWidget {
+  const _FilterChip({
+    required this.label,
+    required this.isSelected,
+    this.dotColor,
+    this.isFloating = false,
+    required this.onTap,
+  });
 
-  Widget _buildReportPreview(BuildContext context, report, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context)!;
-    final cs = Theme.of(context).colorScheme;
-    return Card(
-      margin: EdgeInsets.zero,
-      elevation: 4,
-      surfaceTintColor: Colors.transparent,
-      clipBehavior: Clip.antiAlias,
-      child: Padding(
-        padding: const EdgeInsets.all(PetSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  final String label;
+  final bool isSelected;
+  final Color? dotColor;
+  final bool isFloating;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final bg = isSelected
+        ? PetTokens.plum
+        : (isFloating
+            ? PetTokens.surface.withValues(alpha: 0.95)
+            : PetTokens.surface);
+    final fg = isSelected ? Colors.white : const Color(0xFF4A3A44);
+    final border = isSelected ? PetTokens.plum : PetTokens.border;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        height: 40,
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: border, width: 1.2),
+          boxShadow: isFloating
+              ? const [
+                  BoxShadow(
+                    color: Color(0x142A1A29),
+                    offset: Offset(0, 4),
+                    blurRadius: 10,
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              children: [
-                Container(
-                  width: 64,
-                  height: 64,
-                  clipBehavior: Clip.antiAlias,
-                  decoration: BoxDecoration(
-                    color: cs.primaryContainer,
-                    borderRadius: PetRadius.mdAll,
-                  ),
-                  child:
-                      report.pet.primaryPhotoUrl != null &&
-                          report.pet.primaryPhotoUrl!.isNotEmpty
-                      ? Image.network(
-                          report.pet.primaryPhotoUrl!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => Center(
-                            child: Icon(
-                              report.pet.species.toLowerCase() == 'gato'
-                                  ? PhosphorIconsFill.pawPrint
-                                  : PhosphorIconsRegular.pawPrint,
-                              color: cs.primary,
-                              size: 28,
-                            ),
-                          ),
-                        )
-                      : Center(
-                          child: Icon(
-                            report.pet.species.toLowerCase() == 'gato'
-                                ? PhosphorIconsFill.pawPrint
-                                : PhosphorIconsRegular.pawPrint,
-                            color: cs.primary,
-                            size: 28,
-                          ),
-                        ),
+            if (dotColor != null && !isSelected) ...[
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: dotColor,
+                  shape: BoxShape.circle,
                 ),
-                const SizedBox(width: PetSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              report.pet.name,
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                          ),
-                          StatusBadge(
-                            status: report.type == ReportType.lost
-                                ? PetStatus.lost
-                                : PetStatus.found,
-                          ),
-                          const SizedBox(width: PetSpacing.xs),
-                          IconButton(
-                            tooltip: 'Cerrar vista previa',
-                            visualDensity: VisualDensity.compact,
-                            onPressed: () {
-                              ref.read(selectedReportProvider.notifier).state =
-                                  null;
-                            },
-                            icon: Icon(
-                              PhosphorIconsRegular.x,
-                              size: 18,
-                              color: cs.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: PetSpacing.xs),
-                      Text(
-                        '${report.pet.breed} · ${report.pet.sex} · ${report.pet.age}',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                      const SizedBox(height: PetSpacing.xs),
-                      Row(
-                        children: [
-                          Icon(
-                            PhosphorIconsRegular.mapPin,
-                            size: 14,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurfaceVariant,
-                          ),
-                          const SizedBox(width: PetSpacing.xs),
-                          Text(
-                            '${report.distanceKm.toStringAsFixed(2).replaceAll('.', ',')} km',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          const SizedBox(width: PetSpacing.md),
-                          Icon(
-                            PhosphorIconsRegular.clock,
-                            size: 14,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurfaceVariant,
-                          ),
-                          const SizedBox(width: PetSpacing.xs),
-                          Text(
-                            l10n.exploreHoursAgo,
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: PetSpacing.md),
-            Row(
-              children: [
-                Icon(
-                  PhosphorIconsRegular.mapPin,
-                  size: 16,
-                  color: cs.primary,
-                ),
-                const SizedBox(width: PetSpacing.xs),
-                Expanded(
-                  child: Text(
-                    report.address,
-                    style: Theme.of(context).textTheme.bodySmall,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: PetSpacing.md),
-            Row(
-              children: [
-                Expanded(
-                  child: PetButton(
-                    label: l10n.exploreViewReport,
-                    onPressed: () => context.go('/reports/${report.id}'),
-                  ),
-                ),
-                const SizedBox(width: PetSpacing.md),
-                IconButton(
-                  tooltip: 'Guardar reporte',
-                  onPressed: () {
-                    final saved = {...ref.read(savedReportIdsProvider)};
-                    if (!saved.add(report.id)) saved.remove(report.id);
-                    ref.read(savedReportIdsProvider.notifier).state = saved;
-                  },
-                  icon: Icon(
-                    ref.watch(savedReportIdsProvider).contains(report.id)
-                        ? PhosphorIconsFill.bookmark
-                        : PhosphorIconsRegular.bookmark,
-                    color: cs.primary,
-                  ),
-                  style: IconButton.styleFrom(
-                    backgroundColor: cs.primaryContainer,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: PetRadius.mdAll,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: PetSpacing.sm),
-                IconButton(
-                  tooltip: l10n.shareAction,
-                  onPressed: () async {
-                    await SharePlus.instance.share(
-                      ShareParams(text: 'https://petlink.app/reports/${report.id}'),
-                    );
-                  },
-                  icon: Icon(
-                    PhosphorIconsRegular.shareNetwork,
-                    color: cs.primary,
-                  ),
-                  style: IconButton.styleFrom(
-                    backgroundColor: cs.primaryContainer,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: PetRadius.mdAll,
-                    ),
-                  ),
-                ),
-              ],
+              ),
+              const SizedBox(width: 6),
+            ],
+            Text(
+              label,
+              style: PetTokens.body(
+                13,
+                color: fg,
+                weight: FontWeight.w700,
+              ),
             ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildListView(
-    BuildContext context,
-    AsyncValue<List<PetReport>> reportsAsync,
-    WidgetRef ref,
-  ) {
+class _PetListCard extends StatelessWidget {
+  const _PetListCard({
+    required this.report,
+    required this.onTap,
+  });
+
+  final PetReport report;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final isLost = report.type == ReportType.lost;
     final l10n = AppLocalizations.of(context)!;
-    return reportsAsync.when(
-      data: (reports) {
-        if (reports.isEmpty) {
-          return EmptyState(
-            icon: PhosphorIconsRegular.magnifyingGlass,
-            title: l10n.exploreNoReports,
-            subtitle: l10n.exploreNoReportsDescription,
-          );
-        }
-        return ListView.separated(
-          padding: const EdgeInsets.symmetric(
-            horizontal: PetSpacing.lg,
-            vertical: PetSpacing.md,
+    final badgeBg = isLost ? PetTokens.lostBg : PetTokens.mintBg;
+    final badgeColor = isLost ? PetTokens.clayText : PetTokens.mintText;
+    final statusText = isLost ? l10n.statusLost : l10n.statusFound;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: PetTokens.surfaceOf(context),
+        borderRadius: BorderRadius.circular(PetTokens.rCard),
+        border: Border.all(color: PetTokens.borderOf(context)),
+        boxShadow: PetTokens.shadowCard,
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(PetTokens.rCard),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              // Avatar 68x68 con foto o icono temÃ¡tico
+              Container(
+                width: 68,
+                height: 68,
+                decoration: BoxDecoration(
+                  color: badgeBg,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: report.pet.primaryPhotoUrl != null &&
+                        report.pet.primaryPhotoUrl!.isNotEmpty
+                    ? Image.network(
+                        report.pet.primaryPhotoUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            Icon(Icons.pets_rounded, color: badgeColor, size: 30),
+                      )
+                    : Icon(Icons.pets_rounded, color: badgeColor, size: 30),
+              ),
+              const SizedBox(width: 14),
+              // Datos
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            report.pet.name,
+                            overflow: TextOverflow.ellipsis,
+                            style: PetTokens.displayThemed(context, 21),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: badgeBg,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            statusText,
+                            style: PetTokens.body(
+                              12,
+                              color: badgeColor,
+                              weight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '${report.pet.species} \u00B7 ${report.pet.sex}',
+                      style: PetTokens.body(13, color: PetTokens.muted),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.location_on_outlined,
+                          size: 14,
+                          color: PetTokens.muted,
+                        ),
+                        const SizedBox(width: 3),
+                        Expanded(
+                          child: Text(
+                            '${report.distanceKm.toStringAsFixed(2)} km \u00B7 ${report.address.isNotEmpty ? report.address : "Cerca de ti"}',
+                            overflow: TextOverflow.ellipsis,
+                            style: PetTokens.body(12, color: PetTokens.muted),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          itemCount: reports.length,
-          separatorBuilder: (_, _) => const SizedBox(height: PetSpacing.md),
-          itemBuilder: (context, index) {
-            final report = reports[index];
-            return PetCardCompact(
-              report: report,
-              onTap: () => context.go('/reports/${report.id}'),
-            );
-          },
-        );
-      },
-      loading: () =>
-          Center(child: CircularProgressIndicator(color: PetColors.primary)),
-      error: (_, _) => ErrorState(
-        title: l10n.exploreMapLoadError,
-        subtitle: l10n.connectionRetryDescription,
-        onRetry: () => ref.invalidate(exploreReportsProvider),
+        ),
       ),
     );
   }
 }
+
+/// Tarjeta flotante en el mapa al seleccionar un pin segÃºn `ExplorarMapa.dc.html`
+class _SelectedReportSheet extends StatelessWidget {
+  const _SelectedReportSheet({
+    required this.report,
+    required this.onTap,
+    required this.onClose,
+  });
+
+  final PetReport report;
+  final VoidCallback onTap;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    final isLost = report.type == ReportType.lost;
+    final l10n = AppLocalizations.of(context)!;
+    final badgeBg = isLost ? PetTokens.lostBg : PetTokens.mintBg;
+    final badgeColor = isLost ? PetTokens.clayText : PetTokens.mintText;
+    final statusText = isLost ? l10n.statusLost : l10n.statusFound;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: PetTokens.surface.withValues(alpha: 0.98),
+        borderRadius: BorderRadius.circular(PetTokens.rCard),
+        border: Border.all(color: PetTokens.border),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x332A1A29),
+            offset: Offset(0, 10),
+            blurRadius: 28,
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(PetTokens.rCard),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: badgeBg,
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: report.pet.primaryPhotoUrl != null &&
+                        report.pet.primaryPhotoUrl!.isNotEmpty
+                    ? Image.network(
+                        report.pet.primaryPhotoUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            Icon(Icons.pets_rounded, color: badgeColor, size: 28),
+                      )
+                    : Icon(Icons.pets_rounded, color: badgeColor, size: 28),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            report.pet.name,
+                            overflow: TextOverflow.ellipsis,
+                            style: PetTokens.display(21, color: PetTokens.ink),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: badgeBg,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            statusText,
+                            style: PetTokens.body(
+                              12,
+                              color: badgeColor,
+                              weight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${report.pet.species} \u00B7 ${report.pet.sex} \u00B7 ${report.address}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: PetTokens.body(13, color: PetTokens.muted),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${l10n.exploreViewReport} \u2192',
+                      style: PetTokens.body(
+                        13,
+                        color: PetTokens.plum,
+                        weight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close_rounded, size: 18),
+                color: PetTokens.muted2,
+                onPressed: onClose,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Estado vacÃ­o con huella oscilando segÃºn `Explorar.dc.html`
+class _EmptyStateSwaying extends StatefulWidget {
+  const _EmptyStateSwaying();
+
+  @override
+  State<_EmptyStateSwaying> createState() => _EmptyStateSwayingState();
+}
+
+class _EmptyStateSwayingState extends State<_EmptyStateSwaying>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _swayController;
+
+  @override
+  void initState() {
+    super.initState();
+    _swayController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _swayController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
+      child: Column(
+        children: [
+          AnimatedBuilder(
+            animation: _swayController,
+            builder: (context, child) {
+              final angle =
+                  math.sin(_swayController.value * 2 * math.pi) *
+                  (6 * math.pi / 180);
+              return Transform.rotate(
+                angle: angle,
+                alignment: const Alignment(0, 0.9),
+                child: child,
+              );
+            },
+            child: PetPaw(size: 72, color: PetTokens.track),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            l10n.exploreNoReports,
+            style: PetTokens.display(20, color: PetTokens.ink),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            l10n.exploreNoReportsDescription,
+            style: PetTokens.body(14, color: PetTokens.muted),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Marcador pulsante para la ubicación del usuario
+class _UserPulseMarker extends StatefulWidget {
+  const _UserPulseMarker();
+
+  @override
+  State<_UserPulseMarker> createState() => _UserPulseMarkerState();
+}
+
+class _UserPulseMarkerState extends State<_UserPulseMarker>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pulseController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2200),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _pulseController,
+      builder: (context, _) {
+        final t = _pulseController.value;
+        final ringScale = 0.3 + 1.1 * t;
+        final ringOpacity = (1.0 - t).clamp(0.0, 1.0) * 0.45;
+
+        return Center(
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Transform.scale(
+                scale: ringScale,
+                child: Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: PetTokens.mint.withValues(alpha: ringOpacity),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+              Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: PetTokens.mint,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 3),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x33000000),
+                      offset: Offset(0, 2),
+                      blurRadius: 8,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+

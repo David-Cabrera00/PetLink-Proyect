@@ -67,9 +67,13 @@ class ActivityItem {
       body: json['body'] as String?,
       status: json['status'] as String? ?? 'active',
       reportType: json['reportType'] as String? ?? 'lost',
-      isRead: isReadExplicit ?? (readAt != null || (json['type'] as String? ?? 'report') == 'report'),
+      isRead:
+          isReadExplicit ??
+          (readAt != null || (json['type'] as String? ?? 'report') == 'report'),
       readAt: readAt,
-      createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
+      createdAt:
+          DateTime.tryParse(json['createdAt'] as String? ?? '') ??
+          DateTime.now(),
     );
   }
 }

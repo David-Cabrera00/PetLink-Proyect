@@ -8,16 +8,24 @@ class PetSighting {
   final String? photoUrl;
   final DateTime createdAt;
 
-  const PetSighting({required this.id, required this.latitude, required this.longitude, required this.description, this.photoUrl, required this.createdAt});
+  const PetSighting({
+    required this.id,
+    required this.latitude,
+    required this.longitude,
+    required this.description,
+    this.photoUrl,
+    required this.createdAt,
+  });
 
   factory PetSighting.fromJson(Map<String, dynamic> json) => PetSighting(
-        id: json['id'] as String? ?? '',
-        latitude: (json['latitude'] as num?)?.toDouble() ?? 0,
-        longitude: (json['longitude'] as num?)?.toDouble() ?? 0,
-        description: json['description'] as String? ?? '',
-        photoUrl: json['photoUrl'] as String?,
-        createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
-      );
+    id: json['id'] as String? ?? '',
+    latitude: (json['latitude'] as num?)?.toDouble() ?? 0,
+    longitude: (json['longitude'] as num?)?.toDouble() ?? 0,
+    description: json['description'] as String? ?? '',
+    photoUrl: json['photoUrl'] as String?,
+    createdAt:
+        DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
+  );
 }
 
 enum ReportType { lost, found }
@@ -62,15 +70,35 @@ class PetReport {
   });
 
   factory PetReport.fromJson(Map<String, dynamic> json) => PetReport(
-        id: json['id'] as String? ?? '', pet: Pet.fromJson((json['pet'] as Map?)?.cast<String, dynamic>() ?? json),
-        type: (json['type'] as String? ?? 'lost').toLowerCase() == 'found' ? ReportType.found : ReportType.lost,
-        status: ReportStatus.values.firstWhere((value) => value.name.toLowerCase() == (json['status'] as String? ?? 'active').toLowerCase(), orElse: () => ReportStatus.active),
-        latitude: (json['latitude'] as num?)?.toDouble() ?? 0, longitude: (json['longitude'] as num?)?.toDouble() ?? 0,
-        address: json['address'] as String? ?? '', createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
-        lastSeenAt: DateTime.tryParse(json['lastSeenAt'] as String? ?? '') ?? DateTime.now(), description: json['description'] as String? ?? '', traits: json['traits'] as String? ?? '',
-        distanceKm: (json['distanceKm'] as num?)?.toDouble() ?? 0, sightingsCount: json['sightingsCount'] as int? ?? 0,
-        isOwner: json['isOwner'] as bool? ?? false,
-        ownerEmail: json['ownerEmail'] as String?,
-        sightings: (json['sightings'] as List<dynamic>? ?? []).map((item) => PetSighting.fromJson((item as Map).cast<String, dynamic>())).toList(),
-      );
+    id: json['id'] as String? ?? '',
+    pet: Pet.fromJson((json['pet'] as Map?)?.cast<String, dynamic>() ?? json),
+    type: (json['type'] as String? ?? 'lost').toLowerCase() == 'found'
+        ? ReportType.found
+        : ReportType.lost,
+    status: ReportStatus.values.firstWhere(
+      (value) =>
+          value.name.toLowerCase() ==
+          (json['status'] as String? ?? 'active').toLowerCase(),
+      orElse: () => ReportStatus.active,
+    ),
+    latitude: (json['latitude'] as num?)?.toDouble() ?? 0,
+    longitude: (json['longitude'] as num?)?.toDouble() ?? 0,
+    address: json['address'] as String? ?? '',
+    createdAt:
+        DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
+    lastSeenAt:
+        DateTime.tryParse(json['lastSeenAt'] as String? ?? '') ??
+        DateTime.now(),
+    description: json['description'] as String? ?? '',
+    traits: json['traits'] as String? ?? '',
+    distanceKm: (json['distanceKm'] as num?)?.toDouble() ?? 0,
+    sightingsCount: json['sightingsCount'] as int? ?? 0,
+    isOwner: json['isOwner'] as bool? ?? false,
+    ownerEmail: json['ownerEmail'] as String?,
+    sightings: (json['sightings'] as List<dynamic>? ?? [])
+        .map(
+          (item) => PetSighting.fromJson((item as Map).cast<String, dynamic>()),
+        )
+        .toList(),
+  );
 }

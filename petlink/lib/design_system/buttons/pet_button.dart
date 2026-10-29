@@ -128,11 +128,7 @@ class PetButton extends StatelessWidget {
           Icon(icon, size: 20),
           const SizedBox(width: 12),
           Flexible(
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+            child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
           ),
         ],
       );

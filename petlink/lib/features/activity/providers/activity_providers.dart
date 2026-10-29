@@ -48,7 +48,9 @@ class ActivityNotifier extends AsyncNotifier<List<ActivityItem>> {
 
     // Actualización optimista inmediata en la UI
     state = AsyncData(
-      current.map((item) => item.copyWith(isRead: true, readAt: DateTime.now())).toList(),
+      current
+          .map((item) => item.copyWith(isRead: true, readAt: DateTime.now()))
+          .toList(),
     );
 
     // Persistencia en el backend

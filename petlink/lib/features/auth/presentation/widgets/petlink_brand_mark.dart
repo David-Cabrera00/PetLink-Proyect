@@ -13,7 +13,11 @@ class PetLinkBrandMark extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(PhosphorIconsRegular.pawPrint, size: 20, color: colorScheme.primary),
+        Icon(
+          PhosphorIconsRegular.pawPrint,
+          size: 20,
+          color: colorScheme.primary,
+        ),
         const SizedBox(width: 8),
         Text(
           'PetLink',

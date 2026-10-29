@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'pet_colors.dart';
 import 'pet_typography.dart';
-import 'pet_radius.dart';
+import 'pet_tokens.dart';
 import 'pet_spacing.dart';
 import 'pet_theme_extension.dart';
 
@@ -52,7 +52,9 @@ class PetTheme {
           backgroundColor: PetColors.primary,
           foregroundColor: PetColors.surfaceLight,
           minimumSize: const Size(double.infinity, 52),
-          shape: RoundedRectangleBorder(borderRadius: PetRadius.lgAll),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(PetTokens.rButton),
+          ),
           textStyle: PetTypography.button,
         ),
       ),
@@ -61,7 +63,9 @@ class PetTheme {
           foregroundColor: PetColors.primary,
           minimumSize: const Size(double.infinity, 52),
           side: const BorderSide(color: PetColors.primary, width: 1.5),
-          shape: RoundedRectangleBorder(borderRadius: PetRadius.lgAll),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(PetTokens.rButton),
+          ),
           textStyle: PetTypography.button,
         ),
       ),
@@ -73,19 +77,19 @@ class PetTheme {
           vertical: PetSpacing.md,
         ),
         border: OutlineInputBorder(
-          borderRadius: PetRadius.lgAll,
+          borderRadius: BorderRadius.circular(PetTokens.rInput),
           borderSide: const BorderSide(color: PetColors.borderLight),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: PetRadius.lgAll,
+          borderRadius: BorderRadius.circular(PetTokens.rInput),
           borderSide: const BorderSide(color: PetColors.borderLight),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: PetRadius.lgAll,
+          borderRadius: BorderRadius.circular(PetTokens.rInput),
           borderSide: const BorderSide(color: PetColors.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: PetRadius.lgAll,
+          borderRadius: BorderRadius.circular(PetTokens.rInput),
           borderSide: const BorderSide(color: PetColors.lostLight),
         ),
       ),
@@ -93,7 +97,7 @@ class PetTheme {
         color: PetColors.surfaceLight,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: PetRadius.xlAll,
+          borderRadius: BorderRadius.circular(PetTokens.rCard),
           side: const BorderSide(color: PetColors.borderLight),
         ),
       ),
@@ -162,7 +166,9 @@ class PetTheme {
           backgroundColor: PetColors.primaryLight,
           foregroundColor: PetColors.surfaceDark,
           minimumSize: const Size(double.infinity, 52),
-          shape: RoundedRectangleBorder(borderRadius: PetRadius.lgAll),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(PetTokens.rButton),
+          ),
           textStyle: PetTypography.button,
         ),
       ),
@@ -171,7 +177,9 @@ class PetTheme {
           foregroundColor: PetColors.primaryLight,
           minimumSize: const Size(double.infinity, 52),
           side: BorderSide(color: PetColors.primaryLight, width: 1.5),
-          shape: RoundedRectangleBorder(borderRadius: PetRadius.lgAll),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(PetTokens.rButton),
+          ),
           textStyle: PetTypography.button,
         ),
       ),
@@ -183,19 +191,19 @@ class PetTheme {
           vertical: PetSpacing.md,
         ),
         border: OutlineInputBorder(
-          borderRadius: PetRadius.lgAll,
+          borderRadius: BorderRadius.circular(PetTokens.rInput),
           borderSide: const BorderSide(color: PetColors.borderDark),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: PetRadius.lgAll,
+          borderRadius: BorderRadius.circular(PetTokens.rInput),
           borderSide: const BorderSide(color: PetColors.borderDark),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: PetRadius.lgAll,
+          borderRadius: BorderRadius.circular(PetTokens.rInput),
           borderSide: BorderSide(color: PetColors.primaryLight, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: PetRadius.lgAll,
+          borderRadius: BorderRadius.circular(PetTokens.rInput),
           borderSide: const BorderSide(color: PetColors.lostDark),
         ),
       ),
@@ -203,7 +211,7 @@ class PetTheme {
         color: PetColors.surfaceDark,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: PetRadius.xlAll,
+          borderRadius: BorderRadius.circular(PetTokens.rCard),
           side: const BorderSide(color: PetColors.borderDark),
         ),
       ),
