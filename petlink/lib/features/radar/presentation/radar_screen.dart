@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:petlink/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
+import 'package:go_router/go_router.dart';
+import 'package:petlink/l10n/app_localizations.dart';
 
-import '../../../core/theme/pet_spacing.dart';
-import '../../../core/theme/pet_radius.dart';
-import '../../../core/theme/pet_theme_extension.dart';
-import '../../../shared/widgets/match_card.dart';
-import '../../../shared/widgets/pet_card_compact.dart';
-import '../../../shared/widgets/section_header.dart';
-import '../../../shared/widgets/empty_state.dart';
-import '../../../shared/widgets/error_state.dart';
+import '../../../core/theme/pet_tokens.dart';
+import '../../../shared/models/pet_match.dart';
+import '../../../shared/models/pet_report.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../explore/providers/explore_providers.dart';
 import '../providers/radar_providers.dart';
+import 'widgets/animated_radar_sweep.dart';
 
 class RadarScreen extends ConsumerStatefulWidget {
   const RadarScreen({super.key});
@@ -25,7 +20,7 @@ class RadarScreen extends ConsumerStatefulWidget {
 }
 
 class _RadarScreenState extends ConsumerState<RadarScreen> {
-  String _locationLabel = 'Ubicación no disponible';
+  String _locationLabel = 'Radio 5 km';
 
   @override
   void initState() {
@@ -45,9 +40,21 @@ class _RadarScreenState extends ConsumerState<RadarScreen> {
     }
     try {
       await Geolocator.getCurrentPosition();
-      if (mounted) setState(() => _locationLabel = 'Ubicación actual');
+      if (mounted) setState(() => _locationLabel = 'Radio 5 km');
     } catch (_) {
-      // Keep the neutral label when the device cannot provide a position.
+      // Mantiene el label predeterminado
+    }
+  }
+
+  String _getGreeting(BuildContext context, String? userName) {
+    final hour = DateTime.now().hour;
+    final isEn = Localizations.localeOf(context).languageCode == 'en';
+    if (hour < 12) {
+      return isEn ? 'Good morning' : 'Buenos días';
+    } else if (hour < 18) {
+      return isEn ? 'Good afternoon' : 'Buenas tardes';
+    } else {
+      return isEn ? 'Good evening' : 'Buenas noches';
     }
   }
 
@@ -57,254 +64,310 @@ class _RadarScreenState extends ConsumerState<RadarScreen> {
     final nearbyAsync = ref.watch(nearbyReportsProvider);
     final matchesAsync = ref.watch(matchesProvider);
     final summary = ref.watch(radarSummaryProvider);
+    final user = ref.watch(authProvider).user;
+    final greeting = _getGreeting(context, user?.name);
+    final top = MediaQuery.of(context).padding.top;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.navigationRadar)),
+      backgroundColor: PetTokens.bgOf(context),
       body: RefreshIndicator(
+        color: PetTokens.plum,
         onRefresh: () async {
           ref.invalidate(nearbyReportsProvider);
           ref.invalidate(matchesProvider);
         },
-        child: TweenAnimationBuilder<double>(
-          tween: Tween(begin: 0, end: 1),
-          duration: const Duration(milliseconds: 420),
-          curve: Curves.easeOutCubic,
-          builder: (context, value, child) => Opacity(
-            opacity: value,
-            child: Transform.translate(
-              offset: Offset(0, 12 * (1 - value)),
-              child: child,
-            ),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: EdgeInsets.fromLTRB(
+            0,
+            top + 16,
+            0,
+            PetTokens.contentBottomPadding,
           ),
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(
-              PetSpacing.lg,
-              PetSpacing.md,
-              PetSpacing.lg,
-              PetSpacing.xxl,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildHeader(context, ref.watch(authProvider).user?.name),
-              const SizedBox(height: PetSpacing.lg),
-              _buildZoneSelector(context),
-              const SizedBox(height: PetSpacing.xl),
-              _buildRadarActiveSection(context, summary),
-              const SizedBox(height: PetSpacing.xl),
-              _buildMatchesSection(context, matchesAsync, ref),
-              const SizedBox(height: PetSpacing.xl),
-              _buildNearbySection(context, nearbyAsync, ref),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context, String? userName) {
-    final l10n = AppLocalizations.of(context)!;
-    final cs = Theme.of(context).colorScheme;
-    final accent = PetThemeExtension.of(context).accent;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(PhosphorIconsRegular.pawPrint, color: cs.primary, size: 20),
-            const SizedBox(width: PetSpacing.sm),
-            Text(
-              l10n.radarActive,
-              style: Theme.of(context).textTheme.labelLarge
-                  ?.copyWith(color: cs.primary, fontWeight: FontWeight.w700),
-            ),
-            const Spacer(),
-            Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
-            ),
-          ],
-        ),
-        const SizedBox(height: PetSpacing.md),
-        Text(
-          _buildGreeting(context, userName),
-          style: Theme.of(context).textTheme.headlineMedium
-              ?.copyWith(color: cs.onSurface, fontWeight: FontWeight.w700),
-        ),
-        const SizedBox(height: PetSpacing.xs),
-        Text(
-          l10n.radarNearYou,
-          style: Theme.of(context).textTheme.bodyMedium
-              ?.copyWith(color: cs.onSurfaceVariant),
-        ),
-      ],
-    );
-  }
-
-  String _buildGreeting(BuildContext context, String? userName) {
-    final name = (userName ?? '').trim().isEmpty ? 'PetLink' : userName!.trim();
-    final hour = DateTime.now().hour;
-    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
-    final greeting = hour < 12
-        ? (isEnglish ? 'Good morning' : 'Buenos días')
-        : hour < 18
-            ? (isEnglish ? 'Good afternoon' : 'Buenas tardes')
-            : (isEnglish ? 'Good evening' : 'Buenas noches');
-    return '$greeting, $name';
-  }
-
-  Widget _buildZoneSelector(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final cs = Theme.of(context).colorScheme;
-    return GestureDetector(
-      onTap: () {
-        ref.read(exploreViewModeProvider.notifier).state = ExploreViewMode.map;
-        context.go('/explore');
-      },
-      child: Container(
-        padding: const EdgeInsets.all(PetSpacing.md),
-        decoration: BoxDecoration(
-          color: cs.surface,
-          borderRadius: PetRadius.xlAll,
-          border: Border.all(color: cs.outlineVariant),
-        ),
-        child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(PetSpacing.sm),
-            decoration: BoxDecoration(
-              color: cs.primaryContainer,
-              borderRadius: PetRadius.lgAll,
-            ),
-            child: Icon(PhosphorIconsRegular.mapPin, color: cs.primary),
-          ),
-          const SizedBox(width: PetSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _locationLabel,
-                  style: Theme.of(context).textTheme.titleMedium,
+              // 1. Header con Saludo y Botón "Radio 5 km"
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: PetTokens.gutter + 4,
                 ),
-                const SizedBox(height: PetSpacing.xs),
-                Text(
-                  l10n.radarRadius,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
-            ),
-          ),
-          Icon(PhosphorIconsRegular.caretRight, color: cs.onSurfaceVariant),
-        ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRadarActiveSection(BuildContext context, RadarSummary summary) {
-    final l10n = AppLocalizations.of(context)!;
-    final cs = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(PetSpacing.lg),
-      decoration: BoxDecoration(
-        color: cs.primary,
-        borderRadius: PetRadius.xxlAll,
-        border: Border.all(color: cs.onPrimary.withValues(alpha: 0.12)),
-        boxShadow: [
-          BoxShadow(
-            color: cs.primary.withValues(alpha: 0.22),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Row(
-                      children: [
-                        Icon(
-                          PhosphorIconsFill.broadcast,
-                          size: 18,
-                          color: cs.onPrimary,
-                        ),
-                        const SizedBox(width: PetSpacing.sm),
-                        Text(
-                          l10n.radarActive.toUpperCase(),
-                          style: Theme.of(context).textTheme.labelLarge
-                              ?.copyWith(
-                                color: cs.onPrimary.withValues(alpha: 0.78),
-                                letterSpacing: 1.1,
-                                fontWeight: FontWeight.w700,
-                              ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: PetSpacing.md),
-                    Text(
-                      l10n.radarReportsWithinRadius(summary.totalReports),
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: cs.onPrimary,
-                        fontWeight: FontWeight.w700,
-                        height: 1.2,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            greeting.toUpperCase(),
+                            style: PetTokens.eyebrow(color: PetTokens.muted2),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            l10n.navigationRadar,
+                            style: PetTokens.displayThemed(context, 36),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: PetSpacing.sm),
-                    Text(
-                      l10n.radarPublishedLast24Hours(summary.recentReports),
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: cs.onPrimary.withValues(alpha: 0.72),
+                    InkWell(
+                      onTap: () {
+                        ref.read(exploreViewModeProvider.notifier).state =
+                            ExploreViewMode.map;
+                        context.go('/explore');
+                      },
+                      borderRadius: BorderRadius.circular(14),
+                      child: Container(
+                        height: 44,
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                        decoration: BoxDecoration(
+                          color: PetTokens.surfaceOf(context),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: PetTokens.borderOf(context)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.location_on_outlined,
+                              size: 16,
+                              color: PetTokens.plum,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              _locationLabel,
+                              style: PetTokens.body(
+                                13,
+                                color: PetTokens.plum,
+                                weight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: PetSpacing.md),
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: cs.onPrimary.withValues(alpha: 0.12),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: cs.onPrimary.withValues(alpha: 0.24),
-                  ),
+              const SizedBox(height: 20),
+
+              // 2. Tarjeta Hero Ciruela con Radar Animado
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: PetTokens.gutter,
                 ),
-                child: Center(
-                  child: Text(
-                    '${summary.totalReports}',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: cs.onPrimary,
-                      fontWeight: FontWeight.w700,
+                child: _RadarHeroCard(
+                  summary: summary,
+                  onExploreTap: () => context.go('/explore'),
+                ),
+              ),
+              const SizedBox(height: 28),
+
+              // 3. Sección "Posibles coincidencias"
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: PetTokens.gutter + 4,
+                ),
+                child: Text(
+                  l10n.radarPossibleMatches,
+                  style: PetTokens.displayThemed(context, 22),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: PetTokens.gutter,
+                ),
+                child: matchesAsync.when(
+                  data: (matches) {
+                    if (matches.isEmpty) {
+                      return _EmptyMatchesCard(l10n: l10n);
+                    }
+                    return Column(
+                      children: [
+                        for (final match in matches) ...[
+                          _MatchItemCard(
+                            match: match,
+                            onTap: () => context.go('/matches/${match.id}'),
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+                      ],
+                    );
+                  },
+                  loading: () => const _LoadingPlaceholder(),
+                  error: (err, st) => const _EmptyMatchesCard(),
+                ),
+              ),
+              const SizedBox(height: 28),
+
+              // 4. Sección "Cerca de ti"
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: PetTokens.gutter + 4,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      l10n.radarNearby,
+                      style: PetTokens.display(22, color: PetTokens.ink),
                     ),
-                  ),
+                    GestureDetector(
+                      onTap: () => context.go('/explore'),
+                      child: Text(
+                        l10n.exploreAll,
+                        style: PetTokens.body(
+                          14,
+                          color: PetTokens.plum,
+                          weight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: PetTokens.gutter,
+                ),
+                child: nearbyAsync.when(
+                  data: (reports) {
+                    if (reports.isEmpty) {
+                      return const _EmptyNearbyCard();
+                    }
+                    return Column(
+                      children: [
+                        for (final report in reports.take(4)) ...[
+                          _NearbyPetCard(
+                            report: report,
+                            onTap: () => context.go('/reports/${report.id}'),
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+                      ],
+                    );
+                  },
+                  loading: () => const _LoadingPlaceholder(),
+                  error: (err, st) => const _EmptyNearbyCard(),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: PetSpacing.lg),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => context.go('/explore'),
-              icon: const Icon(PhosphorIconsRegular.arrowRight),
-              label: Text(l10n.radarExplore),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: cs.primary,
-                minimumSize: const Size(double.infinity, 52),
-                shape: RoundedRectangleBorder(
-                  borderRadius: PetRadius.lgAll,
+        ),
+      ),
+    );
+  }
+}
+
+/// Tarjeta Hero en plum con radar animado y contador grande Fraunces
+class _RadarHeroCard extends StatelessWidget {
+  const _RadarHeroCard({
+    required this.summary,
+    required this.onExploreTap,
+  });
+
+  final RadarSummary summary;
+  final VoidCallback onExploreTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Container(
+      decoration: BoxDecoration(
+        color: PetTokens.plum,
+        borderRadius: BorderRadius.circular(PetTokens.rCardHero),
+        boxShadow: PetTokens.shadowCard,
+      ),
+      padding: const EdgeInsets.all(22),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              // Radar con haz giratorio continuo
+              const AnimatedRadarSweep(size: 140),
+              const SizedBox(width: 16),
+              // Datos y contador en Fraunces 64px
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Badge "● ACTIVO"
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 7,
+                          height: 7,
+                          decoration: const BoxDecoration(
+                            color: PetTokens.mintOnDark,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          l10n.radarActive.toUpperCase(),
+                          style: PetTokens.eyebrow(color: PetTokens.peach),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    // Contador gigante
+                    Text(
+                      '${summary.totalReports}',
+                      style: PetTokens.display(
+                        60,
+                        color: PetTokens.cream,
+                        height: 1.0,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      l10n.radarReportsWithinRadius(summary.totalReports),
+                      style: PetTokens.body(
+                        13,
+                        color: PetTokens.lilacText,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
                 ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Botón ancho crema "Explorar el radar"
+          InkWell(
+            onTap: onExploreTap,
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              height: 52,
+              decoration: BoxDecoration(
+                color: PetTokens.cream,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    l10n.radarExplore,
+                    style: PetTokens.body(
+                      15,
+                      color: PetTokens.plum,
+                      weight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.arrow_forward_rounded,
+                    size: 20,
+                    color: PetTokens.plum,
+                  ),
+                ],
               ),
             ),
           ),
@@ -312,177 +375,432 @@ class _RadarScreenState extends ConsumerState<RadarScreen> {
       ),
     );
   }
+}
 
-  Widget _buildMatchesSection(
-    BuildContext context,
-    AsyncValue matchesAsync,
-    WidgetRef ref,
-  ) {
-    final l10n = AppLocalizations.of(context)!;
-    return Column(
-      children: [
-        SectionHeader(title: l10n.radarPossibleMatches),
-        const SizedBox(height: PetSpacing.md),
-        matchesAsync.when(
-          data: (matches) {
-            if (matches.isEmpty) {
-              return _buildEmptyMatches(context);
-            }
-            return Column(
-              children: matches
-                  .map<Widget>(
-                    (match) => Padding(
-                      padding: const EdgeInsets.only(bottom: PetSpacing.md),
-                      child: MatchCard(
-                        match: match,
-                        onTap: () => context.go('/matches/${match.id}'),
+/// Tarjeta de coincidencia con avatar doble
+class _MatchItemCard extends StatelessWidget {
+  const _MatchItemCard({
+    required this.match,
+    required this.onTap,
+  });
+
+  final PetMatch match;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: PetTokens.surfaceOf(context),
+        borderRadius: BorderRadius.circular(PetTokens.rCard),
+        border: Border.all(color: const Color(0xFFCFE5DD)),
+        boxShadow: PetTokens.shadowCard,
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(PetTokens.rCard),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Avatar doble superpuesto 56x56
+              SizedBox(
+                width: 56,
+                height: 56,
+                child: Stack(
+                  children: [
+                    // Mascota perdida (arriba izquierda)
+                    Positioned(
+                      left: 0,
+                      top: 0,
+                      child: Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: PetTokens.lostBg,
+                          borderRadius: BorderRadius.circular(13),
+                          border: Border.all(
+                            color: PetTokens.surfaceOf(context),
+                            width: 2,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.pets_rounded,
+                          size: 18,
+                          color: PetTokens.clayText,
+                        ),
                       ),
                     ),
-                  )
-                  .toList(),
-            );
-          },
-          loading: () => _buildLoadingCard(context),
-          error: (Object _, StackTrace _) => ErrorState(
-            title: l10n.radarMatchesLoadError,
-            subtitle: l10n.connectionRetryDescription,
-            onRetry: () => ref.invalidate(matchesProvider),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEmptyMatches(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final cs = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(PetSpacing.xl),
-      decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).dividerColor),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            PhosphorIconsRegular.magnifyingGlass,
-            size: 48,
-            color: cs.onSurfaceVariant.withValues(alpha: 0.5),
-          ),
-          const SizedBox(height: PetSpacing.md),
-          Text(
-            l10n.radarNoMatches,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: PetSpacing.xs),
-          Text(
-            l10n.radarNoMatchesDescription,
-            style: Theme.of(context).textTheme.bodySmall,
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNearbySection(
-    BuildContext context,
-    AsyncValue nearbyAsync,
-    WidgetRef ref,
-  ) {
-    final l10n = AppLocalizations.of(context)!;
-    return Column(
-      children: [
-        SectionHeader(title: l10n.radarNearby),
-        const SizedBox(height: PetSpacing.md),
-        nearbyAsync.when(
-          data: (reports) {
-            if (reports.isEmpty) {
-              return EmptyState(
-                icon: PhosphorIconsRegular.mapPinLine,
-                title: l10n.radarNoNearbyReports,
-                subtitle: l10n.radarNoNearbyReportsDescription,
-              );
-            }
-            return Column(
-              children: reports
-                  .take(3)
-                  .map<Widget>(
-                    (report) => Padding(
-                      padding: const EdgeInsets.only(bottom: PetSpacing.md),
-                      child: PetCardCompact(
-                        report: report,
-                        onTap: () => context.go('/reports/${report.id}'),
+                    // Mascota encontrada (abajo derecha)
+                    Positioned(
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: PetTokens.mintBg,
+                          borderRadius: BorderRadius.circular(13),
+                          border: Border.all(
+                            color: PetTokens.surfaceOf(context),
+                            width: 2,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.check_rounded,
+                          size: 18,
+                          color: PetTokens.mint,
+                        ),
                       ),
                     ),
-                  )
-                  .toList(),
-            );
-          },
-          loading: () => _buildLoadingCard(context),
-          error: (Object _, StackTrace _) => ErrorState(
-            title: l10n.radarReportsLoadError,
-            subtitle: l10n.connectionRetryDescription,
-            onRetry: () => ref.invalidate(nearbyReportsProvider),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 14),
+              // Datos de la coincidencia
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: match.lostReport.pet.name,
+                            style: PetTokens.body(
+                              16,
+                              color: PetTokens.ink,
+                              weight: FontWeight.w700,
+                            ),
+                          ),
+                          TextSpan(
+                            text: ' · tu reporte',
+                            style: PetTokens.body(
+                              14,
+                              color: PetTokens.muted,
+                              weight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Alguien encontró una mascota parecida',
+                      style: PetTokens.body(13, color: PetTokens.muted),
+                    ),
+                    const SizedBox(height: 6),
+                    // Chips de especie, distancia y tiempo
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: PetTokens.mintBg,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '✓ Especie',
+                            style: PetTokens.body(
+                              12,
+                              color: PetTokens.mintText,
+                              weight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.location_on_outlined,
+                              size: 14,
+                              color: PetTokens.muted,
+                            ),
+                            const SizedBox(width: 3),
+                            Text(
+                              '${match.distanceKm.toStringAsFixed(1)} km',
+                              style: PetTokens.body(12, color: PetTokens.muted),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.access_time_rounded,
+                              size: 14,
+                              color: PetTokens.muted,
+                            ),
+                            const SizedBox(width: 3),
+                            Text(
+                              'Hace ${match.timeDifference.inHours > 0 ? '${match.timeDifference.inHours} h' : '${match.timeDifference.inMinutes} m'}',
+                              style: PetTokens.body(12, color: PetTokens.muted),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
+}
 
-  Widget _buildLoadingCard(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+/// Tarjeta de reporte cercano según `Radar.dc.html`
+class _NearbyPetCard extends StatelessWidget {
+  const _NearbyPetCard({
+    required this.report,
+    required this.onTap,
+  });
+
+  final PetReport report;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final isLost = report.type == ReportType.lost;
+    final badgeBg = isLost ? PetTokens.lostBg : PetTokens.mintBg;
+    final badgeColor = isLost ? PetTokens.clayText : PetTokens.mintText;
+    final statusText = isLost ? l10n.statusLost : l10n.statusFound;
+
     return Container(
-      height: 126,
-      padding: const EdgeInsets.all(PetSpacing.md),
       decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outlineVariant),
+        color: PetTokens.surfaceOf(context),
+        borderRadius: BorderRadius.circular(PetTokens.rCard),
+        border: Border.all(color: PetTokens.borderOf(context)),
+        boxShadow: PetTokens.shadowCard,
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(PetTokens.rCard),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              // Avatar ilustrado / foto de la mascota
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: badgeBg,
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: report.pet.primaryPhotoUrl != null &&
+                        report.pet.primaryPhotoUrl!.isNotEmpty
+                    ? Image.network(
+                        report.pet.primaryPhotoUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            Icon(Icons.pets_rounded, color: badgeColor, size: 28),
+                      )
+                    : Icon(Icons.pets_rounded, color: badgeColor, size: 28),
+              ),
+              const SizedBox(width: 14),
+              // Datos de la mascota
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            report.pet.name,
+                            overflow: TextOverflow.ellipsis,
+                            style: PetTokens.displayThemed(context, 20),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: badgeBg,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            statusText,
+                            style: PetTokens.body(
+                              12,
+                              color: badgeColor,
+                              weight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '${report.pet.species} · ${report.pet.sex}',
+                      style: PetTokens.body(13, color: PetTokens.muted),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.location_on_outlined,
+                          size: 14,
+                          color: PetTokens.muted,
+                        ),
+                        const SizedBox(width: 3),
+                        Expanded(
+                          child: Text(
+                            '${report.distanceKm.toStringAsFixed(2)} km · ${report.address.isNotEmpty ? report.address : "Cerca de ti"}',
+                            overflow: TextOverflow.ellipsis,
+                            style: PetTokens.body(12, color: PetTokens.muted),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyMatchesCard extends StatelessWidget {
+  const _EmptyMatchesCard({this.l10n});
+  final AppLocalizations? l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: PetTokens.surface,
+        borderRadius: BorderRadius.circular(PetTokens.rCard),
+        border: Border.all(color: PetTokens.border),
       ),
       child: Row(
         children: [
           Container(
-            width: 56,
-            height: 56,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              color: cs.surfaceContainerHighest,
-              borderRadius: PetRadius.lgAll,
+              color: PetTokens.lilacBg,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Icon(
+              Icons.search_rounded,
+              color: PetTokens.plum,
+              size: 22,
             ),
           ),
-          const SizedBox(width: PetSpacing.md),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 140,
-                  height: 14,
-                  decoration: BoxDecoration(
-                    color: cs.surfaceContainerHighest,
-                    borderRadius: PetRadius.smAll,
-                  ),
+                Text(
+                  'Sin coincidencias aún',
+                  style: PetTokens.body(15, color: PetTokens.ink, weight: FontWeight.w700),
                 ),
-                const SizedBox(height: PetSpacing.sm),
-                Container(
-                  width: 100,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    color: cs.surfaceContainerHighest,
-                    borderRadius: PetRadius.smAll,
-                  ),
+                const SizedBox(height: 2),
+                Text(
+                  'Te avisaremos en cuanto detectemos una mascota similar en tu radar.',
+                  style: PetTokens.body(13, color: PetTokens.muted),
                 ),
               ],
             ),
           ),
-          Icon(
-            PhosphorIconsRegular.spinner,
-            color: cs.primary,
-            size: 22,
+        ],
+      ),
+    );
+  }
+}
+
+class _EmptyNearbyCard extends StatelessWidget {
+  const _EmptyNearbyCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: PetTokens.surface,
+        borderRadius: BorderRadius.circular(PetTokens.rCard),
+        border: Border.all(color: PetTokens.border),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: PetTokens.lilacBg,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Icon(
+              Icons.pets_rounded,
+              color: PetTokens.plum,
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'No hay reportes cercanos',
+                  style: PetTokens.body(15, color: PetTokens.ink, weight: FontWeight.w700),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'No se encontraron mascotas perdidas o encontradas en tu radio.',
+                  style: PetTokens.body(13, color: PetTokens.muted),
+                ),
+              ],
+            ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _LoadingPlaceholder extends StatelessWidget {
+  const _LoadingPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 90,
+      decoration: BoxDecoration(
+        color: PetTokens.surface,
+        borderRadius: BorderRadius.circular(PetTokens.rCard),
+        border: Border.all(color: PetTokens.border),
+      ),
+      child: const Center(
+        child: SizedBox(
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: PetTokens.plum,
+          ),
+        ),
       ),
     );
   }
