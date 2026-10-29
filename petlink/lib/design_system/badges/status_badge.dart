@@ -61,9 +61,17 @@ class StatusBadge extends StatelessWidget {
           PhosphorIconsRegular.checkCircle,
         );
       case PetStatus.match:
-        return (l10n.statusMatch, extension.match, PhosphorIconsRegular.diamond);
+        return (
+          l10n.statusMatch,
+          extension.match,
+          PhosphorIconsRegular.diamond,
+        );
       case PetStatus.recovered:
-        return (l10n.statusRecovered, extension.found, PhosphorIconsRegular.heart);
+        return (
+          l10n.statusRecovered,
+          extension.found,
+          PhosphorIconsRegular.heart,
+        );
     }
   }
 }
