@@ -8,18 +8,22 @@ class PetTypography {
 
   static TextStyle get _manrope => GoogleFonts.manrope();
 
-  static TextStyle get display => _manrope.copyWith(
-    fontSize: 32,
-    fontWeight: FontWeight.w700,
+  static TextStyle get _fraunces => GoogleFonts.fraunces();
+
+  static TextStyle get display => _fraunces.copyWith(
+    fontSize: 34,
+    fontWeight: FontWeight.w500,
+    letterSpacing: -0.68,
     color: PetColors.textPrimary,
-    height: 1.2,
+    height: 1.05,
   );
 
-  static TextStyle get heading => _manrope.copyWith(
-    fontSize: 24,
-    fontWeight: FontWeight.w700,
+  static TextStyle get heading => _fraunces.copyWith(
+    fontSize: 22,
+    fontWeight: FontWeight.w500,
+    letterSpacing: -0.44,
     color: PetColors.textPrimary,
-    height: 1.3,
+    height: 1.2,
   );
 
   static TextStyle get title => _manrope.copyWith(
@@ -52,7 +56,7 @@ class PetTypography {
 
   static TextStyle get button => _manrope.copyWith(
     fontSize: 16,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w700,
     color: PetColors.surface,
     height: 1.2,
   );
