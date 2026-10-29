@@ -16,6 +16,6 @@ async function bootstrap() {
 
   const config = new DocumentBuilder().setTitle('PetLink API').setDescription('API para reportes de mascotas perdidas y encontradas').setVersion('1.0').addBearerAuth().build();
   SwaggerModule.setup('docs', app, SwaggerModule.createDocument(app, config));
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
 }
 void bootstrap();
