@@ -349,7 +349,7 @@ Pendiente (priorizado):
 
 - [x] **Fase 0 — Base limpia:** Working tree commiteado y ordenado en ramas lógicas.
 - [x] **Fase 1 — Reportes sin duplicados:** `PartialReportUploadException`, navegación directa al reporte, borrador limpio y test de desconexión en 2da foto.
-- [ ] **Fase 2 — Localización completa:** Inventario y extracción de strings a ARB es/en.
+- [x] **Fase 2 — Localización completa:** Inventario y extracción de strings a ARB es/en, plurales ICU y consistencia bilingüe es/en.
 - [ ] **Fase 3 — Pruebas de sesión y red:** Blindaje HTTP/Auth con inyección de cliente HTTP y almacenamiento fake.
 - [ ] **Fase 4 — APK release + Render:** Keystore, build de release y configuración de despliegue.
 - [ ] **Fase 5 — Features externas:** Recuperación de contraseña, OAuth Google, FCM push, IA.
