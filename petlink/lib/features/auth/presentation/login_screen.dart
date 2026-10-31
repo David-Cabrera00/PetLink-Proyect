@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 
+import '../../../core/network/api_error_message.dart';
 import '../../../core/theme/pet_tokens.dart';
 import '../providers/auth_provider.dart';
 import 'widgets/reactive_pet_avatar.dart';
@@ -54,14 +55,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
-    await ref.read(authProvider.notifier).login(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      await ref.read(authProvider.notifier).login(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(content: Text(apiErrorMessage(l10n, error, isLogin: true))),
         );
+    }
   }
 
   Future<void> _continueWithGoogle() async {
-    await ref.read(authProvider.notifier).loginWithGoogle();
+    final l10n = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(l10n.authGoogleUnavailable)));
   }
 
   @override
@@ -171,30 +185,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           },
                         ),
                         const SizedBox(height: 10),
-
-                        // Olvidaste contraseña
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () => context.go('/forgot-password'),
-                            style: TextButton.styleFrom(
-                              foregroundColor: PetTokens.plumAccentOf(context),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 4,
-                              ),
-                            ),
-                            child: Text(
-                              l10n.authForgotPassword,
-                              style: PetTokens.body(
-                                14,
-                                color: PetTokens.plumAccentOf(context),
-                                weight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
 
                         // Botón Entrar primario
                         _PrimaryButton(
