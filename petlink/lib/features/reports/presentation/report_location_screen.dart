@@ -245,9 +245,10 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
                                     vertical: 12,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: PetTokens.surface
+                                    color: PetTokens.surfaceOf(context)
                                         .withValues(alpha: 0.96),
                                     borderRadius: BorderRadius.circular(18),
+                                    border: Border.all(color: PetTokens.borderOf(context)),
                                     boxShadow: const [
                                       BoxShadow(
                                         color: Color(0x1F2A1A29),
@@ -262,14 +263,14 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
                                         width: 40,
                                         height: 40,
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFFFCEEE8),
+                                          color: PetTokens.lostBgOf(context),
                                           borderRadius:
                                               BorderRadius.circular(12),
                                         ),
                                         alignment: Alignment.center,
-                                        child: const Icon(
+                                        child: Icon(
                                           PhosphorIconsBold.broadcast,
-                                          color: PetTokens.clayText,
+                                          color: PetTokens.lostTextOf(context),
                                           size: 20,
                                         ),
                                       ),
@@ -333,7 +334,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
                                   size: 20,
                                 ),
                                 filled: true,
-                                fillColor: PetTokens.surfaceOf(context),
+                                fillColor: PetTokens.surfaceHigherOf(context),
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 14,
                                   vertical: 14,
@@ -347,8 +348,8 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
-                                  borderSide: const BorderSide(
-                                    color: PetTokens.plum,
+                                  borderSide: BorderSide(
+                                    color: PetTokens.plumAccentOf(context),
                                     width: 2.0,
                                   ),
                                 ),
@@ -424,15 +425,25 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
                       width: 110,
                       height: 56,
                       decoration: BoxDecoration(
+                        color: PetTokens.isDark(context)
+                            ? PetTokens.surfaceHigherOf(context)
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: PetTokens.plum, width: 1.5),
+                        border: Border.all(
+                          color: PetTokens.isDark(context)
+                              ? PetTokens.borderOf(context)
+                              : PetTokens.plum,
+                          width: 1.5,
+                        ),
                       ),
                       alignment: Alignment.center,
                       child: Text(
                         l10n.backAction,
                         style: PetTokens.body(
                           15,
-                          color: PetTokens.plum,
+                          color: PetTokens.isDark(context)
+                              ? PetTokens.inkOf(context)
+                              : PetTokens.plum,
                           weight: FontWeight.w700,
                         ),
                       ),
