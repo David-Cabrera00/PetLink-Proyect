@@ -14,6 +14,7 @@
     "prisma:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@nestjs/cli": "^11.0.0",
     "@nestjs/common": "^11.0.0",
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.0.0",
@@ -26,11 +27,12 @@
     "class-validator": "^0.14.2",
     "helmet": "^8.1.0",
     "joi": "^18.0.1",
+    "prisma": "^6.17.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.2"
+    "rxjs": "^7.8.2",
+    "typescript": "^5.9.2"
   },
   "devDependencies": {
-    "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.0",
     "@types/bcryptjs": "^2.4.6",
@@ -38,10 +40,8 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.0",
     "jest": "^30.0.0",
-    "prisma": "^6.17.0",
     "ts-jest": "^29.4.0",
     "ts-node": "^10.9.2",
-    "tsx": "^4.19.2",
-    "typescript": "^5.9.2"
+    "tsx": "^4.19.2"
   }
 }
