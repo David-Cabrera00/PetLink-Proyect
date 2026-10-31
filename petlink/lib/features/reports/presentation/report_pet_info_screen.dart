@@ -652,6 +652,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
     required String label,
     required bool isSelected,
     required VoidCallback onTap,
+    IconData? icon,
   }) {
     return Expanded(
       child: InkWell(
@@ -677,14 +678,32 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
             ),
           ),
           alignment: Alignment.center,
-          child: Text(
-            label,
-            style: PetTokens.bodyThemed(
-              context,
-              13,
-              color: isSelected ? Colors.white : PetTokens.inkOf(context),
-              weight: isSelected ? FontWeight.w700 : FontWeight.w500,
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (icon != null) ...[
+                Icon(
+                  icon,
+                  size: 17,
+                  color: isSelected
+                      ? Colors.white
+                      : (PetTokens.isDark(context)
+                          ? PetTokens.clayLight
+                          : PetTokens.clay),
+                ),
+                const SizedBox(width: 6),
+              ],
+              Text(
+                label,
+                style: PetTokens.bodyThemed(
+                  context,
+                  13,
+                  color: isSelected ? Colors.white : PetTokens.inkOf(context),
+                  weight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ),
       ),
