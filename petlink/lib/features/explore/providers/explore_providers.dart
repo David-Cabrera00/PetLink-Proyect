@@ -3,6 +3,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../shared/models/pet_report.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../../radar/providers/radar_providers.dart';
 
 enum ExploreFilter { all, lost, found, nearby, mine }
@@ -22,6 +23,8 @@ final exploreLocationProvider = StateProvider<LatLng?>((ref) => null);
 final exploreSearchQueryProvider = StateProvider<String>((ref) => '');
 
 final exploreReportsProvider = FutureProvider<List<PetReport>>((ref) async {
+  // Invalida la caché al cambiar de cuenta y no consulta sin sesión.
+  if (ref.watch(currentUserEmailProvider) == null) return const [];
   final repository = ref.watch(petReportRepositoryProvider);
   final filter = ref.watch(exploreFilterProvider);
   final currentLocation = ref.watch(exploreLocationProvider);
