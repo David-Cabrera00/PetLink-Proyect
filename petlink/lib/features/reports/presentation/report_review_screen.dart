@@ -151,15 +151,25 @@ class _ReportReviewScreenState extends ConsumerState<ReportReviewScreen> {
                       width: 110,
                       height: 56,
                       decoration: BoxDecoration(
+                        color: PetTokens.isDark(context)
+                            ? PetTokens.surfaceHigherOf(context)
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: PetTokens.plum, width: 1.5),
+                        border: Border.all(
+                          color: PetTokens.isDark(context)
+                              ? PetTokens.borderOf(context)
+                              : PetTokens.plum,
+                          width: 1.5,
+                        ),
                       ),
                       alignment: Alignment.center,
                       child: Text(
                         l10n.backAction,
                         style: PetTokens.body(
                           15,
-                          color: PetTokens.plum,
+                          color: PetTokens.isDark(context)
+                              ? PetTokens.inkOf(context)
+                              : PetTokens.plum,
                           weight: FontWeight.w700,
                         ),
                       ),
@@ -253,7 +263,7 @@ class _WantedPosterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final posterColor = isLost ? PetTokens.clayText : PetTokens.mint;
+    final posterColor = isLost ? PetTokens.lostTextOf(context) : PetTokens.mintTextOf(context);
     final stampText = isLost ? 'PERDIDA\nAY\u00DADANOS' : 'ENCONTRADA\nHOGAR';
 
     return Stack(
@@ -261,16 +271,10 @@ class _WantedPosterCard extends StatelessWidget {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: PetTokens.surface,
+            color: PetTokens.surfaceOf(context),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: PetTokens.border),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x282A1A29),
-                offset: Offset(0, 18),
-                blurRadius: 36,
-              ),
-            ],
+            border: Border.all(color: PetTokens.borderOf(context)),
+            boxShadow: PetTokens.shadowCardThemed(context),
           ),
           padding: const EdgeInsets.all(18),
           child: Column(
@@ -293,7 +297,9 @@ class _WantedPosterCard extends StatelessWidget {
               Container(
                 height: 200,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1E6DC),
+                  color: PetTokens.isDark(context)
+                      ? const Color(0xFF28212F)
+                      : const Color(0xFFF1E6DC),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: ClipRRect(
@@ -331,16 +337,16 @@ class _WantedPosterCard extends StatelessWidget {
               // Nombre
               Text(
                 petName,
-                style: PetTokens.display(
+                style: PetTokens.displayThemed(
+                  context,
                   32,
-                  color: PetTokens.ink,
                   italic: true,
                 ),
               ),
               const SizedBox(height: 4),
 
               // Resumen
-              Text(summary, style: PetTokens.body(13, color: PetTokens.muted)),
+              Text(summary, style: PetTokens.bodyThemed(context, 13, color: PetTokens.mutedOf(context))),
               const SizedBox(height: 12),
 
               // Pills de ubicación y fecha
@@ -354,23 +360,26 @@ class _WantedPosterCard extends StatelessWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEFE3EC),
+                      color: PetTokens.isDark(context)
+                          ? const Color(0xFF2C2232)
+                          : const Color(0xFFEFE3EC),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           PhosphorIconsRegular.mapPin,
                           size: 14,
-                          color: PetTokens.plum,
+                          color: PetTokens.plumAccentOf(context),
                         ),
                         const SizedBox(width: 4),
                         Text(
                           address,
-                          style: PetTokens.body(
+                          style: PetTokens.bodyThemed(
+                            context,
                             12,
-                            color: PetTokens.plum,
+                            color: PetTokens.plumAccentOf(context),
                             weight: FontWeight.w700,
                           ),
                         ),
@@ -383,23 +392,26 @@ class _WantedPosterCard extends StatelessWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEFE3EC),
+                      color: PetTokens.isDark(context)
+                          ? const Color(0xFF2C2232)
+                          : const Color(0xFFEFE3EC),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           PhosphorIconsRegular.clock,
                           size: 14,
-                          color: PetTokens.plum,
+                          color: PetTokens.plumAccentOf(context),
                         ),
                         const SizedBox(width: 4),
                         Text(
                           dateFormatted,
-                          style: PetTokens.body(
+                          style: PetTokens.bodyThemed(
+                            context,
                             12,
-                            color: PetTokens.plum,
+                            color: PetTokens.plumAccentOf(context),
                             weight: FontWeight.w700,
                           ),
                         ),
@@ -414,14 +426,14 @@ class _WantedPosterCard extends StatelessWidget {
                 const SizedBox(height: 12),
                 Text(
                   'Se\u00F1as: ${traits!.trim()}',
-                  style: PetTokens.body(13, color: PetTokens.ink),
+                  style: PetTokens.bodyThemed(context, 13, color: PetTokens.inkOf(context)),
                 ),
               ],
               if (description != null && description!.trim().isNotEmpty) ...[
                 const SizedBox(height: 4),
                 Text(
                   description!.trim(),
-                  style: PetTokens.body(13, color: PetTokens.muted),
+                  style: PetTokens.bodyThemed(context, 13, color: PetTokens.mutedOf(context)),
                 ),
               ],
             ],
@@ -468,7 +480,7 @@ class _WantedPosterCard extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: posterColor, width: 3),
-                color: PetTokens.surface.withValues(alpha: 0.88),
+                color: PetTokens.isDark(context) ? PetTokens.surfaceHigherOf(context) : PetTokens.surface.withValues(alpha: 0.88),
               ),
               alignment: Alignment.center,
               child: Text(
