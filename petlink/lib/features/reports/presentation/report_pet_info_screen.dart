@@ -36,8 +36,8 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
     final picker = ImagePicker();
     final picked = await picker.pickImage(
       source: source,
-      imageQuality: 85,
-      maxWidth: 1200,
+      imageQuality: 70,
+      maxWidth: 800,
     );
     if (picked == null) return;
 
@@ -689,7 +689,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                   color: isSelected
                       ? Colors.white
                       : (PetTokens.isDark(context)
-                          ? PetTokens.clayLight
+                          ? PetTokens.clayOnDark
                           : PetTokens.clay),
                 ),
                 const SizedBox(width: 6),
