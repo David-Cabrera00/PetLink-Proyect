@@ -225,7 +225,7 @@ class ReportsScreen extends ConsumerWidget {
                         const SizedBox(height: 12),
                         Text(
                           l10n.reportsLoadError,
-                          style: PetTokens.display(16, color: PetTokens.ink),
+                          style: PetTokens.displayThemed(context, 16),
                         ),
                         const SizedBox(height: 14),
                         FilledButton(
@@ -353,9 +353,14 @@ class _CreateReportHeroCard extends StatelessWidget {
       child: Container(
         height: 236,
         decoration: BoxDecoration(
-          color: PetTokens.plum,
+          color: PetTokens.isDark(context)
+              ? const Color(0xFF2E1C2E)
+              : PetTokens.plum,
           borderRadius: BorderRadius.circular(28),
-          boxShadow: PetTokens.shadowButton,
+          border: PetTokens.isDark(context)
+              ? Border.all(color: const Color(0xFF5A3E5C), width: 1.5)
+              : null,
+          boxShadow: PetTokens.shadowCardThemed(context),
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(28),
@@ -503,7 +508,7 @@ class _CommunityReportsCard extends StatelessWidget {
           color: PetTokens.surfaceOf(context),
           borderRadius: BorderRadius.circular(28),
           border: Border.all(color: PetTokens.borderOf(context)),
-          boxShadow: PetTokens.shadowCard,
+          boxShadow: PetTokens.shadowCardThemed(context),
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(28),
@@ -550,13 +555,15 @@ class _CommunityReportsCard extends StatelessWidget {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF1E8EF),
+                        color: PetTokens.isDark(context)
+                            ? const Color(0xFF2C2232)
+                            : const Color(0xFFF1E8EF),
                         borderRadius: BorderRadius.circular(14),
                       ),
                       alignment: Alignment.center,
-                      child: const Icon(
+                      child: Icon(
                         Icons.chevron_right_rounded,
-                        color: PetTokens.plum,
+                        color: PetTokens.plumAccentOf(context),
                         size: 24,
                       ),
                     ),
@@ -587,7 +594,7 @@ class _MyPersonalReportsLink extends StatelessWidget {
       borderRadius: BorderRadius.circular(18),
       child: CustomPaint(
         painter: _DashedBorderPainter(
-          color: const Color(0xFFD9CBC0),
+          color: PetTokens.borderOf(context),
           radius: 18,
           strokeWidth: 1.5,
         ),
@@ -604,14 +611,14 @@ class _MyPersonalReportsLink extends StatelessWidget {
               Expanded(
                 child: Text.rich(
                   TextSpan(
-                    style: PetTokens.body(14, color: PetTokens.muted),
+                    style: PetTokens.bodyThemed(context, 14, color: PetTokens.mutedOf(context)),
                     children: [
                       TextSpan(text: '${l10n.reportsTitle} \u00B7 '),
                       TextSpan(
                         text: l10n.navigationProfile,
                         style: PetTokens.body(
                           14,
-                          color: PetTokens.plum,
+                          color: PetTokens.plumAccentOf(context),
                           weight: FontWeight.w700,
                         ),
                       ),
@@ -619,10 +626,10 @@ class _MyPersonalReportsLink extends StatelessWidget {
                   ),
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.chevron_right_rounded,
                 size: 20,
-                color: PetTokens.muted,
+                color: PetTokens.mutedOf(context),
               ),
             ],
           ),
@@ -646,8 +653,8 @@ class _MyReportItemCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final isLost = report.type == ReportType.lost;
     final isEn = Localizations.localeOf(context).languageCode == 'en';
-    final badgeBg = isLost ? PetTokens.lostBg : PetTokens.mintBg;
-    final badgeColor = isLost ? PetTokens.clayText : PetTokens.mintText;
+    final badgeBg = isLost ? PetTokens.lostBgOf(context) : PetTokens.mintBgOf(context);
+    final badgeColor = isLost ? PetTokens.lostTextOf(context) : PetTokens.mintTextOf(context);
     final statusText = isLost ? l10n.statusLost : l10n.statusFound;
 
     return InkWell(
@@ -659,13 +666,7 @@ class _MyReportItemCard extends StatelessWidget {
           color: PetTokens.surfaceOf(context),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: PetTokens.borderOf(context)),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x0C2A1A29),
-              offset: Offset(0, 4),
-              blurRadius: 14,
-            ),
-          ],
+          boxShadow: PetTokens.shadowCardThemed(context),
         ),
         child: Row(
           children: [
@@ -675,7 +676,7 @@ class _MyReportItemCard extends StatelessWidget {
               child: Container(
                 width: 68,
                 height: 68,
-                color: isLost ? const Color(0xFFFCEEE8) : const Color(0xFFDDEFE9),
+                color: isLost ? PetTokens.lostBgOf(context) : PetTokens.mintBgOf(context),
                 child: (report.pet.primaryPhotoUrl != null &&
                         report.pet.primaryPhotoUrl!.isNotEmpty)
                     ? Image.network(
@@ -684,14 +685,14 @@ class _MyReportItemCard extends StatelessWidget {
                         errorBuilder: (_, _, _) => Center(
                           child: PetPaw(
                             size: 28,
-                            color: isLost ? PetTokens.clayText : PetTokens.mint,
+                            color: isLost ? PetTokens.lostTextOf(context) : PetTokens.mintTextOf(context),
                           ),
                         ),
                       )
                     : Center(
                         child: PetPaw(
                           size: 28,
-                          color: isLost ? PetTokens.clayText : PetTokens.mint,
+                          color: isLost ? PetTokens.lostTextOf(context) : PetTokens.mintTextOf(context),
                         ),
                       ),
               ),

@@ -118,7 +118,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           focusNode: _emailFocus,
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.next,
-                          style: PetTokens.body(16, color: PetTokens.ink),
+                          style: PetTokens.bodyThemed(context, 16, color: PetTokens.inkOf(context)),
                           decoration: _inputDecoration(
                             hint: 'tu@correo.com',
                             prefixIcon: Icons.mail_outline_rounded,
@@ -147,7 +147,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           obscureText: _obscurePassword,
                           textInputAction: TextInputAction.done,
                           onFieldSubmitted: (_) => _submit(),
-                          style: PetTokens.body(16, color: PetTokens.ink),
+                          style: PetTokens.bodyThemed(context, 16, color: PetTokens.inkOf(context)),
                           decoration: _inputDecoration(
                             hint: '••••••••',
                             prefixIcon: Icons.lock_outline_rounded,
@@ -178,7 +178,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           child: TextButton(
                             onPressed: () => context.go('/forgot-password'),
                             style: TextButton.styleFrom(
-                              foregroundColor: PetTokens.plum,
+                              foregroundColor: PetTokens.plumAccentOf(context),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 6,
                                 vertical: 4,
@@ -188,7 +188,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               l10n.authForgotPassword,
                               style: PetTokens.body(
                                 14,
-                                color: PetTokens.plum,
+                                color: PetTokens.plumAccentOf(context),
                                 weight: FontWeight.w700,
                               ),
                             ),
@@ -220,7 +220,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               l10n.authNoAccount,
                               style: PetTokens.body(
                                 15,
-                                color: PetTokens.muted,
+                                color: PetTokens.mutedOf(context),
                               ),
                             ),
                             const SizedBox(width: 6),
@@ -230,7 +230,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 l10n.authCreateAccount,
                                 style: PetTokens.body(
                                   15,
-                                  color: PetTokens.clayText,
+                                  color: PetTokens.lostTextOf(context),
                                   weight: FontWeight.w800,
                                 ),
                               ),
@@ -245,7 +245,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           textAlign: TextAlign.center,
                           style: PetTokens.display(
                             15,
-                            color: PetTokens.placeholder,
+                            color: PetTokens.mutedOf(context),
                             italic: true,
                           ),
                         ),
@@ -268,27 +268,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: PetTokens.body(16, color: PetTokens.placeholder),
+      hintStyle: PetTokens.body(16, color: PetTokens.mutedOf(context)),
       prefixIcon: Icon(prefixIcon, color: PetTokens.muted2, size: 20),
       suffixIcon: suffixIcon,
       filled: true,
-      fillColor: PetTokens.surface,
+      fillColor: PetTokens.surfaceHigherOf(context),
       contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(PetTokens.rInput),
-        borderSide: BorderSide(color: PetTokens.border, width: 1.5),
+        borderSide: BorderSide(color: PetTokens.borderOf(context), width: 1.5),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(PetTokens.rInput),
-        borderSide: BorderSide(color: PetTokens.border, width: 1.5),
+        borderSide: BorderSide(color: PetTokens.borderOf(context), width: 1.5),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(PetTokens.rInput),
-        borderSide: BorderSide(color: PetTokens.plum, width: 2),
+        borderSide: BorderSide(color: PetTokens.plumAccentOf(context), width: 2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(PetTokens.rInput),
-        borderSide: BorderSide(color: PetTokens.lostBg, width: 1.5),
+        borderSide: BorderSide(color: PetTokens.lostBorderOf(context), width: 1.5),
       ),
     );
   }
@@ -304,7 +304,7 @@ class _FieldLabel extends StatelessWidget {
       padding: const EdgeInsets.only(left: 4),
       child: Text(
         label,
-        style: PetTokens.body(13, color: PetTokens.ink, weight: FontWeight.w700),
+        style: PetTokens.body(13, color: PetTokens.inkOf(context), weight: FontWeight.w700),
       ),
     );
   }

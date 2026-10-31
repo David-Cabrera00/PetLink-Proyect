@@ -33,14 +33,14 @@ class PetColors {
   // Lost
   static const Color lostLight = Color(0xFFB4472F); // clayText
   static const Color lostSoftLight = Color(0xFFFCEEE8); // lostBg
-  static const Color lostDark = Color(0xFFE58E98);
-  static const Color lostSoftDark = Color(0xFF4A252D);
+  static const Color lostDark = Color(0xFFFF9E84);
+  static const Color lostSoftDark = Color(0x33E07A5F);
 
   // Found
   static const Color foundLight = Color(0xFF2C7A69); // mint
   static const Color foundSoftLight = Color(0xFFDDEFE9); // mintBg
-  static const Color foundDark = Color(0xFFA9BDD0);
-  static const Color foundSoftDark = Color(0xFF2A3746);
+  static const Color foundDark = Color(0xFF5CD6A5);
+  static const Color foundSoftDark = Color(0x2E4B8B73);
 
   // Match
   static const Color matchLight = Color(0xFF8A6386);

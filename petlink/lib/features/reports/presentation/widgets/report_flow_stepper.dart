@@ -105,6 +105,7 @@ class _ReportFlowStepperState extends State<ReportFlowStepper>
                     currentStep: widget.currentStep,
                     totalSteps: widget.totalSteps,
                     pulseValue: _pulseController.value,
+                    isDark: PetTokens.isDark(context),
                   ),
                 );
               },
@@ -121,11 +122,13 @@ class _StepperTrackPainter extends CustomPainter {
     required this.currentStep,
     required this.totalSteps,
     required this.pulseValue,
+    required this.isDark,
   });
 
   final int currentStep;
   final int totalSteps;
   final double pulseValue;
+  final bool isDark;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -136,7 +139,7 @@ class _StepperTrackPainter extends CustomPainter {
 
     // 1. Línea base discontinua
     final dashedPaint = Paint()
-      ..color = const Color(0xFFDCCFC4)
+      ..color = isDark ? const Color(0xFF2C2432) : const Color(0xFFDCCFC4)
       ..strokeWidth = 2.0
       ..style = PaintingStyle.stroke;
 
@@ -151,7 +154,7 @@ class _StepperTrackPainter extends CustomPainter {
     if (currentStep > 1) {
       final completedX = startX + (currentStep - 1) * stepDistance;
       final solidPaint = Paint()
-        ..color = PetTokens.plum
+        ..color = isDark ? const Color(0xFFD8AED6) : PetTokens.plum
         ..strokeWidth = 2.5
         ..strokeCap = StrokeCap.round
         ..style = PaintingStyle.stroke;
@@ -167,7 +170,7 @@ class _StepperTrackPainter extends CustomPainter {
         // Pasos completados: huella ciruela
         canvas.save();
         canvas.translate(nodeX - 8, nodeY - 8);
-        PawPainter(color: PetTokens.plum).paint(canvas, const Size(16, 16));
+        PawPainter(color: isDark ? const Color(0xFFD8AED6) : PetTokens.plum).paint(canvas, const Size(16, 16));
         canvas.restore();
       } else if (i == currentStep) {
         // Paso actual: anillo pulsante + huella terracota
@@ -188,7 +191,7 @@ class _StepperTrackPainter extends CustomPainter {
         // Pasos futuros: huella gris suave
         canvas.save();
         canvas.translate(nodeX - 8, nodeY - 8);
-        const PawPainter(color: Color(0xFFE3D6CB))
+        PawPainter(color: isDark ? const Color(0xFF362D3B) : const Color(0xFFE3D6CB))
             .paint(canvas, const Size(16, 16));
         canvas.restore();
       }
@@ -198,7 +201,7 @@ class _StepperTrackPainter extends CustomPainter {
     final houseX = endX;
     final houseY = 22.0;
     final isDone = currentStep >= totalSteps;
-    final houseColor = isDone ? PetTokens.clay : const Color(0xFFE3D6CB);
+    final houseColor = isDone ? PetTokens.clay : (isDark ? const Color(0xFF362D3B) : const Color(0xFFE3D6CB));
 
     final housePaint = Paint()
       ..color = houseColor
@@ -239,5 +242,6 @@ class _StepperTrackPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _StepperTrackPainter oldDelegate) =>
       oldDelegate.currentStep != currentStep ||
-      oldDelegate.pulseValue != pulseValue;
+      oldDelegate.pulseValue != pulseValue ||
+      oldDelegate.isDark != isDark;
 }

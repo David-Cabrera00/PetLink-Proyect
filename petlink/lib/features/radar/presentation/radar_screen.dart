@@ -214,7 +214,7 @@ class _RadarScreenState extends ConsumerState<RadarScreen> {
                   children: [
                     Text(
                       l10n.radarNearby,
-                      style: PetTokens.display(22, color: PetTokens.ink),
+                      style: PetTokens.displayThemed(context, 22),
                     ),
                     GestureDetector(
                       onTap: () => context.go('/explore'),
@@ -222,7 +222,7 @@ class _RadarScreenState extends ConsumerState<RadarScreen> {
                         l10n.exploreAll,
                         style: PetTokens.body(
                           14,
-                          color: PetTokens.plum,
+                          color: PetTokens.plumAccentOf(context),
                           weight: FontWeight.w700,
                         ),
                       ),
@@ -279,9 +279,14 @@ class _RadarHeroCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
-        color: PetTokens.plum,
+        color: PetTokens.isDark(context)
+            ? const Color(0xFF2E1C2E)
+            : PetTokens.plum,
         borderRadius: BorderRadius.circular(PetTokens.rCardHero),
-        boxShadow: PetTokens.shadowCard,
+        border: PetTokens.isDark(context)
+            ? Border.all(color: const Color(0xFF5A3E5C), width: 1.5)
+            : null,
+        boxShadow: PetTokens.shadowCardThemed(context),
       ),
       padding: const EdgeInsets.all(22),
       child: Column(
@@ -347,7 +352,9 @@ class _RadarHeroCard extends StatelessWidget {
             child: Container(
               height: 52,
               decoration: BoxDecoration(
-                color: PetTokens.cream,
+                color: PetTokens.isDark(context)
+                    ? const Color(0xFFE8D4E8)
+                    : PetTokens.cream,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
@@ -470,7 +477,7 @@ class _MatchItemCard extends StatelessWidget {
                             text: match.lostReport.pet.name,
                             style: PetTokens.body(
                               16,
-                              color: PetTokens.ink,
+                              color: PetTokens.inkOf(context),
                               weight: FontWeight.w700,
                             ),
                           ),
@@ -488,7 +495,7 @@ class _MatchItemCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       'Alguien encontró una mascota parecida',
-                      style: PetTokens.body(13, color: PetTokens.muted),
+                      style: PetTokens.bodyThemed(context, 13, color: PetTokens.mutedOf(context)),
                     ),
                     const SizedBox(height: 6),
                     // Chips de especie, distancia y tiempo
@@ -648,7 +655,7 @@ class _NearbyPetCard extends StatelessWidget {
                     const SizedBox(height: 3),
                     Text(
                       '${report.pet.species} · ${report.pet.sex}',
-                      style: PetTokens.body(13, color: PetTokens.muted),
+                      style: PetTokens.bodyThemed(context, 13, color: PetTokens.mutedOf(context)),
                     ),
                     const SizedBox(height: 4),
                     Row(
@@ -688,9 +695,9 @@ class _EmptyMatchesCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: PetTokens.surface,
+        color: PetTokens.surfaceOf(context),
         borderRadius: BorderRadius.circular(PetTokens.rCard),
-        border: Border.all(color: PetTokens.border),
+        border: Border.all(color: PetTokens.borderOf(context)),
       ),
       child: Row(
         children: [
@@ -698,12 +705,12 @@ class _EmptyMatchesCard extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: PetTokens.lilacBg,
+              color: PetTokens.isDark(context) ? const Color(0xFF382338) : PetTokens.lilacBg,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.search_rounded,
-              color: PetTokens.plum,
+              color: PetTokens.plumAccentOf(context),
               size: 22,
             ),
           ),
@@ -714,12 +721,12 @@ class _EmptyMatchesCard extends StatelessWidget {
               children: [
                 Text(
                   'Sin coincidencias aún',
-                  style: PetTokens.body(15, color: PetTokens.ink, weight: FontWeight.w700),
+                  style: PetTokens.bodyThemed(context, 15, color: PetTokens.inkOf(context), weight: FontWeight.w700),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   'Te avisaremos en cuanto detectemos una mascota similar en tu radar.',
-                  style: PetTokens.body(13, color: PetTokens.muted),
+                  style: PetTokens.bodyThemed(context, 13, color: PetTokens.mutedOf(context)),
                 ),
               ],
             ),
@@ -738,9 +745,9 @@ class _EmptyNearbyCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: PetTokens.surface,
+        color: PetTokens.surfaceOf(context),
         borderRadius: BorderRadius.circular(PetTokens.rCard),
-        border: Border.all(color: PetTokens.border),
+        border: Border.all(color: PetTokens.borderOf(context)),
       ),
       child: Row(
         children: [
@@ -748,12 +755,12 @@ class _EmptyNearbyCard extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: PetTokens.lilacBg,
+              color: PetTokens.isDark(context) ? const Color(0xFF382338) : PetTokens.lilacBg,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(
-              Icons.pets_rounded,
-              color: PetTokens.plum,
+            child: Icon(
+              Icons.pets_rounded,
+              color: PetTokens.plumAccentOf(context),
               size: 22,
             ),
           ),
@@ -764,12 +771,12 @@ class _EmptyNearbyCard extends StatelessWidget {
               children: [
                 Text(
                   'No hay reportes cercanos',
-                  style: PetTokens.body(15, color: PetTokens.ink, weight: FontWeight.w700),
+                  style: PetTokens.bodyThemed(context, 15, color: PetTokens.inkOf(context), weight: FontWeight.w700),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   'No se encontraron mascotas perdidas o encontradas en tu radio.',
-                  style: PetTokens.body(13, color: PetTokens.muted),
+                  style: PetTokens.bodyThemed(context, 13, color: PetTokens.mutedOf(context)),
                 ),
               ],
             ),
@@ -788,9 +795,9 @@ class _LoadingPlaceholder extends StatelessWidget {
     return Container(
       height: 90,
       decoration: BoxDecoration(
-        color: PetTokens.surface,
+        color: PetTokens.surfaceOf(context),
         borderRadius: BorderRadius.circular(PetTokens.rCard),
-        border: Border.all(color: PetTokens.border),
+        border: Border.all(color: PetTokens.borderOf(context)),
       ),
       child: const Center(
         child: SizedBox(

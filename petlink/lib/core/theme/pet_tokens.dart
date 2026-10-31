@@ -102,7 +102,7 @@ class PetTokens {
 
   static Color bgOf(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
-          ? const Color(0xFF141117)
+          ? const Color(0xFF131016)
           : sand;
 
   static Color surfaceOf(BuildContext context) =>
@@ -110,32 +110,98 @@ class PetTokens {
           ? const Color(0xFF1E1924)
           : surface;
 
+  static Color surfaceHigherOf(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFF28212F)
+          : surface;
+
   static Color inkOf(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
-          ? const Color(0xFFF8F2F6)
+          ? const Color(0xFFF6EFF5)
           : ink;
 
   static Color mutedOf(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
-          ? const Color(0xFFB8AAB7)
+          ? const Color(0xFFA89BAA)
           : muted;
 
   static Color borderOf(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
-          ? const Color(0xFF3B2F3D)
+          ? const Color(0xFF362D3B)
           : border;
 
   static Color trackOf(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
-          ? const Color(0xFF332938)
+          ? const Color(0xFF2C2432)
           : track;
 
   static Color cardOf(BuildContext context) => surfaceOf(context);
 
   static Color cardSubtleOf(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
-          ? const Color(0xFF28202C)
+          ? const Color(0xFF261F2C)
           : const Color(0xFFEFE5DC);
+
+  static Color plumAccentOf(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFFD8AED6)
+          : plum;
+
+  // Badges y chips de estado armónicos en Dark Mode
+  static Color lostBgOf(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? const Color(0x33E07A5F)
+          : lostBg;
+
+  static Color lostTextOf(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFFFF9E84)
+          : clayText;
+
+  static Color lostBorderOf(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? const Color(0x59E07A5F)
+          : const Color(0xFFF3C7BA);
+
+  static Color mintBgOf(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? const Color(0x2E4B8B73)
+          : mintBg;
+
+  static Color mintTextOf(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFF5CD6A5)
+          : mintText;
+
+  static Color mintBorderOf(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? const Color(0x594B8B73)
+          : const Color(0xFFB5E0D3);
+
+  static Color optionSelectedBgOf(BuildContext context, {required bool isLost}) {
+    if (isLost) {
+      return Theme.of(context).brightness == Brightness.dark
+          ? const Color(0x33E07A5F)
+          : const Color(0xFFFCEEE8);
+    } else {
+      return Theme.of(context).brightness == Brightness.dark
+          ? const Color(0x2E4B8B73)
+          : const Color(0xFFE8F3EF);
+    }
+  }
+
+  static List<BoxShadow> shadowCardThemed(BuildContext context) {
+    if (isDark(context)) {
+      return const [
+        BoxShadow(
+          color: Color(0x33000000),
+          offset: Offset(0, 8),
+          blurRadius: 20,
+        ),
+      ];
+    }
+    return shadowCard;
+  }
 
   // Tipografía: Fraunces (display) + Manrope (UI)
   static TextStyle display(

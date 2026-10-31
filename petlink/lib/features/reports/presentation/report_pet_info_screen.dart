@@ -408,7 +408,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
         hintText: hintText,
         hintStyle: PetTokens.body(15, color: PetTokens.placeholder),
         filled: true,
-        fillColor: PetTokens.surfaceOf(context),
+        fillColor: PetTokens.surfaceHigherOf(context),
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -416,7 +416,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: PetTokens.plum, width: 2.0),
+          borderSide: BorderSide(color: PetTokens.plumAccentOf(context), width: 2.0),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -443,10 +443,18 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
           duration: PetTokens.dFast,
           height: 44,
           decoration: BoxDecoration(
-            color: isSelected ? PetTokens.plum : PetTokens.surfaceOf(context),
+            color: isSelected
+                ? (PetTokens.isDark(context)
+                    ? const Color(0xFF6B366B)
+                    : PetTokens.plum)
+                : PetTokens.surfaceHigherOf(context),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: isSelected ? PetTokens.plum : PetTokens.borderOf(context),
+              color: isSelected
+                  ? (PetTokens.isDark(context)
+                      ? const Color(0xFF9E5C9E)
+                      : PetTokens.plum)
+                  : PetTokens.borderOf(context),
               width: 1.5,
             ),
           ),
@@ -486,15 +494,14 @@ class _PetIdCardPreview extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: PetTokens.plum,
+        color: PetTokens.isDark(context)
+            ? const Color(0xFF2B1D2C)
+            : PetTokens.plum,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x334A2D4A),
-            offset: Offset(0, 10),
-            blurRadius: 24,
-          ),
-        ],
+        border: PetTokens.isDark(context)
+            ? Border.all(color: const Color(0xFF5A3E5C), width: 1.5)
+            : null,
+        boxShadow: PetTokens.shadowCardThemed(context),
       ),
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -504,7 +511,9 @@ class _PetIdCardPreview extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: PetTokens.plumDeep,
+              color: PetTokens.isDark(context)
+                  ? const Color(0xFF1E131E)
+                  : PetTokens.plumDeep,
               borderRadius: BorderRadius.circular(18),
             ),
             alignment: Alignment.center,

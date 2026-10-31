@@ -102,17 +102,17 @@ class ActivityScreen extends ConsumerWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.done_all_rounded,
                           size: 16,
-                          color: PetTokens.clayText,
+                          color: PetTokens.lostTextOf(context),
                         ),
                         const SizedBox(width: 4),
                         Text(
                           l10n.activityMarkAllAsRead,
                           style: PetTokens.body(
                             12,
-                            color: PetTokens.clayText,
+                            color: PetTokens.lostTextOf(context),
                             weight: FontWeight.w700,
                           ),
                         ),
@@ -236,7 +236,7 @@ class ActivityScreen extends ConsumerWidget {
             const SizedBox(height: 14),
             Text(
               l10n.activityError,
-              style: PetTokens.display(18, color: PetTokens.ink),
+              style: PetTokens.displayThemed(context, 18),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
@@ -280,7 +280,11 @@ class _TimelineGroup extends StatelessWidget {
           bottom: 22,
           child: CustomPaint(
             size: const Size(2, double.infinity),
-            painter: _DashedLinePainter(color: PetTokens.borderDark),
+            painter: _DashedLinePainter(
+              color: PetTokens.isDark(context)
+                  ? PetTokens.borderOf(context)
+                  : PetTokens.borderDark,
+            ),
           ),
         ),
 
@@ -310,6 +314,7 @@ class _TimelineRow extends StatelessWidget {
     final isEn = Localizations.localeOf(context).languageCode == 'en';
 
     // Configuración del nodo según el tipo de actividad en Actividad.dc.html
+    final isDark = PetTokens.isDark(context);
     final (Color dotBg, Color dotColor, Widget icon) = switch (item.type) {
       'sighting' => (
         PetTokens.clay,
@@ -317,9 +322,9 @@ class _TimelineRow extends StatelessWidget {
         const Icon(PhosphorIconsBold.binoculars, size: 20, color: Colors.white),
       ),
       'report' => (
-        const Color(0xFFEFE3EC),
-        PetTokens.plum,
-        PetPaw(size: 18, color: PetTokens.plum),
+        isDark ? const Color(0xFF382338) : const Color(0xFFEFE3EC),
+        PetTokens.plumAccentOf(context),
+        PetPaw(size: 18, color: PetTokens.plumAccentOf(context)),
       ),
       'match' => (
         PetTokens.mint,
@@ -369,20 +374,26 @@ class _TimelineRow extends StatelessWidget {
                 color: PetTokens.surfaceOf(context),
                 borderRadius: BorderRadius.circular(22),
                 border: Border.all(
-                  color: isUnread ? const Color(0xFFE9B6A5) : PetTokens.borderOf(context),
+                  color: isUnread
+                      ? (isDark ? const Color(0xFF8A3B28) : const Color(0xFFE9B6A5))
+                      : PetTokens.borderOf(context),
                   width: isUnread ? 1.5 : 1.0,
                 ),
                 boxShadow: [
                   if (isUnread)
-                    const BoxShadow(
-                      color: Color(0x1FE07A5F),
-                      offset: Offset(0, 8),
+                    BoxShadow(
+                      color: isDark
+                          ? const Color(0x33E07A5F)
+                          : const Color(0x1FE07A5F),
+                      offset: const Offset(0, 8),
                       blurRadius: 20,
                     )
                   else
-                    const BoxShadow(
-                      color: Color(0x0A2A1A29),
-                      offset: Offset(0, 3),
+                    BoxShadow(
+                      color: isDark
+                          ? Colors.black.withValues(alpha: 0.25)
+                          : const Color(0x0A2A1A29),
+                      offset: const Offset(0, 3),
                       blurRadius: 10,
                     ),
                 ],
@@ -431,7 +442,7 @@ class _TimelineRow extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: PetTokens.lostBg,
+                            color: PetTokens.lostBgOf(context),
                             borderRadius: BorderRadius.circular(9),
                           ),
                           child: Row(
@@ -443,7 +454,7 @@ class _TimelineRow extends StatelessWidget {
                                 isEn ? 'New' : 'Nuevo',
                                 style: PetTokens.body(
                                   11,
-                                  color: PetTokens.clayText,
+                                  color: PetTokens.lostTextOf(context),
                                   weight: FontWeight.w800,
                                 ),
                               ),
@@ -459,14 +470,14 @@ class _TimelineRow extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: PetTokens.mintBg,
+                            color: PetTokens.mintBgOf(context),
                             borderRadius: BorderRadius.circular(9),
                           ),
                           child: Text(
                             isEn ? 'Active' : 'Activo',
                             style: PetTokens.body(
                               11,
-                              color: PetTokens.mintText,
+                              color: PetTokens.mintTextOf(context),
                               weight: FontWeight.w800,
                             ),
                           ),
