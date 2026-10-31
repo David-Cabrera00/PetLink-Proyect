@@ -48,21 +48,17 @@ class AppRouter {
 
         final path = state.uri.path;
         final isAuthenticated = authState.isAuthenticated;
-        final isProtected =
-            path == '/radar' ||
-            path == '/explore' ||
-            path == '/activity' ||
-            path == '/profile' ||
-            path == '/report/new' ||
-            path.startsWith('/report/new/');
-        final isAuthRoute =
+        final isPublicRoute =
             path == '/intro' ||
             path == '/welcome' ||
             path == '/login' ||
-            path == '/register';
+            path == '/register' ||
+            path == '/forgot-password';
 
-        if (!isAuthenticated && isProtected) return '/welcome';
-        if (isAuthenticated && isAuthRoute) return '/radar';
+        // Todo lo que no sea público requiere sesión (incluye reportes,
+        // coincidencias y enlaces profundos).
+        if (!isAuthenticated && !isPublicRoute) return '/welcome';
+        if (isAuthenticated && isPublicRoute) return '/radar';
         return null;
       },
       routes: [
