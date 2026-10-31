@@ -281,9 +281,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              Localizations.localeOf(context).languageCode == 'en'
-                                                  ? 'Alert within 5 km radius'
-                                                  : 'Alerta en un radio de 5 km',
+                                              l10n.reportLocationRadiusAlert,
                                               style: PetTokens.bodyThemed(
                                                 context,
                                                 13,
@@ -292,9 +290,7 @@ class _ReportLocationScreenState extends ConsumerState<ReportLocationScreen> {
                                               ),
                                             ),
                                             Text(
-                                              Localizations.localeOf(context).languageCode == 'en'
-                                                  ? 'We will notify the nearby community.'
-                                                  : 'Avisaremos a la comunidad cercana.',
+                                              l10n.reportLocationRadiusNotice,
                                               style: PetTokens.bodyThemed(
                                                 context,
                                                 12,

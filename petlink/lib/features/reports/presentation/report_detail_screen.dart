@@ -59,7 +59,7 @@ class ReportDetailScreen extends ConsumerWidget {
           if (reportAsync.valueOrNull?.isOwner == true)
             IconButton(
               icon: const Icon(PhosphorIconsRegular.trash),
-              tooltip: 'Eliminar reporte',
+              tooltip: l10n.deleteReport,
               onPressed: () => _confirmDelete(context, ref),
             ),
         ],
@@ -558,12 +558,13 @@ class ReportDetailScreen extends ConsumerWidget {
   }
 
   Future<void> _contactOwner(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context)!;
     final report = await ref.read(reportByIdProvider(reportId).future);
     final email = report?.ownerEmail;
     if (email == null || email.trim().isEmpty) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No hay datos de contacto disponibles')),
+          SnackBar(content: Text(l10n.noContactData)),
         );
       }
       return;
@@ -571,29 +572,30 @@ class ReportDetailScreen extends ConsumerWidget {
     final uri = Uri(
       scheme: 'mailto',
       path: email,
-      queryParameters: {'subject': 'Sobre tu reporte en PetLink'},
+      queryParameters: {'subject': l10n.contactEmailSubject},
     );
     if (!await launchUrl(uri) && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No se pudo abrir el correo')),
+        SnackBar(content: Text(l10n.contactEmailError)),
       );
     }
   }
 
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Eliminar reporte'),
-        content: const Text('Esta acción no se puede deshacer.'),
+        title: Text(l10n.deleteReport),
+        content: Text(l10n.deleteReportConfirmation),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Eliminar'),
+            child: Text(l10n.deleteReport),
           ),
         ],
       ),
@@ -611,7 +613,7 @@ class ReportDetailScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('No se pudo eliminar: $error')));
+        ).showSnackBar(SnackBar(content: Text(l10n.deleteReportError(error.toString()))));
       }
     }
   }
