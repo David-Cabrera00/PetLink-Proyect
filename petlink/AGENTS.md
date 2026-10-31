@@ -351,7 +351,7 @@ Pendiente (priorizado):
 - [x] **Fase 1 — Reportes sin duplicados:** `PartialReportUploadException`, navegación directa al reporte, borrador limpio y test de desconexión en 2da foto.
 - [x] **Fase 2 — Localización completa:** Inventario y extracción de strings a ARB es/en, plurales ICU y consistencia bilingüe es/en.
 - [x] **Fase 3 — Pruebas de sesión y red:** Inyección de http.Client y SessionStorage, tests de refresh 401, timeout/retry, errores tipados y AuthNotifier offline.
-- [ ] **Fase 4 — APK release + Render:** Keystore, build de release y configuración de despliegue.
+- [x] **Fase 4 — APK release + Render:** Backend en vivo en Render, com.petlink.app, configs de firma y APK Release compilado.
 - [ ] **Fase 5 — Features externas:** Recuperación de contraseña, OAuth Google, FCM push, IA.
 
 ## Estado del working tree (2026-10-31)
