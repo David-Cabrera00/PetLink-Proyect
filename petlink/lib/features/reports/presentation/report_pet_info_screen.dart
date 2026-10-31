@@ -425,13 +425,15 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                                 Row(
                                   children: [
                                     _buildSelectChip(
-                                      label: 'Macho \u2642',
+                                      label: 'Macho',
+                                      icon: PhosphorIconsBold.genderMale,
                                       isSelected: _sex == 'Macho',
                                       onTap: () => setState(() => _sex = 'Macho'),
                                     ),
                                     const SizedBox(width: 8),
                                     _buildSelectChip(
-                                      label: 'Hembra \u2640',
+                                      label: 'Hembra',
+                                      icon: PhosphorIconsBold.genderFemale,
                                       isSelected: _sex == 'Hembra',
                                       onTap: () => setState(() => _sex = 'Hembra'),
                                     ),

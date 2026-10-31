@@ -848,7 +848,7 @@ class _PetListCard extends StatelessWidget {
                         const SizedBox(width: 3),
                         Expanded(
                           child: Text(
-                            '${report.distanceKm.toStringAsFixed(2)} km · ${report.address.isNotEmpty ? report.address : "Cerca de ti"}',
+                            (report.distanceKm > 0.05 ? '${report.distanceKm.toStringAsFixed(1)} km · ' : '') + (report.address.isNotEmpty ? report.address : 'Cerca de ti'),
                             overflow: TextOverflow.ellipsis,
                             style: PetTokens.body(12, color: PetTokens.mutedOf(context)),
                           ),
