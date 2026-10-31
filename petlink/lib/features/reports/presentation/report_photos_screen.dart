@@ -222,10 +222,10 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                             const SizedBox(width: 10),
                             Text(
                               isFull
-                                  ? 'Listo, 3 de 3 fotos'
+                                  ? l10n.reportPhotosFull
                                   : (photoCount == 0
-                                      ? 'Agregar foto'
-                                      : 'Agregar otra foto ($photoCount/3)'),
+                                      ? l10n.reportPhotosAddPrompt
+                                      : l10n.addAnotherPhoto(photoCount)),
                               style: PetTokens.body(
                                 15,
                                 color: isFull
@@ -372,12 +372,12 @@ class _PolaroidStage extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               Text(
-                'Aún no hay fotos',
+                AppLocalizations.of(context)!.reportPhotosEmpty,
                 style: PetTokens.displayThemed(context, 18),
               ),
               const SizedBox(height: 4),
               Text(
-                'Toca para tomar o elegir de frente, perfil o cuerpo.',
+                AppLocalizations.of(context)!.reportPhotosEmptyHint,
                 style: PetTokens.body(13, color: PetTokens.mutedOf(context)),
                 textAlign: TextAlign.center,
               ),

@@ -231,7 +231,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                         // Lema al pie
                         Text(
-                          'Cada huella cuenta.',
+                          l10n.authTagline,
                           textAlign: TextAlign.center,
                           style: PetTokens.display(
                             15,
@@ -313,6 +313,7 @@ class _LoginHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final top = MediaQuery.of(context).padding.top;
 
     return SizedBox(
@@ -359,7 +360,7 @@ class _LoginHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'HOLA DE NUEVO',
+                  l10n.authHelloAgain,
                   style: PetTokens.eyebrow(color: PetTokens.peach),
                 ),
                 const SizedBox(height: 8),
@@ -367,9 +368,9 @@ class _LoginHeader extends StatelessWidget {
                   TextSpan(
                     style: PetTokens.display(36, color: PetTokens.cream),
                     children: [
-                      const TextSpan(text: 'Te estábamos\n'),
+                      TextSpan(text: l10n.authWeWereWaiting),
                       TextSpan(
-                        text: 'esperando',
+                        text: l10n.authWaitingForYou,
                         style: PetTokens.display(
                           36,
                           color: PetTokens.clayOnDark,
@@ -460,9 +461,9 @@ class _PrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: PetTokens.plum,
+          backgroundColor: PetTokens.isDark(context) ? PetTokens.clay : PetTokens.plum,
           foregroundColor: Colors.white,
-          disabledBackgroundColor: PetTokens.plum.withValues(alpha: 0.6),
+          disabledBackgroundColor: (PetTokens.isDark(context) ? PetTokens.clay : PetTokens.plum).withValues(alpha: 0.6),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(PetTokens.rButton),
           ),

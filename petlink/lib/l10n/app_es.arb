@@ -40,7 +40,7 @@
   "radarPossibleMatches": "Posibles coincidencias",
   "radarMatchesLoadError": "No pudimos cargar las coincidencias",
   "radarNoMatches": "Sin coincidencias todavía",
-  "radarNoMatchesDescription": "Seguimos comparando tu reporte con mascotas encontradas cerca de ti.",
+  "radarNoMatchesDescription": "Te avisaremos en cuanto detectemos una mascota similar en tu radar.",
   "radarNearby": "Cerca de ti",
   "radarNoNearbyReports": "No hay reportes cerca",
   "radarNoNearbyReportsDescription": "Los reportes de mascotas aparecerán aquí cuando estén cerca de tu ubicación.",
@@ -75,19 +75,25 @@
   "activityTimeMinutesAgo": "Hace {minutes} min",
   "@activityTimeMinutesAgo": {
     "placeholders": {
-      "minutes": { "type": "int" }
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "activityTimeHoursAgo": "Hace {hours} h",
   "@activityTimeHoursAgo": {
     "placeholders": {
-      "hours": { "type": "int" }
+      "hours": {
+        "type": "int"
+      }
     }
   },
   "activityTimeDaysAgo": "Hace {days} d",
   "@activityTimeDaysAgo": {
     "placeholders": {
-      "days": { "type": "int" }
+      "days": {
+        "type": "int"
+      }
     }
   },
   "reportsTitle": "Mis reportes",
@@ -347,5 +353,129 @@
   "authInvalidCredentials": "Correo o contraseña incorrectos.",
   "authEmailInUse": "Ese correo ya está registrado.",
   "authSessionExpired": "Tu sesión expiró. Inicia sesión de nuevo.",
-  "authGoogleUnavailable": "Google Sign-In aún no está disponible."
+  "authGoogleUnavailable": "Google Sign-In aún no está disponible.",
+  "reportPublishedMissingPhotos": "{count, plural, =1{Tu reporte fue publicado, pero no se pudo subir 1 foto.} other{Tu reporte fue publicado, pero no se pudieron subir {count} fotos.}}",
+  "@reportPublishedMissingPhotos": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timeToday": "Hoy",
+  "timeYesterday": "Ayer",
+  "timeDaysAgoFull": "Hace {days} días",
+  "@timeDaysAgoFull": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "statusNew": "Nuevo",
+  "welcomeEyebrow": "Comunidad de búsqueda",
+  "greetingMorning": "Buenos días",
+  "greetingAfternoon": "Buenas tardes",
+  "greetingEvening": "Buenas noches",
+  "radarYourReportSuffix": " · tu reporte",
+  "radarMatchFoundNotice": "Alguien encontró una mascota parecida",
+  "radarNoMatchesTitle": "Sin coincidencias aún",
+  "radarNoReportsTitle": "No hay reportes cercanos",
+  "radarNoReportsDescription": "No se encontraron mascotas perdidas o encontradas en tu radio.",
+  "recordedLocation": "Ubicación registrada",
+  "reportLocationRadiusAlert": "Alerta en un radio de 5 km",
+  "reportLocationRadiusNotice": "Avisaremos a la comunidad cercana.",
+  "stepPrefix": "Paso",
+  "ofPrefix": "de",
+  "reportPhotosFull": "Listo, 3 de 3 fotos",
+  "addAnotherPhoto": "Agregar otra foto ({count}/3)",
+  "@addAnotherPhoto": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportPhotosEmpty": "Aún no hay fotos",
+  "reportPhotosEmptyHint": "Toca para tomar o elegir de frente, perfil o cuerpo.",
+  "petIdCardHeader": "FICHA DE BÚSQUEDA",
+  "packMemberBadge": "MIEMBRO DE LA MANADA",
+  "profilePhotoUpdated": "Foto de perfil actualizada",
+  "profilePhotoUpdateError": "No se pudo actualizar la foto: {error}",
+  "@profilePhotoUpdateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "changeNameTitle": "Cambiar nombre",
+  "nameOrNicknameHint": "Tu nombre o apodo",
+  "nameUpdated": "Nombre actualizado",
+  "nameUpdateError": "No se pudo actualizar el nombre: {error}",
+  "@nameUpdateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "noContactData": "No hay datos de contacto disponibles",
+  "contactEmailSubject": "Sobre tu reporte en PetLink",
+  "contactEmailError": "No se pudo abrir el correo",
+  "deleteReport": "Eliminar reporte",
+  "deleteReportConfirmation": "Esta acción no se puede deshacer.",
+  "deleteReportError": "No se pudo eliminar: {error}",
+  "@deleteReportError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "sightingSent": "Avistamiento enviado",
+  "sightingSendError": "No se pudo enviar: {error}",
+  "@sightingSendError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "sightingLoadError": "No se pudo cargar el reporte: {error}",
+  "@sightingLoadError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "reportNotFound": "Reporte no encontrado",
+  "sightingPrompt": "Cuéntanos dónde y cómo viste a {name}.",
+  "@sightingPrompt": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "sightingDescription": "Descripción",
+  "sightingDescriptionHint": "Describe el lugar y la situación",
+  "sightingDescriptionRequired": "Escribe una descripción",
+  "sightingSubmit": "Enviar avistamiento",
+  "exploreSearching": "Buscando reportes...",
+  "authPasswordStrength": "Fuerza de la contraseña",
+  "authPasswordWeak": "Débil",
+  "authPasswordMedium": "Media",
+  "authPasswordStrong": "Fuerte",
+  "authPasswordVeryStrong": "Muy fuerte",
+  "authTagline": "Cada huella cuenta.",
+  "authHelloAgain": "HOLA DE NUEVO",
+  "authWeWereWaiting": "Te estábamos\\n",
+  "authWaitingForYou": "esperando",
+  "timeWeeksAgo": "{weeks, plural, =1{Hace 1 semana} other{Hace {weeks} semanas}}",
+  "@timeWeeksAgo": {
+    "placeholders": {
+      "weeks": {
+        "type": "int"
+      }
+    }
+  },
+  "timeMonthsAgo": "{months, plural, =1{Hace 1 mes} other{Hace {months} meses}}",
+  "@timeMonthsAgo": {
+    "placeholders": {
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+  "cancel": "Cancelar"
 }

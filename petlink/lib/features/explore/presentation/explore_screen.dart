@@ -402,7 +402,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Buscando reportes...',
+                      l10n.exploreSearching,
                       style: PetTokens.body(
                         12,
                         color: PetTokens.mutedOf(context),

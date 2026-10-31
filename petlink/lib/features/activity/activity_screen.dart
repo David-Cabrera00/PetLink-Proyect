@@ -191,26 +191,20 @@ class ActivityScreen extends ConsumerWidget {
   String _groupDateLabel(BuildContext context, DateTime date) {
     final now = DateTime.now();
     final diff = now.difference(date);
-    final isEn = Localizations.localeOf(context).languageCode == 'en';
+    final l10n = AppLocalizations.of(context)!;
 
     if (diff.inDays == 0) {
-      return isEn ? 'Today' : 'Hoy';
+      return l10n.timeToday;
     } else if (diff.inDays == 1) {
-      return isEn ? 'Yesterday' : 'Ayer';
+      return l10n.timeYesterday;
     } else if (diff.inDays < 7) {
-      return isEn ? '${diff.inDays} days ago' : 'Hace ${diff.inDays} días';
+      return l10n.timeDaysAgoFull(diff.inDays);
     } else if (diff.inDays < 30) {
       final weeks = (diff.inDays / 7).floor();
-      if (isEn) {
-        return weeks == 1 ? '1 week ago' : '$weeks weeks ago';
-      }
-      return weeks == 1 ? 'Hace 1 semana' : 'Hace $weeks semanas';
+      return l10n.timeWeeksAgo(weeks);
     } else {
       final months = (diff.inDays / 30).floor();
-      if (isEn) {
-        return months == 1 ? '1 month ago' : '$months months ago';
-      }
-      return months == 1 ? 'Hace 1 mes' : 'Hace $months meses';
+      return l10n.timeMonthsAgo(months);
     }
   }
 
@@ -311,7 +305,7 @@ class _TimelineRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUnread = !item.isRead;
-    final isEn = Localizations.localeOf(context).languageCode == 'en';
+    final l10n = AppLocalizations.of(context)!;
 
     // Configuración del nodo según el tipo de actividad en Actividad.dc.html
     final isDark = PetTokens.isDark(context);
@@ -451,7 +445,7 @@ class _TimelineRow extends StatelessWidget {
                               const _PulsingClayDot(),
                               const SizedBox(width: 5),
                               Text(
-                                isEn ? 'New' : 'Nuevo',
+                                l10n.statusNew,
                                 style: PetTokens.body(
                                   11,
                                   color: PetTokens.lostTextOf(context),
@@ -474,7 +468,7 @@ class _TimelineRow extends StatelessWidget {
                             borderRadius: BorderRadius.circular(9),
                           ),
                           child: Text(
-                            isEn ? 'Active' : 'Activo',
+                            l10n.activityStatusActive,
                             style: PetTokens.body(
                               11,
                               color: PetTokens.mintTextOf(context),

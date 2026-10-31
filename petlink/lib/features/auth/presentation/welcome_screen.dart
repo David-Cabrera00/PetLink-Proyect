@@ -71,8 +71,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isEn = Localizations.localeOf(context).languageCode == 'en';
-    final eyebrow = isEn ? 'Search community' : 'Comunidad de búsqueda';
+    final eyebrow = l10n.welcomeEyebrow;
     final top = MediaQuery.of(context).padding.top;
 
     return Scaffold(

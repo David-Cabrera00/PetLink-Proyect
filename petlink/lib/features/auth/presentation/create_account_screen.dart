@@ -313,7 +313,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
 
                         // Lema
                         Text(
-                          'Cada huella cuenta.',
+                          l10n.authTagline,
                           textAlign: TextAlign.center,
                           style: PetTokens.display(
                             15,
@@ -597,9 +597,9 @@ class _RegisterButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: PetTokens.plum,
+          backgroundColor: PetTokens.isDark(context) ? PetTokens.clay : PetTokens.plum,
           foregroundColor: Colors.white,
-          disabledBackgroundColor: PetTokens.plum.withValues(alpha: 0.6),
+          disabledBackgroundColor: (PetTokens.isDark(context) ? PetTokens.clay : PetTokens.plum).withValues(alpha: 0.6),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(PetTokens.rButton),
           ),

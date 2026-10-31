@@ -1,3 +1,4 @@
+import 'package:petlink/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/pet_tokens.dart';
@@ -42,9 +43,9 @@ class _ReportFlowStepperState extends State<ReportFlowStepper>
 
   @override
   Widget build(BuildContext context) {
-    final isEn = Localizations.localeOf(context).languageCode == 'en';
-    final stepPrefix = isEn ? 'Step' : 'Paso';
-    final ofPrefix = isEn ? 'of' : 'de';
+    final l10n = AppLocalizations.of(context)!;
+    final stepPrefix = l10n.stepPrefix;
+    final ofPrefix = l10n.ofPrefix;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

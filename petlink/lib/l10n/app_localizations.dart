@@ -221,7 +221,7 @@ abstract class AppLocalizations {
   /// No description provided for @radarNoMatchesDescription.
   ///
   /// In es, this message translates to:
-  /// **'Seguimos comparando tu reporte con mascotas encontradas cerca de ti.'**
+  /// **'Te avisaremos en cuanto detectemos una mascota similar en tu radar.'**
   String get radarNoMatchesDescription;
 
   /// No description provided for @radarNearby.
@@ -1765,6 +1765,360 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Google Sign-In aún no está disponible.'**
   String get authGoogleUnavailable;
+
+  /// No description provided for @reportPublishedMissingPhotos.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{Tu reporte fue publicado, pero no se pudo subir 1 foto.} other{Tu reporte fue publicado, pero no se pudieron subir {count} fotos.}}'**
+  String reportPublishedMissingPhotos(int count);
+
+  /// No description provided for @timeToday.
+  ///
+  /// In es, this message translates to:
+  /// **'Hoy'**
+  String get timeToday;
+
+  /// No description provided for @timeYesterday.
+  ///
+  /// In es, this message translates to:
+  /// **'Ayer'**
+  String get timeYesterday;
+
+  /// No description provided for @timeDaysAgoFull.
+  ///
+  /// In es, this message translates to:
+  /// **'Hace {days} días'**
+  String timeDaysAgoFull(int days);
+
+  /// No description provided for @statusNew.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo'**
+  String get statusNew;
+
+  /// No description provided for @welcomeEyebrow.
+  ///
+  /// In es, this message translates to:
+  /// **'Comunidad de búsqueda'**
+  String get welcomeEyebrow;
+
+  /// No description provided for @greetingMorning.
+  ///
+  /// In es, this message translates to:
+  /// **'Buenos días'**
+  String get greetingMorning;
+
+  /// No description provided for @greetingAfternoon.
+  ///
+  /// In es, this message translates to:
+  /// **'Buenas tardes'**
+  String get greetingAfternoon;
+
+  /// No description provided for @greetingEvening.
+  ///
+  /// In es, this message translates to:
+  /// **'Buenas noches'**
+  String get greetingEvening;
+
+  /// No description provided for @radarYourReportSuffix.
+  ///
+  /// In es, this message translates to:
+  /// **' · tu reporte'**
+  String get radarYourReportSuffix;
+
+  /// No description provided for @radarMatchFoundNotice.
+  ///
+  /// In es, this message translates to:
+  /// **'Alguien encontró una mascota parecida'**
+  String get radarMatchFoundNotice;
+
+  /// No description provided for @radarNoMatchesTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin coincidencias aún'**
+  String get radarNoMatchesTitle;
+
+  /// No description provided for @radarNoReportsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay reportes cercanos'**
+  String get radarNoReportsTitle;
+
+  /// No description provided for @radarNoReportsDescription.
+  ///
+  /// In es, this message translates to:
+  /// **'No se encontraron mascotas perdidas o encontradas en tu radio.'**
+  String get radarNoReportsDescription;
+
+  /// No description provided for @recordedLocation.
+  ///
+  /// In es, this message translates to:
+  /// **'Ubicación registrada'**
+  String get recordedLocation;
+
+  /// No description provided for @reportLocationRadiusAlert.
+  ///
+  /// In es, this message translates to:
+  /// **'Alerta en un radio de 5 km'**
+  String get reportLocationRadiusAlert;
+
+  /// No description provided for @reportLocationRadiusNotice.
+  ///
+  /// In es, this message translates to:
+  /// **'Avisaremos a la comunidad cercana.'**
+  String get reportLocationRadiusNotice;
+
+  /// No description provided for @stepPrefix.
+  ///
+  /// In es, this message translates to:
+  /// **'Paso'**
+  String get stepPrefix;
+
+  /// No description provided for @ofPrefix.
+  ///
+  /// In es, this message translates to:
+  /// **'de'**
+  String get ofPrefix;
+
+  /// No description provided for @reportPhotosFull.
+  ///
+  /// In es, this message translates to:
+  /// **'Listo, 3 de 3 fotos'**
+  String get reportPhotosFull;
+
+  /// No description provided for @addAnotherPhoto.
+  ///
+  /// In es, this message translates to:
+  /// **'Agregar otra foto ({count}/3)'**
+  String addAnotherPhoto(int count);
+
+  /// No description provided for @reportPhotosEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Aún no hay fotos'**
+  String get reportPhotosEmpty;
+
+  /// No description provided for @reportPhotosEmptyHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Toca para tomar o elegir de frente, perfil o cuerpo.'**
+  String get reportPhotosEmptyHint;
+
+  /// No description provided for @petIdCardHeader.
+  ///
+  /// In es, this message translates to:
+  /// **'FICHA DE BÚSQUEDA'**
+  String get petIdCardHeader;
+
+  /// No description provided for @packMemberBadge.
+  ///
+  /// In es, this message translates to:
+  /// **'MIEMBRO DE LA MANADA'**
+  String get packMemberBadge;
+
+  /// No description provided for @profilePhotoUpdated.
+  ///
+  /// In es, this message translates to:
+  /// **'Foto de perfil actualizada'**
+  String get profilePhotoUpdated;
+
+  /// No description provided for @profilePhotoUpdateError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo actualizar la foto: {error}'**
+  String profilePhotoUpdateError(Object error);
+
+  /// No description provided for @changeNameTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar nombre'**
+  String get changeNameTitle;
+
+  /// No description provided for @nameOrNicknameHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu nombre o apodo'**
+  String get nameOrNicknameHint;
+
+  /// No description provided for @nameUpdated.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre actualizado'**
+  String get nameUpdated;
+
+  /// No description provided for @nameUpdateError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo actualizar el nombre: {error}'**
+  String nameUpdateError(Object error);
+
+  /// No description provided for @noContactData.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay datos de contacto disponibles'**
+  String get noContactData;
+
+  /// No description provided for @contactEmailSubject.
+  ///
+  /// In es, this message translates to:
+  /// **'Sobre tu reporte en PetLink'**
+  String get contactEmailSubject;
+
+  /// No description provided for @contactEmailError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo abrir el correo'**
+  String get contactEmailError;
+
+  /// No description provided for @deleteReport.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar reporte'**
+  String get deleteReport;
+
+  /// No description provided for @deleteReportConfirmation.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta acción no se puede deshacer.'**
+  String get deleteReportConfirmation;
+
+  /// No description provided for @deleteReportError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo eliminar: {error}'**
+  String deleteReportError(Object error);
+
+  /// No description provided for @sightingSent.
+  ///
+  /// In es, this message translates to:
+  /// **'Avistamiento enviado'**
+  String get sightingSent;
+
+  /// No description provided for @sightingSendError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo enviar: {error}'**
+  String sightingSendError(Object error);
+
+  /// No description provided for @sightingLoadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo cargar el reporte: {error}'**
+  String sightingLoadError(Object error);
+
+  /// No description provided for @reportNotFound.
+  ///
+  /// In es, this message translates to:
+  /// **'Reporte no encontrado'**
+  String get reportNotFound;
+
+  /// No description provided for @sightingPrompt.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuéntanos dónde y cómo viste a {name}.'**
+  String sightingPrompt(Object name);
+
+  /// No description provided for @sightingDescription.
+  ///
+  /// In es, this message translates to:
+  /// **'Descripción'**
+  String get sightingDescription;
+
+  /// No description provided for @sightingDescriptionHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Describe el lugar y la situación'**
+  String get sightingDescriptionHint;
+
+  /// No description provided for @sightingDescriptionRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe una descripción'**
+  String get sightingDescriptionRequired;
+
+  /// No description provided for @sightingSubmit.
+  ///
+  /// In es, this message translates to:
+  /// **'Enviar avistamiento'**
+  String get sightingSubmit;
+
+  /// No description provided for @exploreSearching.
+  ///
+  /// In es, this message translates to:
+  /// **'Buscando reportes...'**
+  String get exploreSearching;
+
+  /// No description provided for @authPasswordStrength.
+  ///
+  /// In es, this message translates to:
+  /// **'Fuerza de la contraseña'**
+  String get authPasswordStrength;
+
+  /// No description provided for @authPasswordWeak.
+  ///
+  /// In es, this message translates to:
+  /// **'Débil'**
+  String get authPasswordWeak;
+
+  /// No description provided for @authPasswordMedium.
+  ///
+  /// In es, this message translates to:
+  /// **'Media'**
+  String get authPasswordMedium;
+
+  /// No description provided for @authPasswordStrong.
+  ///
+  /// In es, this message translates to:
+  /// **'Fuerte'**
+  String get authPasswordStrong;
+
+  /// No description provided for @authPasswordVeryStrong.
+  ///
+  /// In es, this message translates to:
+  /// **'Muy fuerte'**
+  String get authPasswordVeryStrong;
+
+  /// No description provided for @authTagline.
+  ///
+  /// In es, this message translates to:
+  /// **'Cada huella cuenta.'**
+  String get authTagline;
+
+  /// No description provided for @authHelloAgain.
+  ///
+  /// In es, this message translates to:
+  /// **'HOLA DE NUEVO'**
+  String get authHelloAgain;
+
+  /// No description provided for @authWeWereWaiting.
+  ///
+  /// In es, this message translates to:
+  /// **'Te estábamos\\n'**
+  String get authWeWereWaiting;
+
+  /// No description provided for @authWaitingForYou.
+  ///
+  /// In es, this message translates to:
+  /// **'esperando'**
+  String get authWaitingForYou;
+
+  /// No description provided for @timeWeeksAgo.
+  ///
+  /// In es, this message translates to:
+  /// **'{weeks, plural, =1{Hace 1 semana} other{Hace {weeks} semanas}}'**
+  String timeWeeksAgo(int weeks);
+
+  /// No description provided for @timeMonthsAgo.
+  ///
+  /// In es, this message translates to:
+  /// **'{months, plural, =1{Hace 1 mes} other{Hace {months} meses}}'**
+  String timeMonthsAgo(int months);
+
+  /// No description provided for @cancel.
+  ///
+  /// In es, this message translates to:
+  /// **'Cancelar'**
+  String get cancel;
 }
 
 class _AppLocalizationsDelegate

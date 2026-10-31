@@ -336,20 +336,23 @@ Cambios recientes ya implementados:
 - Sin mocks en release: los repositorios fallan de forma visible si falta `API_BASE_URL`.
 - Build del backend corregido (`dist/main.js`) y `*.tsbuildinfo` ignorado.
 - Google Sign-In y recuperación de contraseña ya no simulan funcionar.
+- **Prevención de reportes duplicados por fallo de fotos (Fase 1):** `RemotePetReportRepository.createReport` captura fallos al subir fotos individuales; si alguna falla lanza `PartialReportUploadException` con el `PetReport` ya creado en base de datos. `ReportReviewScreen` limpia el borrador, invalida cachés, redirige a `/reports/:id` y notifica al usuario con el mensaje localizado `reportPublishedMissingPhotos`. Cubierto con pruebas unitarias en `test/report_repository_test.dart`.
 
 Pendiente (priorizado):
 
-1. **Reportes duplicados por fallo de fotos.** `RemotePetReportRepository.createReport` crea el reporte y luego sube las fotos. Si una falla, la excepción llega a la pantalla de revisión, el borrador no se limpia y al reintentar se crea otro reporte. Sugerencia: lanzar una excepción que incluya el `PetReport` ya creado, limpiar el borrador y navegar a `/reports/:id` avisando cuántas fotos faltaron.
-2. **Recuperación de contraseña real.** Requiere proveedor de email (Resend/SendGrid/SMTP) y un endpoint con token de un solo uso. Mientras tanto el enlace está oculto.
-3. **Google Sign-In real.** Requiere OAuth en Android/iOS y validar el id token en el backend.
-4. **Textos hardcodeados en español** fuera de los ARB (radar, reportes, perfil y ajustes): al cambiar a inglés no se traducen. Mover a `app_es.arb`/`app_en.arb`.
-5. **Firma y publicación del APK.** `applicationId` sigue como `com.example.petlink`; faltan keystore, `key.properties` y `signingConfigs` de release. No publicar con la firma debug.
-6. **Despliegue en Render.** Definir `JWT_REFRESH_SECRET` distinto y ejecutar `npx prisma migrate deploy`. El free tier duerme y el arranque en frío puede superar los timeouts; evaluar instancia paga o keep-alive.
-7. **Pruebas del refresh automático.** `ApiClient` usa `http` directo; para testearlo conviene inyectar `http.Client` y cubrir: 401 → refresh → reintento, refresh inválido → logout y error de red → conservar sesión.
-8. **Push en segundo plano con FCM/APNs.**
-9. **Integrar automáticamente el análisis de IA al subir fotos.**
-10. **Mejorar el algoritmo de coincidencias con atributos visuales.**
-11. **Pruebas automatizadas más completas.**
+1. **Localización completa (Fase 2):** Mover a los ARB todos los textos hardcodeados en español (radar, reportes, perfil y ajustes).
+2. **Pruebas de sesión y red (Fase 3):** Inyectar `http.Client` en `ApiClient` y testear 401 → refresh → reintento, refresh inválido → logout, error de red → conservar sesión, timeout/retry.
+3. **Firma y publicación del APK + Render (Fase 4):** `applicationId` definitivo, keystore, `key.properties`, `signingConfigs` de release, variables en Render y migración.
+4. **Features externas (Fase 5):** Recuperación de contraseña real (email provider), Google Sign-In real (OAuth), push con FCM/APNs, IA automática al subir fotos y algoritmo de matching visual.
+
+## Plan de trabajo acordado y estado de fases
+
+- [x] **Fase 0 — Base limpia:** Working tree commiteado y ordenado en ramas lógicas.
+- [x] **Fase 1 — Reportes sin duplicados:** `PartialReportUploadException`, navegación directa al reporte, borrador limpio y test de desconexión en 2da foto.
+- [x] **Fase 2 — Localización completa:** Inventario y extracción de strings a ARB es/en, plurales ICU y consistencia bilingüe es/en.
+- [ ] **Fase 3 — Pruebas de sesión y red:** Blindaje HTTP/Auth con inyección de cliente HTTP y almacenamiento fake.
+- [ ] **Fase 4 — APK release + Render:** Keystore, build de release y configuración de despliegue.
+- [ ] **Fase 5 — Features externas:** Recuperación de contraseña, OAuth Google, FCM push, IA.
 
 ## Estado del working tree (2026-10-31)
 

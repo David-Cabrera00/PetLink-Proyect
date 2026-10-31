@@ -7,6 +7,7 @@ import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../../../core/network/api_error_message.dart';
 import '../../../core/theme/pet_tokens.dart';
 import '../../../shared/models/pet_report.dart';
+import '../../../shared/repositories/pet_report_repository.dart';
 import '../../../shared/widgets/pet_paw_painters.dart';
 import '../../../shared/widgets/photo_preview.dart';
 import '../../explore/providers/explore_providers.dart';
@@ -42,6 +43,23 @@ class _ReportReviewScreenState extends ConsumerState<ReportReviewScreen> {
         ref.invalidate(exploreReportsProvider);
         notifier.clearDraft();
         context.go('/report/new/published');
+      }
+    } on PartialReportUploadException catch (e) {
+      if (context.mounted) {
+        ref.invalidate(nearbyReportsProvider);
+        ref.invalidate(myReportsProvider);
+        ref.invalidate(exploreReportsProvider);
+        notifier.clearDraft();
+        context.go('/reports/${e.report.id}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              l10n.reportPublishedMissingPhotos(e.failedPhotosCount),
+            ),
+            backgroundColor: PetTokens.clayText,
+            duration: const Duration(seconds: 4),
+          ),
+        );
       }
     } catch (e) {
       if (context.mounted) {
