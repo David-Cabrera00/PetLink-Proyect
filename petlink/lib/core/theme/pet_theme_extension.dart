@@ -22,25 +22,25 @@ class PetThemeExtension extends ThemeExtension<PetThemeExtension> {
   final Color surfaceVariant;
 
   static const PetThemeExtension light = PetThemeExtension(
-    lost: Color(0xFFA9474E),
-    lostSoft: Color(0xFFF3DDE0),
-    found: Color(0xFF687D91),
-    foundSoft: Color(0xFFDDE6EC),
+    lost: Color(0xFFB4472F),
+    lostSoft: Color(0xFFFCEEE8),
+    found: Color(0xFF2C7A69),
+    foundSoft: Color(0xFFDDEFE9),
     match: Color(0xFF8A6386),
     matchSoft: Color(0xFFE8DCE7),
-    accent: Color(0xFFE99478),
-    surfaceVariant: Color(0xFFE8DCE7),
+    accent: Color(0xFFE07A5F),
+    surfaceVariant: Color(0xFFEFE3EC),
   );
 
   static const PetThemeExtension dark = PetThemeExtension(
-    lost: Color(0xFFE58E98),
-    lostSoft: Color(0xFF4A252D),
-    found: Color(0xFFA9BDD0),
-    foundSoft: Color(0xFF2A3746),
-    match: Color(0xFFC6A8C3),
-    matchSoft: Color(0xFF443344),
-    accent: Color(0xFFF0A083),
-    surfaceVariant: Color(0xFF28202C),
+    lost: Color(0xFFFF9E84),
+    lostSoft: Color(0x33E07A5F),
+    found: Color(0xFF5CD6A5),
+    foundSoft: Color(0x2E4B8B73),
+    match: Color(0xFFD8AED6),
+    matchSoft: Color(0xFF382338),
+    accent: Color(0xFFFF9E84),
+    surfaceVariant: Color(0xFF28212F),
   );
 
   static PetThemeExtension of(BuildContext context) {
