@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../shared/models/pet_report.dart';
@@ -9,28 +10,42 @@ import '../../../shared/repositories/mock/mock_match_repository.dart';
 import '../../../core/network/api_client.dart';
 import '../../../shared/repositories/remote/remote_pet_report_repository.dart';
 import '../../../shared/repositories/remote/remote_match_repository.dart';
+import '../../auth/providers/auth_provider.dart';
+
+/// Sin backend configurado solo se permiten mocks en desarrollo. En release
+/// es mejor fallar de forma visible que mostrar datos falsos.
+Never _missingConfiguration() {
+  throw StateError(
+    'API_BASE_URL no está configurada. Compila con '
+    '--dart-define=API_BASE_URL=https://tu-api/api/v1',
+  );
+}
 
 final petReportRepositoryProvider = Provider<PetReportRepository>((ref) {
   final client = ApiClient.instance;
-  return client.isConfigured
-      ? RemotePetReportRepository(client)
-      : MockPetReportRepository();
+  if (client.isConfigured) return RemotePetReportRepository(client);
+  if (kDebugMode) return MockPetReportRepository();
+  return _missingConfiguration();
 });
 
 final matchRepositoryProvider = Provider<MatchRepository>((ref) {
   final client = ApiClient.instance;
-  return client.isConfigured
-      ? RemoteMatchRepository(client)
-      : MockMatchRepository();
+  if (client.isConfigured) return RemoteMatchRepository(client);
+  if (kDebugMode) return MockMatchRepository();
+  return _missingConfiguration();
 });
 
 final nearbyReportsProvider = FutureProvider<List<PetReport>>((ref) async {
+  // Invalida la caché cuando cambia la cuenta autenticada y evita llamar a la
+  // API después de cerrar sesión.
+  if (ref.watch(currentUserEmailProvider) == null) return const [];
   final repository = ref.watch(petReportRepositoryProvider);
   final reports = await repository.getNearbyReports();
   return reports.where((report) => !report.isOwner).toList();
 });
 
 final matchesProvider = FutureProvider<List<PetMatch>>((ref) async {
+  if (ref.watch(currentUserEmailProvider) == null) return const [];
   final repository = ref.watch(matchRepositoryProvider);
   return repository.getMatchesForUser();
 });
