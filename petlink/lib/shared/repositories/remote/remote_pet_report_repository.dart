@@ -48,10 +48,26 @@ class RemotePetReportRepository implements PetReportRepository {
     final report = PetReport.fromJson(
       (response as Map).cast<String, dynamic>(),
     );
-    for (final path in draft.photos.where(
+    final localPhotos = draft.photos.where(
       (photo) => !photo.startsWith('http'),
-    )) {
-      await client.uploadFile(path, '/reports/${report.id}/photos');
+    ).toList();
+    int failedPhotosCount = 0;
+    Object? lastError;
+    for (final path in localPhotos) {
+      try {
+        await client.uploadFile(path, '/reports/${report.id}/photos');
+      } catch (e) {
+        failedPhotosCount++;
+        lastError = e;
+      }
+    }
+    if (failedPhotosCount > 0) {
+      throw PartialReportUploadException(
+        report: report,
+        failedPhotosCount: failedPhotosCount,
+        totalPhotosCount: localPhotos.length,
+        cause: lastError,
+      );
     }
     return report;
   }

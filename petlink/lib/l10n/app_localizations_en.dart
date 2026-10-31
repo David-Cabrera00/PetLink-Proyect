@@ -902,4 +902,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authGoogleUnavailable => 'Google Sign-In is not available yet.';
+
+  @override
+  String reportPublishedMissingPhotos(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Your report was published, but $count photos failed to upload.',
+      one: 'Your report was published, but 1 photo failed to upload.',
+    );
+    return '$_temp0';
+  }
 }

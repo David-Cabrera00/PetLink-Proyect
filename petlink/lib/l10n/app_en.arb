@@ -75,19 +75,25 @@
   "activityTimeMinutesAgo": "{minutes}m ago",
   "@activityTimeMinutesAgo": {
     "placeholders": {
-      "minutes": { "type": "int" }
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "activityTimeHoursAgo": "{hours}h ago",
   "@activityTimeHoursAgo": {
     "placeholders": {
-      "hours": { "type": "int" }
+      "hours": {
+        "type": "int"
+      }
     }
   },
   "activityTimeDaysAgo": "{days}d ago",
   "@activityTimeDaysAgo": {
     "placeholders": {
-      "days": { "type": "int" }
+      "days": {
+        "type": "int"
+      }
     }
   },
   "reportsTitle": "My reports",
@@ -347,5 +353,13 @@
   "authInvalidCredentials": "Incorrect email or password.",
   "authEmailInUse": "That email is already registered.",
   "authSessionExpired": "Your session expired. Please sign in again.",
-  "authGoogleUnavailable": "Google Sign-In is not available yet."
+  "authGoogleUnavailable": "Google Sign-In is not available yet.",
+  "reportPublishedMissingPhotos": "{count, plural, =1{Your report was published, but 1 photo failed to upload.} other{Your report was published, but {count} photos failed to upload.}}",
+  "@reportPublishedMissingPhotos": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

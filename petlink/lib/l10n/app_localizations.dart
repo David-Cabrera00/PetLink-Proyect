@@ -1765,6 +1765,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Google Sign-In aún no está disponible.'**
   String get authGoogleUnavailable;
+
+  /// No description provided for @reportPublishedMissingPhotos.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{Tu reporte fue publicado, pero no se pudo subir 1 foto.} other{Tu reporte fue publicado, pero no se pudieron subir {count} fotos.}}'**
+  String reportPublishedMissingPhotos(int count);
 }
 
 class _AppLocalizationsDelegate
