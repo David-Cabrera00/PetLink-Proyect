@@ -176,7 +176,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           text: l10n.navigationExplore,
                           style: PetTokens.display(
                             36,
-                            color: PetTokens.clayText,
+                            color: PetTokens.lostTextOf(context),
                             italic: true,
                           ),
                         ),
@@ -240,7 +240,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       l10n.radarReportsCount(reports.length),
                       style: PetTokens.body(
                         13,
-                        color: PetTokens.muted,
+                        color: PetTokens.mutedOf(context),
                         weight: FontWeight.w600,
                       ),
                     ),
@@ -376,13 +376,15 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: PetTokens.surface.withValues(alpha: 0.92),
+                  color: PetTokens.surfaceOf(context).withValues(alpha: 0.92),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: PetTokens.border),
-                  boxShadow: const [
+                  border: Border.all(color: PetTokens.borderOf(context)),
+                  boxShadow: [
                     BoxShadow(
-                      color: Color(0x1F2A1A29),
-                      offset: Offset(0, 4),
+                      color: PetTokens.isDark(context)
+                          ? Colors.black.withValues(alpha: 0.3)
+                          : const Color(0x1F2A1A29),
+                      offset: const Offset(0, 4),
                       blurRadius: 12,
                     ),
                   ],
@@ -390,12 +392,12 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const SizedBox(
+                    SizedBox(
                       width: 12,
                       height: 12,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: PetTokens.plum,
+                        color: PetTokens.plumAccentOf(context),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -403,7 +405,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       'Buscando reportes...',
                       style: PetTokens.body(
                         12,
-                        color: PetTokens.muted,
+                        color: PetTokens.mutedOf(context),
                         weight: FontWeight.w600,
                       ),
                     ),
@@ -429,10 +431,12 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                         color: PetTokens.surfaceOf(context).withValues(alpha: 0.95),
                         borderRadius: BorderRadius.circular(18),
                         border: Border.all(color: PetTokens.borderOf(context)),
-                        boxShadow: const [
+                        boxShadow: [
                           BoxShadow(
-                            color: Color(0x1F2A1A29),
-                            offset: Offset(0, 8),
+                            color: PetTokens.isDark(context)
+                                ? Colors.black.withValues(alpha: 0.35)
+                                : const Color(0x1F2A1A29),
+                            offset: const Offset(0, 8),
                             blurRadius: 22,
                           ),
                         ],
@@ -449,7 +453,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           Expanded(
                             child: TextField(
                               controller: _searchController,
-                              style: PetTokens.body(15, color: PetTokens.ink),
+                              style: PetTokens.body(15, color: PetTokens.inkOf(context)),
                               decoration: InputDecoration(
                                 hintText: l10n.exploreSearchHint,
                                 hintStyle: PetTokens.body(
@@ -519,13 +523,15 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: PetTokens.surface.withValues(alpha: 0.95),
+                color: PetTokens.surfaceOf(context).withValues(alpha: 0.95),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: PetTokens.border),
-                boxShadow: const [
+                border: Border.all(color: PetTokens.borderOf(context)),
+                boxShadow: [
                   BoxShadow(
-                    color: Color(0x1F2A1A29),
-                    offset: Offset(0, 6),
+                    color: PetTokens.isDark(context)
+                        ? Colors.black.withValues(alpha: 0.3)
+                        : const Color(0x1F2A1A29),
+                    offset: const Offset(0, 6),
                     blurRadius: 16,
                   ),
                 ],
@@ -575,9 +581,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     return Container(
       height: 52,
       decoration: BoxDecoration(
-        color: PetTokens.surface,
+        color: PetTokens.surfaceOf(context),
         borderRadius: BorderRadius.circular(PetTokens.rInput),
-        border: Border.all(color: PetTokens.border, width: 1.5),
+        border: Border.all(color: PetTokens.borderOf(context), width: 1.5),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
@@ -591,7 +597,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
           Expanded(
             child: TextField(
               controller: _searchController,
-              style: PetTokens.body(15, color: PetTokens.ink),
+              style: PetTokens.body(15, color: PetTokens.inkOf(context)),
               decoration: InputDecoration(
                 hintText: l10n.exploreSearchHint,
                 hintStyle: PetTokens.body(15, color: PetTokens.placeholder),
@@ -676,13 +682,16 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = PetTokens.isDark(context);
     final bg = isSelected
-        ? PetTokens.plum
+        ? (isDark ? const Color(0xFF6B366B) : PetTokens.plum)
         : (isFloating
-            ? PetTokens.surface.withValues(alpha: 0.95)
-            : PetTokens.surface);
-    final fg = isSelected ? Colors.white : const Color(0xFF4A3A44);
-    final border = isSelected ? PetTokens.plum : PetTokens.border;
+            ? PetTokens.surfaceOf(context).withValues(alpha: 0.95)
+            : PetTokens.surfaceOf(context));
+    final fg = isSelected ? Colors.white : PetTokens.inkOf(context);
+    final border = isSelected
+        ? (isDark ? PetTokens.plumAccentOf(context) : PetTokens.plum)
+        : PetTokens.borderOf(context);
 
     return InkWell(
       onTap: onTap,
@@ -695,10 +704,12 @@ class _FilterChip extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: border, width: 1.2),
           boxShadow: isFloating
-              ? const [
+              ? [
                   BoxShadow(
-                    color: Color(0x142A1A29),
-                    offset: Offset(0, 4),
+                    color: isDark
+                        ? Colors.black.withValues(alpha: 0.25)
+                        : const Color(0x142A1A29),
+                    offset: const Offset(0, 4),
                     blurRadius: 10,
                   ),
                 ]
@@ -746,8 +757,10 @@ class _PetListCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isLost = report.type == ReportType.lost;
     final l10n = AppLocalizations.of(context)!;
-    final badgeBg = isLost ? PetTokens.lostBg : PetTokens.mintBg;
-    final badgeColor = isLost ? PetTokens.clayText : PetTokens.mintText;
+    final badgeBg =
+        isLost ? PetTokens.lostBgOf(context) : PetTokens.mintBgOf(context);
+    final badgeColor =
+        isLost ? PetTokens.lostTextOf(context) : PetTokens.mintTextOf(context);
     final statusText = isLost ? l10n.statusLost : l10n.statusFound;
 
     return Container(
@@ -755,7 +768,7 @@ class _PetListCard extends StatelessWidget {
         color: PetTokens.surfaceOf(context),
         borderRadius: BorderRadius.circular(PetTokens.rCard),
         border: Border.all(color: PetTokens.borderOf(context)),
-        boxShadow: PetTokens.shadowCard,
+        boxShadow: PetTokens.shadowCardThemed(context),
       ),
       child: InkWell(
         onTap: onTap,
@@ -764,7 +777,7 @@ class _PetListCard extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           child: Row(
             children: [
-              // Avatar 68x68 con foto o icono temÃ¡tico
+              // Avatar 68x68 con foto o icono temático
               Container(
                 width: 68,
                 height: 68,
@@ -821,23 +834,23 @@ class _PetListCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      '${report.pet.species} \u00B7 ${report.pet.sex}',
-                      style: PetTokens.body(13, color: PetTokens.muted),
+                      '${report.pet.species} · ${report.pet.sex}',
+                      style: PetTokens.body(13, color: PetTokens.mutedOf(context)),
                     ),
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.location_on_outlined,
                           size: 14,
-                          color: PetTokens.muted,
+                          color: PetTokens.mutedOf(context),
                         ),
                         const SizedBox(width: 3),
                         Expanded(
                           child: Text(
-                            '${report.distanceKm.toStringAsFixed(2)} km \u00B7 ${report.address.isNotEmpty ? report.address : "Cerca de ti"}',
+                            '${report.distanceKm.toStringAsFixed(2)} km · ${report.address.isNotEmpty ? report.address : "Cerca de ti"}',
                             overflow: TextOverflow.ellipsis,
-                            style: PetTokens.body(12, color: PetTokens.muted),
+                            style: PetTokens.body(12, color: PetTokens.mutedOf(context)),
                           ),
                         ),
                       ],
@@ -869,22 +882,18 @@ class _SelectedReportSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final isLost = report.type == ReportType.lost;
     final l10n = AppLocalizations.of(context)!;
-    final badgeBg = isLost ? PetTokens.lostBg : PetTokens.mintBg;
-    final badgeColor = isLost ? PetTokens.clayText : PetTokens.mintText;
+    final badgeBg =
+        isLost ? PetTokens.lostBgOf(context) : PetTokens.mintBgOf(context);
+    final badgeColor =
+        isLost ? PetTokens.lostTextOf(context) : PetTokens.mintTextOf(context);
     final statusText = isLost ? l10n.statusLost : l10n.statusFound;
 
     return Container(
       decoration: BoxDecoration(
-        color: PetTokens.surface.withValues(alpha: 0.98),
+        color: PetTokens.surfaceOf(context).withValues(alpha: 0.98),
         borderRadius: BorderRadius.circular(PetTokens.rCard),
-        border: Border.all(color: PetTokens.border),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x332A1A29),
-            offset: Offset(0, 10),
-            blurRadius: 28,
-          ),
-        ],
+        border: Border.all(color: PetTokens.borderOf(context)),
+        boxShadow: PetTokens.shadowCardThemed(context),
       ),
       child: InkWell(
         onTap: onTap,
@@ -924,7 +933,7 @@ class _SelectedReportSheet extends StatelessWidget {
                           child: Text(
                             report.pet.name,
                             overflow: TextOverflow.ellipsis,
-                            style: PetTokens.display(21, color: PetTokens.ink),
+                            style: PetTokens.displayThemed(context, 21),
                           ),
                         ),
                         Container(
@@ -949,17 +958,17 @@ class _SelectedReportSheet extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${report.pet.species} \u00B7 ${report.pet.sex} \u00B7 ${report.address}',
+                      '${report.pet.species} · ${report.pet.sex} · ${report.address}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: PetTokens.body(13, color: PetTokens.muted),
+                      style: PetTokens.body(13, color: PetTokens.mutedOf(context)),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${l10n.exploreViewReport} \u2192',
+                      '${l10n.exploreViewReport} →',
                       style: PetTokens.body(
                         13,
-                        color: PetTokens.plum,
+                        color: PetTokens.plumAccentOf(context),
                         weight: FontWeight.w700,
                       ),
                     ),
@@ -1025,17 +1034,17 @@ class _EmptyStateSwayingState extends State<_EmptyStateSwaying>
                 child: child,
               );
             },
-            child: PetPaw(size: 72, color: PetTokens.track),
+            child: PetPaw(size: 72, color: PetTokens.trackOf(context)),
           ),
           const SizedBox(height: 16),
           Text(
             l10n.exploreNoReports,
-            style: PetTokens.display(20, color: PetTokens.ink),
+            style: PetTokens.displayThemed(context, 20),
           ),
           const SizedBox(height: 6),
           Text(
             l10n.exploreNoReportsDescription,
-            style: PetTokens.body(14, color: PetTokens.muted),
+            style: PetTokens.body(14, color: PetTokens.mutedOf(context)),
             textAlign: TextAlign.center,
           ),
         ],
