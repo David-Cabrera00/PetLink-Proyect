@@ -26,19 +26,73 @@ class ApiException implements Exception {
   String toString() => 'ApiException($statusCode): $message';
 }
 
-class ApiClient {
-  ApiClient._();
-  static final ApiClient instance = ApiClient._();
+abstract class SessionStorage {
+  Future<String?> read(String key);
+  Future<void> write(String key, String value);
+  Future<void> delete(String key);
+}
 
-  static const baseUrl = String.fromEnvironment(
+class SecureSessionStorage implements SessionStorage {
+  final FlutterSecureStorage _storage;
+  const SecureSessionStorage([this._storage = const FlutterSecureStorage()]);
+
+  @override
+  Future<String?> read(String key) => _storage.read(key: key);
+
+  @override
+  Future<void> write(String key, String value) =>
+      _storage.write(key: key, value: value);
+
+  @override
+  Future<void> delete(String key) => _storage.delete(key: key);
+}
+
+class ApiClient {
+  ApiClient._({
+    http.Client? httpClient,
+    SessionStorage? storage,
+    String? baseUrl,
+    Duration? timeout,
+    Duration? retryDelay,
+  })  : _httpClient = httpClient ?? http.Client(),
+        _storage = storage ?? const SecureSessionStorage(),
+        _baseUrlOverride = baseUrl,
+        timeout = timeout ?? const Duration(seconds: 30),
+        retryDelay = retryDelay ?? const Duration(seconds: 2);
+
+  static ApiClient instance = ApiClient._();
+
+  factory ApiClient.forTesting({
+    http.Client? httpClient,
+    SessionStorage? storage,
+    String? baseUrl,
+    Duration? timeout,
+    Duration? retryDelay,
+  }) =>
+      ApiClient._(
+        httpClient: httpClient,
+        storage: storage,
+        baseUrl: baseUrl,
+        timeout: timeout,
+        retryDelay: retryDelay,
+      );
+
+  static const defaultBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
     defaultValue: '',
   );
-  static const timeout = Duration(seconds: 30);
+
+  final http.Client _httpClient;
+  final SessionStorage _storage;
+  final String? _baseUrlOverride;
+  final Duration timeout;
+  final Duration retryDelay;
+
+  String get baseUrl => _baseUrlOverride ?? defaultBaseUrl;
+
   static const _accessKey = 'petlink_access_token';
   static const _refreshKey = 'petlink_refresh_token';
   static const _userKey = 'petlink_user';
-  static const _storage = FlutterSecureStorage();
 
   /// Se dispara cuando la sesión ya no se puede recuperar (refresh inválido o
   /// inexistente). El AuthNotifier la usa para volver a la pantalla de acceso.
@@ -57,18 +111,18 @@ class ApiClient {
     String? refreshToken,
     Map<String, dynamic>? user,
   }) async {
-    await _storage.write(key: _accessKey, value: accessToken);
+    await _storage.write(_accessKey, accessToken);
     if (refreshToken != null && refreshToken.isNotEmpty) {
-      await _storage.write(key: _refreshKey, value: refreshToken);
+      await _storage.write(_refreshKey, refreshToken);
     }
     if (user != null) await saveCachedUser(user);
   }
 
   Future<void> saveCachedUser(Map<String, dynamic> user) =>
-      _storage.write(key: _userKey, value: jsonEncode(user));
+      _storage.write(_userKey, jsonEncode(user));
 
   Future<Map<String, dynamic>?> readCachedUser() async {
-    final raw = await _storage.read(key: _userKey);
+    final raw = await _storage.read(_userKey);
     if (raw == null || raw.isEmpty) return null;
     try {
       final decoded = jsonDecode(raw);
@@ -79,13 +133,13 @@ class ApiClient {
   }
 
   Future<void> clearSession() async {
-    await _storage.delete(key: _accessKey);
-    await _storage.delete(key: _refreshKey);
-    await _storage.delete(key: _userKey);
+    await _storage.delete(_accessKey);
+    await _storage.delete(_refreshKey);
+    await _storage.delete(_userKey);
   }
 
   Future<bool> hasToken() async =>
-      (await _storage.read(key: _accessKey)) != null;
+      (await _storage.read(_accessKey)) != null;
 
   // ---------------------------------------------------------------------------
   // HTTP
@@ -113,7 +167,7 @@ class ApiClient {
       );
       request.headers.addAll(await _authHeaders());
       request.files.add(await http.MultipartFile.fromPath('file', path));
-      return request.send();
+      return _httpClient.send(request);
     }
 
     var response = await _performStreamed(send);
@@ -151,14 +205,14 @@ class ApiClient {
         ...await _authHeaders(),
       };
       return switch (method) {
-        'GET' => http.get(uri, headers: headers),
-        'POST' => http.post(
+        'GET' => _httpClient.get(uri, headers: headers),
+        'POST' => _httpClient.post(
           uri,
           headers: headers,
           body: jsonEncode(body ?? {}),
         ),
-        'DELETE' => http.delete(uri, headers: headers),
-        _ => http.patch(uri, headers: headers, body: jsonEncode(body ?? {})),
+        'DELETE' => _httpClient.delete(uri, headers: headers),
+        _ => _httpClient.patch(uri, headers: headers, body: jsonEncode(body ?? {})),
       };
     }
 
@@ -197,7 +251,7 @@ class ApiClient {
   }
 
   Future<Map<String, String>> _authHeaders() async {
-    final token = await _storage.read(key: _accessKey);
+    final token = await _storage.read(_accessKey);
     return {
       if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
     };
@@ -212,7 +266,9 @@ class ApiClient {
     } on TimeoutException {
       if (retryOnNetworkError) {
         // Un reintento para cubrir arranques en frío del backend.
-        await Future<void>.delayed(const Duration(seconds: 2));
+        if (retryDelay > Duration.zero) {
+          await Future<void>.delayed(retryDelay);
+        }
         return _perform(send);
       }
       throw const ApiException(
@@ -279,14 +335,14 @@ class ApiClient {
   }
 
   Future<bool> _refreshSession() async {
-    final refreshToken = await _storage.read(key: _refreshKey);
+    final refreshToken = await _storage.read(_refreshKey);
     if (refreshToken == null || refreshToken.isEmpty || !isConfigured) {
       await _expireSession();
       return false;
     }
 
     try {
-      final response = await http
+      final response = await _httpClient
           .post(
             Uri.parse('$baseUrl/auth/refresh'),
             headers: const {'Content-Type': 'application/json'},
