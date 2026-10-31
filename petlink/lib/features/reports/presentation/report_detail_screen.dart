@@ -282,6 +282,25 @@ class ReportDetailScreen extends ConsumerWidget {
     );
   }
 
+    String _formatTimeAgo(DateTime date) {
+    final now = DateTime.now();
+    final diff = now.difference(date.toLocal());
+    if (diff.isNegative || diff.inMinutes < 1) {
+      return 'Hace un momento';
+    } else if (diff.inMinutes < 60) {
+      final m = diff.inMinutes;
+      return 'Hace $m ${m == 1 ? "minuto" : "minutos"}';
+    } else if (diff.inHours < 24) {
+      final h = diff.inHours;
+      return 'Hace $h ${h == 1 ? "hora" : "horas"}';
+    } else if (diff.inDays < 7) {
+      final d = diff.inDays;
+      return 'Hace $d ${d == 1 ? "día" : "días"}';
+    } else {
+      return '${date.day.toString().padLeft(2, "0")}/${date.month.toString().padLeft(2, "0")}/${date.year}';
+    }
+  }
+
   Widget _buildTimeSection(BuildContext context, dynamic report) {
     final l10n = AppLocalizations.of(context)!;
     return Row(
@@ -293,7 +312,7 @@ class ReportDetailScreen extends ConsumerWidget {
         ),
         const SizedBox(width: PetSpacing.xs),
         Text(
-          l10n.exploreHoursAgo,
+          _formatTimeAgo(report.lastSeenAt ?? report.createdAt ?? DateTime.now()),
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],
