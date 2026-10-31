@@ -1,3 +1,6 @@
+import 'package:image_picker/image_picker.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+import '../../../core/network/api_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -26,6 +29,61 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
   String _species = 'Perro';
   String? _sex;
   String _size = 'Mediano';
+  bool _isAnalyzingAi = false;
+  String? _aiFeedback;
+
+  Future<void> _pickAndAnalyzeWithAi(ImageSource source) async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: source,
+      imageQuality: 85,
+      maxWidth: 1200,
+    );
+    if (picked == null) return;
+
+    ref.read(reportDraftProvider.notifier).addPhoto(picked.path);
+
+    setState(() {
+      _isAnalyzingAi = true;
+      _aiFeedback = null;
+    });
+
+    try {
+      final analysis = await ApiClient.instance.analyzePetImage(picked.path);
+      ref.read(reportDraftProvider.notifier).applyAiAnalysis(analysis);
+
+      if (mounted) {
+        setState(() {
+          final s = analysis['species']?.toString();
+          if (s != null && s.isNotEmpty) _species = s;
+
+          final b = analysis['breed']?.toString();
+          if (b != null && b.isNotEmpty) _breedController.text = b;
+
+          final c = analysis['color']?.toString();
+          if (c != null && c.isNotEmpty) _colorController.text = c;
+
+          final sz = analysis['size']?.toString();
+          if (sz != null && sz.isNotEmpty) _size = sz;
+
+          final sx = analysis['sex']?.toString();
+          if (sx != null && sx.isNotEmpty) _sex = sx;
+
+          _aiFeedback = '✨ ¡Datos completados por Gemini IA! Revisa y ajusta si es necesario.';
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _aiFeedback = '⚠️ No se pudo autocompletar (' + e.toString() + '). Puedes llenar los campos manualmente.';
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isAnalyzingAi = false);
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -150,6 +208,140 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                         displayName: displayName,
                         summary: summary,
                         tintColor: _resolveTint(_colorController.text),
+                      ),
+                      const SizedBox(height: 14),
+                      // Tarjeta para autocompletar con IA
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: PetTokens.isDark(context)
+                              ? const Color(0xFF2E2230)
+                              : const Color(0xFFFBF4ED),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: PetTokens.clay.withValues(alpha: 0.35),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 32,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                    color: PetTokens.clay.withValues(alpha: 0.15),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: const Icon(
+                                    Icons.auto_awesome,
+                                    color: PetTokens.clay,
+                                    size: 18,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    'Autocompletar con Foto (IA)',
+                                    style: PetTokens.bodyThemed(
+                                      context,
+                                      14,
+                                      color: PetTokens.inkOf(context),
+                                      weight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Sube una foto de la mascota y nuestra IA reconocerá automáticamente la especie, raza, color y tamaño.',
+                              style: PetTokens.bodyThemed(
+                                context,
+                                12,
+                                color: PetTokens.mutedOf(context),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            if (_isAnalyzingAi)
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(PetTokens.clay),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    'Analizando con Gemini IA...',
+                                    style: PetTokens.bodyThemed(
+                                      context,
+                                      13,
+                                      color: PetTokens.inkOf(context),
+                                      weight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            else
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: OutlinedButton.icon(
+                                      onPressed: () => _pickAndAnalyzeWithAi(ImageSource.camera),
+                                      icon: const Icon(PhosphorIconsBold.camera, size: 16),
+                                      label: const Text('Tomar foto'),
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: PetTokens.clay,
+                                        side: const BorderSide(color: PetTokens.clay),
+                                        padding: const EdgeInsets.symmetric(vertical: 10),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      onPressed: () => _pickAndAnalyzeWithAi(ImageSource.gallery),
+                                      icon: const Icon(PhosphorIconsBold.image, size: 16),
+                                      label: const Text('Galería'),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: PetTokens.clay,
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(vertical: 10),
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            if (_aiFeedback != null) ...[
+                              const SizedBox(height: 10),
+                              Text(
+                                _aiFeedback!,
+                                style: PetTokens.bodyThemed(
+                                  context,
+                                  12,
+                                  color: _aiFeedback!.startsWith('⚠️')
+                                      ? Colors.redAccent
+                                      : PetTokens.clay,
+                                  weight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 14),
 

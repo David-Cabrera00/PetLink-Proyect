@@ -50,11 +50,15 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
             ? '$species • $breed'
             : (species ?? 'Mascota identificada');
         setState(() {
-          _aiNotice = '✨ IA detectó: $summary';
+          _aiNotice = '✨ IA detectó: $summary (datos actualizados en el reporte)';
         });
       }
-    } catch (_) {
-      // Ignorar para no bloquear al usuario si falla la conexión
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _aiNotice = '⚠️ No se pudo completar el análisis IA: ' + e.toString();
+        });
+      }
     } finally {
       if (mounted) {
         setState(() => _isAnalyzing = false);
