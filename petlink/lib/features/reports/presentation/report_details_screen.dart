@@ -182,7 +182,7 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
                         child: TextFormField(
                           controller: _traitsController,
                           maxLines: 2,
-                          style: PetTokens.body(15, color: PetTokens.ink),
+                          style: PetTokens.bodyThemed(context, 15, color: PetTokens.inkOf(context)),
                           decoration: InputDecoration(
                             hintText: l10n.reportDetailsTraitsHint,
                             hintStyle: PetTokens.body(
@@ -190,19 +190,19 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
                               color: PetTokens.placeholder,
                             ),
                             filled: true,
-                            fillColor: PetTokens.surface,
+                            fillColor: PetTokens.surfaceHigherOf(context),
                             contentPadding: const EdgeInsets.all(14),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
-                              borderSide: const BorderSide(
-                                color: PetTokens.border,
+                              borderSide: BorderSide(
+                                color: PetTokens.borderOf(context),
                                 width: 1.5,
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
-                              borderSide: const BorderSide(
-                                color: PetTokens.plum,
+                              borderSide: BorderSide(
+                                color: PetTokens.plumAccentOf(context),
                                 width: 2.0,
                               ),
                             ),
@@ -213,7 +213,7 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
 
                       _TimelineFormRow(
                         icon: PhosphorIconsBold.chatText,
-                        nodeColor: PetTokens.plum,
+                        nodeColor: PetTokens.plumAccentOf(context),
                         isLast: false,
                         label: isLost
                             ? l10n.reportDetailsLostQuestion
@@ -221,7 +221,7 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
                         child: TextFormField(
                           controller: _descriptionController,
                           maxLines: 3,
-                          style: PetTokens.body(15, color: PetTokens.ink),
+                          style: PetTokens.bodyThemed(context, 15, color: PetTokens.inkOf(context)),
                           decoration: InputDecoration(
                             hintText: l10n.reportDetailsDescriptionHint,
                             hintStyle: PetTokens.body(
@@ -229,19 +229,19 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
                               color: PetTokens.placeholder,
                             ),
                             filled: true,
-                            fillColor: PetTokens.surface,
+                            fillColor: PetTokens.surfaceHigherOf(context),
                             contentPadding: const EdgeInsets.all(14),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
-                              borderSide: const BorderSide(
-                                color: PetTokens.border,
+                              borderSide: BorderSide(
+                                color: PetTokens.borderOf(context),
                                 width: 1.5,
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
-                              borderSide: const BorderSide(
-                                color: PetTokens.plum,
+                              borderSide: BorderSide(
+                                color: PetTokens.plumAccentOf(context),
                                 width: 2.0,
                               ),
                             ),
@@ -267,10 +267,10 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
                                 child: Container(
                                   height: 50,
                                   decoration: BoxDecoration(
-                                    color: PetTokens.surface,
+                                    color: PetTokens.surfaceHigherOf(context),
                                     borderRadius: BorderRadius.circular(16),
                                     border: Border.all(
-                                      color: PetTokens.border,
+                                      color: PetTokens.borderOf(context),
                                       width: 1.5,
                                     ),
                                   ),
@@ -287,9 +287,10 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
                                       const SizedBox(width: 8),
                                       Text(
                                         _formatDate(_selectedDate),
-                                        style: PetTokens.body(
+                                        style: PetTokens.bodyThemed(
+                                          context,
                                           14,
-                                          color: PetTokens.ink,
+                                          color: PetTokens.inkOf(context),
                                           weight: FontWeight.w600,
                                         ),
                                       ),
@@ -306,10 +307,10 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
                                 child: Container(
                                   height: 50,
                                   decoration: BoxDecoration(
-                                    color: PetTokens.surface,
+                                    color: PetTokens.surfaceHigherOf(context),
                                     borderRadius: BorderRadius.circular(16),
                                     border: Border.all(
-                                      color: PetTokens.border,
+                                      color: PetTokens.borderOf(context),
                                       width: 1.5,
                                     ),
                                   ),
@@ -326,9 +327,10 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
                                       const SizedBox(width: 8),
                                       Text(
                                         _formatTime(_selectedTime),
-                                        style: PetTokens.body(
+                                        style: PetTokens.bodyThemed(
+                                          context,
                                           14,
-                                          color: PetTokens.ink,
+                                          color: PetTokens.inkOf(context),
                                           weight: FontWeight.w600,
                                         ),
                                       ),
@@ -366,15 +368,25 @@ class _ReportDetailsScreenState extends ConsumerState<ReportDetailsScreen> {
                       width: 110,
                       height: 56,
                       decoration: BoxDecoration(
+                        color: PetTokens.isDark(context)
+                            ? PetTokens.surfaceHigherOf(context)
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: PetTokens.plum, width: 1.5),
+                        border: Border.all(
+                          color: PetTokens.isDark(context)
+                              ? PetTokens.borderOf(context)
+                              : PetTokens.plum,
+                          width: 1.5,
+                        ),
                       ),
                       alignment: Alignment.center,
                       child: Text(
                         l10n.backAction,
                         style: PetTokens.body(
                           15,
-                          color: PetTokens.plum,
+                          color: PetTokens.isDark(context)
+                              ? PetTokens.inkOf(context)
+                              : PetTokens.plum,
                           weight: FontWeight.w700,
                         ),
                       ),
@@ -456,7 +468,7 @@ class _TimelineFormRow extends StatelessWidget {
             bottom: -20,
             child: Container(
               width: 2,
-              color: PetTokens.plum.withValues(alpha: 0.3),
+              color: PetTokens.isDark(context) ? PetTokens.borderOf(context) : PetTokens.plum.withValues(alpha: 0.3),
             ),
           ),
         Padding(
@@ -468,7 +480,7 @@ class _TimelineFormRow extends StatelessWidget {
                 label,
                 style: PetTokens.body(
                   14,
-                  color: PetTokens.ink,
+                  color: PetTokens.inkOf(context),
                   weight: FontWeight.w700,
                 ),
               ),
@@ -484,7 +496,7 @@ class _TimelineFormRow extends StatelessWidget {
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              color: isHighlight ? nodeColor : PetTokens.cream,
+              color: isHighlight ? nodeColor : (PetTokens.isDark(context) ? PetTokens.surfaceHigherOf(context) : PetTokens.cream),
               shape: BoxShape.circle,
               border: Border.all(color: nodeColor, width: 2),
             ),
