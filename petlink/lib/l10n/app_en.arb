@@ -40,7 +40,7 @@
   "radarPossibleMatches": "Possible matches",
   "radarMatchesLoadError": "We couldn't load the matches",
   "radarNoMatches": "No matches yet",
-  "radarNoMatchesDescription": "We are still comparing your report with pets found near you.",
+  "radarNoMatchesDescription": "We will notify you as soon as we detect a similar pet on your radar.",
   "radarNearby": "Near you",
   "radarNoNearbyReports": "No reports nearby",
   "radarNoNearbyReportsDescription": "Pet reports will appear here when they are near your location.",
@@ -361,5 +361,121 @@
         "type": "int"
       }
     }
-  }
+  },
+  "timeToday": "Today",
+  "timeYesterday": "Yesterday",
+  "timeDaysAgoFull": "{days} days ago",
+  "@timeDaysAgoFull": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "statusNew": "New",
+  "welcomeEyebrow": "Search community",
+  "greetingMorning": "Good morning",
+  "greetingAfternoon": "Good afternoon",
+  "greetingEvening": "Good evening",
+  "radarYourReportSuffix": " · your report",
+  "radarMatchFoundNotice": "Someone found a similar pet",
+  "radarNoMatchesTitle": "No matches yet",
+  "radarNoReportsTitle": "No nearby reports",
+  "radarNoReportsDescription": "No lost or found pets were found within your radius.",
+  "recordedLocation": "Recorded location",
+  "reportLocationRadiusAlert": "Alert within 5 km radius",
+  "reportLocationRadiusNotice": "We will notify the nearby community.",
+  "stepPrefix": "Step",
+  "ofPrefix": "of",
+  "reportPhotosFull": "Ready, 3 of 3 photos",
+  "addAnotherPhoto": "Add another photo ({count}/3)",
+  "@addAnotherPhoto": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportPhotosEmpty": "No photos yet",
+  "reportPhotosEmptyHint": "Tap to take or choose front, profile, or full body.",
+  "petIdCardHeader": "SEARCH CARD",
+  "packMemberBadge": "PACK MEMBER",
+  "profilePhotoUpdated": "Profile photo updated",
+  "profilePhotoUpdateError": "Could not update photo: {error}",
+  "@profilePhotoUpdateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "changeNameTitle": "Change name",
+  "nameOrNicknameHint": "Your name or nickname",
+  "nameUpdated": "Name updated",
+  "nameUpdateError": "Could not update name: {error}",
+  "@nameUpdateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "noContactData": "No contact information available",
+  "contactEmailSubject": "Regarding your PetLink report",
+  "contactEmailError": "Could not open email app",
+  "deleteReport": "Delete report",
+  "deleteReportConfirmation": "This action cannot be undone.",
+  "deleteReportError": "Could not delete: {error}",
+  "@deleteReportError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "sightingSent": "Sighting sent",
+  "sightingSendError": "Could not send: {error}",
+  "@sightingSendError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "sightingLoadError": "Could not load report: {error}",
+  "@sightingLoadError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "reportNotFound": "Report not found",
+  "sightingPrompt": "Tell us where and how you saw {name}.",
+  "@sightingPrompt": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "sightingDescription": "Description",
+  "sightingDescriptionHint": "Describe the location and situation",
+  "sightingDescriptionRequired": "Please enter a description",
+  "sightingSubmit": "Submit sighting",
+  "exploreSearching": "Searching reports...",
+  "authPasswordStrength": "Password strength",
+  "authPasswordWeak": "Weak",
+  "authPasswordMedium": "Medium",
+  "authPasswordStrong": "Strong",
+  "authPasswordVeryStrong": "Very strong",
+  "authTagline": "Every paw print counts.",
+  "authHelloAgain": "WELCOME BACK",
+  "authWeWereWaiting": "We were\\n",
+  "authWaitingForYou": "waiting for you",
+  "timeWeeksAgo": "{weeks, plural, =1{1 week ago} other{{weeks} weeks ago}}",
+  "@timeWeeksAgo": {
+    "placeholders": {
+      "weeks": {
+        "type": "int"
+      }
+    }
+  },
+  "timeMonthsAgo": "{months, plural, =1{1 month ago} other{{months} months ago}}",
+  "@timeMonthsAgo": {
+    "placeholders": {
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+  "cancel": "Cancel"
 }

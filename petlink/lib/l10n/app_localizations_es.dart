@@ -79,7 +79,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get radarNoMatchesDescription =>
-      'Seguimos comparando tu reporte con mascotas encontradas cerca de ti.';
+      'Te avisaremos en cuanto detectemos una mascota similar en tu radar.';
 
   @override
   String get radarNearby => 'Cerca de ti';
@@ -915,4 +915,212 @@ class AppLocalizationsEs extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get timeToday => 'Hoy';
+
+  @override
+  String get timeYesterday => 'Ayer';
+
+  @override
+  String timeDaysAgoFull(int days) {
+    return 'Hace $days días';
+  }
+
+  @override
+  String get statusNew => 'Nuevo';
+
+  @override
+  String get welcomeEyebrow => 'Comunidad de búsqueda';
+
+  @override
+  String get greetingMorning => 'Buenos días';
+
+  @override
+  String get greetingAfternoon => 'Buenas tardes';
+
+  @override
+  String get greetingEvening => 'Buenas noches';
+
+  @override
+  String get radarYourReportSuffix => ' · tu reporte';
+
+  @override
+  String get radarMatchFoundNotice => 'Alguien encontró una mascota parecida';
+
+  @override
+  String get radarNoMatchesTitle => 'Sin coincidencias aún';
+
+  @override
+  String get radarNoReportsTitle => 'No hay reportes cercanos';
+
+  @override
+  String get radarNoReportsDescription =>
+      'No se encontraron mascotas perdidas o encontradas en tu radio.';
+
+  @override
+  String get recordedLocation => 'Ubicación registrada';
+
+  @override
+  String get reportLocationRadiusAlert => 'Alerta en un radio de 5 km';
+
+  @override
+  String get reportLocationRadiusNotice => 'Avisaremos a la comunidad cercana.';
+
+  @override
+  String get stepPrefix => 'Paso';
+
+  @override
+  String get ofPrefix => 'de';
+
+  @override
+  String get reportPhotosFull => 'Listo, 3 de 3 fotos';
+
+  @override
+  String addAnotherPhoto(int count) {
+    return 'Agregar otra foto ($count/3)';
+  }
+
+  @override
+  String get reportPhotosEmpty => 'Aún no hay fotos';
+
+  @override
+  String get reportPhotosEmptyHint =>
+      'Toca para tomar o elegir de frente, perfil o cuerpo.';
+
+  @override
+  String get petIdCardHeader => 'FICHA DE BÚSQUEDA';
+
+  @override
+  String get packMemberBadge => 'MIEMBRO DE LA MANADA';
+
+  @override
+  String get profilePhotoUpdated => 'Foto de perfil actualizada';
+
+  @override
+  String profilePhotoUpdateError(Object error) {
+    return 'No se pudo actualizar la foto: $error';
+  }
+
+  @override
+  String get changeNameTitle => 'Cambiar nombre';
+
+  @override
+  String get nameOrNicknameHint => 'Tu nombre o apodo';
+
+  @override
+  String get nameUpdated => 'Nombre actualizado';
+
+  @override
+  String nameUpdateError(Object error) {
+    return 'No se pudo actualizar el nombre: $error';
+  }
+
+  @override
+  String get noContactData => 'No hay datos de contacto disponibles';
+
+  @override
+  String get contactEmailSubject => 'Sobre tu reporte en PetLink';
+
+  @override
+  String get contactEmailError => 'No se pudo abrir el correo';
+
+  @override
+  String get deleteReport => 'Eliminar reporte';
+
+  @override
+  String get deleteReportConfirmation => 'Esta acción no se puede deshacer.';
+
+  @override
+  String deleteReportError(Object error) {
+    return 'No se pudo eliminar: $error';
+  }
+
+  @override
+  String get sightingSent => 'Avistamiento enviado';
+
+  @override
+  String sightingSendError(Object error) {
+    return 'No se pudo enviar: $error';
+  }
+
+  @override
+  String sightingLoadError(Object error) {
+    return 'No se pudo cargar el reporte: $error';
+  }
+
+  @override
+  String get reportNotFound => 'Reporte no encontrado';
+
+  @override
+  String sightingPrompt(Object name) {
+    return 'Cuéntanos dónde y cómo viste a $name.';
+  }
+
+  @override
+  String get sightingDescription => 'Descripción';
+
+  @override
+  String get sightingDescriptionHint => 'Describe el lugar y la situación';
+
+  @override
+  String get sightingDescriptionRequired => 'Escribe una descripción';
+
+  @override
+  String get sightingSubmit => 'Enviar avistamiento';
+
+  @override
+  String get exploreSearching => 'Buscando reportes...';
+
+  @override
+  String get authPasswordStrength => 'Fuerza de la contraseña';
+
+  @override
+  String get authPasswordWeak => 'Débil';
+
+  @override
+  String get authPasswordMedium => 'Media';
+
+  @override
+  String get authPasswordStrong => 'Fuerte';
+
+  @override
+  String get authPasswordVeryStrong => 'Muy fuerte';
+
+  @override
+  String get authTagline => 'Cada huella cuenta.';
+
+  @override
+  String get authHelloAgain => 'HOLA DE NUEVO';
+
+  @override
+  String get authWeWereWaiting => 'Te estábamos\\n';
+
+  @override
+  String get authWaitingForYou => 'esperando';
+
+  @override
+  String timeWeeksAgo(int weeks) {
+    String _temp0 = intl.Intl.pluralLogic(
+      weeks,
+      locale: localeName,
+      other: 'Hace $weeks semanas',
+      one: 'Hace 1 semana',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeMonthsAgo(int months) {
+    String _temp0 = intl.Intl.pluralLogic(
+      months,
+      locale: localeName,
+      other: 'Hace $months meses',
+      one: 'Hace 1 mes',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cancel => 'Cancelar';
 }

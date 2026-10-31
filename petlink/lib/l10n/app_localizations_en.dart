@@ -79,7 +79,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get radarNoMatchesDescription =>
-      'We are still comparing your report with pets found near you.';
+      'We will notify you as soon as we detect a similar pet on your radar.';
 
   @override
   String get radarNearby => 'Near you';
@@ -913,4 +913,213 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get timeToday => 'Today';
+
+  @override
+  String get timeYesterday => 'Yesterday';
+
+  @override
+  String timeDaysAgoFull(int days) {
+    return '$days days ago';
+  }
+
+  @override
+  String get statusNew => 'New';
+
+  @override
+  String get welcomeEyebrow => 'Search community';
+
+  @override
+  String get greetingMorning => 'Good morning';
+
+  @override
+  String get greetingAfternoon => 'Good afternoon';
+
+  @override
+  String get greetingEvening => 'Good evening';
+
+  @override
+  String get radarYourReportSuffix => ' · your report';
+
+  @override
+  String get radarMatchFoundNotice => 'Someone found a similar pet';
+
+  @override
+  String get radarNoMatchesTitle => 'No matches yet';
+
+  @override
+  String get radarNoReportsTitle => 'No nearby reports';
+
+  @override
+  String get radarNoReportsDescription =>
+      'No lost or found pets were found within your radius.';
+
+  @override
+  String get recordedLocation => 'Recorded location';
+
+  @override
+  String get reportLocationRadiusAlert => 'Alert within 5 km radius';
+
+  @override
+  String get reportLocationRadiusNotice =>
+      'We will notify the nearby community.';
+
+  @override
+  String get stepPrefix => 'Step';
+
+  @override
+  String get ofPrefix => 'of';
+
+  @override
+  String get reportPhotosFull => 'Ready, 3 of 3 photos';
+
+  @override
+  String addAnotherPhoto(int count) {
+    return 'Add another photo ($count/3)';
+  }
+
+  @override
+  String get reportPhotosEmpty => 'No photos yet';
+
+  @override
+  String get reportPhotosEmptyHint =>
+      'Tap to take or choose front, profile, or full body.';
+
+  @override
+  String get petIdCardHeader => 'SEARCH CARD';
+
+  @override
+  String get packMemberBadge => 'PACK MEMBER';
+
+  @override
+  String get profilePhotoUpdated => 'Profile photo updated';
+
+  @override
+  String profilePhotoUpdateError(Object error) {
+    return 'Could not update photo: $error';
+  }
+
+  @override
+  String get changeNameTitle => 'Change name';
+
+  @override
+  String get nameOrNicknameHint => 'Your name or nickname';
+
+  @override
+  String get nameUpdated => 'Name updated';
+
+  @override
+  String nameUpdateError(Object error) {
+    return 'Could not update name: $error';
+  }
+
+  @override
+  String get noContactData => 'No contact information available';
+
+  @override
+  String get contactEmailSubject => 'Regarding your PetLink report';
+
+  @override
+  String get contactEmailError => 'Could not open email app';
+
+  @override
+  String get deleteReport => 'Delete report';
+
+  @override
+  String get deleteReportConfirmation => 'This action cannot be undone.';
+
+  @override
+  String deleteReportError(Object error) {
+    return 'Could not delete: $error';
+  }
+
+  @override
+  String get sightingSent => 'Sighting sent';
+
+  @override
+  String sightingSendError(Object error) {
+    return 'Could not send: $error';
+  }
+
+  @override
+  String sightingLoadError(Object error) {
+    return 'Could not load report: $error';
+  }
+
+  @override
+  String get reportNotFound => 'Report not found';
+
+  @override
+  String sightingPrompt(Object name) {
+    return 'Tell us where and how you saw $name.';
+  }
+
+  @override
+  String get sightingDescription => 'Description';
+
+  @override
+  String get sightingDescriptionHint => 'Describe the location and situation';
+
+  @override
+  String get sightingDescriptionRequired => 'Please enter a description';
+
+  @override
+  String get sightingSubmit => 'Submit sighting';
+
+  @override
+  String get exploreSearching => 'Searching reports...';
+
+  @override
+  String get authPasswordStrength => 'Password strength';
+
+  @override
+  String get authPasswordWeak => 'Weak';
+
+  @override
+  String get authPasswordMedium => 'Medium';
+
+  @override
+  String get authPasswordStrong => 'Strong';
+
+  @override
+  String get authPasswordVeryStrong => 'Very strong';
+
+  @override
+  String get authTagline => 'Every paw print counts.';
+
+  @override
+  String get authHelloAgain => 'WELCOME BACK';
+
+  @override
+  String get authWeWereWaiting => 'We were\\n';
+
+  @override
+  String get authWaitingForYou => 'waiting for you';
+
+  @override
+  String timeWeeksAgo(int weeks) {
+    String _temp0 = intl.Intl.pluralLogic(
+      weeks,
+      locale: localeName,
+      other: '$weeks weeks ago',
+      one: '1 week ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeMonthsAgo(int months) {
+    String _temp0 = intl.Intl.pluralLogic(
+      months,
+      locale: localeName,
+      other: '$months months ago',
+      one: '1 month ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cancel => 'Cancel';
 }
