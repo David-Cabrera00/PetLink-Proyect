@@ -329,7 +329,7 @@
   "authConfirmPasswordHint": "Repeat your password",
   "authConfirmPasswordRequired": "Confirm your password",
   "authPasswordsMismatch": "Passwords do not match",
-  "authForgotPasswordTitle": "Reset your password",
+  "authForgotPasswordTitle": "Reset password",
   "authForgotPasswordDescription": "We will send instructions to help you regain access to your account.",
   "authSendInstructions": "Send instructions",
   "authForgotPasswordConfirmation": "If the email is registered, you will receive instructions to reset your password.",
@@ -477,5 +477,16 @@
       }
     }
   },
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "authForgotPasswordSubtitle": "Enter your email and we'll send you a 6-digit code.",
+  "authSendResetCode": "Send code",
+  "authResetCodeLabel": "6-digit code",
+  "authResetCodeHint": "123456",
+  "authNewPasswordLabel": "New password",
+  "authNewPasswordHint": "At least 8 characters",
+  "authResetPasswordButton": "Reset password",
+  "authResetCodeSent": "Code sent to your email",
+  "authResetSuccess": "Password updated! You can now log in.",
+  "authBackToLogin": "Back to login",
+  "authPasswordMinLength": "Must be at least 8 characters"
 }

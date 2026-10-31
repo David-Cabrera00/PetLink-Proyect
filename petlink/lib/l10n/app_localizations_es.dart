@@ -825,7 +825,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get authPasswordsMismatch => 'Las contraseñas no coinciden';
 
   @override
-  String get authForgotPasswordTitle => 'Recupera tu contraseña';
+  String get authForgotPasswordTitle => 'Recuperar contraseña';
 
   @override
   String get authForgotPasswordDescription =>
@@ -1123,4 +1123,39 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get cancel => 'Cancelar';
+
+  @override
+  String get authForgotPasswordSubtitle =>
+      'Ingresa tu correo y te enviaremos un código de 6 dígitos.';
+
+  @override
+  String get authSendResetCode => 'Enviar código';
+
+  @override
+  String get authResetCodeLabel => 'Código de 6 dígitos';
+
+  @override
+  String get authResetCodeHint => '123456';
+
+  @override
+  String get authNewPasswordLabel => 'Nueva contraseña';
+
+  @override
+  String get authNewPasswordHint => 'Mínimo 8 caracteres';
+
+  @override
+  String get authResetPasswordButton => 'Cambiar contraseña';
+
+  @override
+  String get authResetCodeSent => 'Código enviado a tu correo';
+
+  @override
+  String get authResetSuccess =>
+      '¡Contraseña actualizada! Ya puedes iniciar sesión.';
+
+  @override
+  String get authBackToLogin => 'Volver a iniciar sesión';
+
+  @override
+  String get authPasswordMinLength => 'Debe tener al menos 8 caracteres';
 }

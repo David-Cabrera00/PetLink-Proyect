@@ -1619,7 +1619,7 @@ abstract class AppLocalizations {
   /// No description provided for @authForgotPasswordTitle.
   ///
   /// In es, this message translates to:
-  /// **'Recupera tu contraseña'**
+  /// **'Recuperar contraseña'**
   String get authForgotPasswordTitle;
 
   /// No description provided for @authForgotPasswordDescription.
@@ -2119,6 +2119,72 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Cancelar'**
   String get cancel;
+
+  /// No description provided for @authForgotPasswordSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Ingresa tu correo y te enviaremos un código de 6 dígitos.'**
+  String get authForgotPasswordSubtitle;
+
+  /// No description provided for @authSendResetCode.
+  ///
+  /// In es, this message translates to:
+  /// **'Enviar código'**
+  String get authSendResetCode;
+
+  /// No description provided for @authResetCodeLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Código de 6 dígitos'**
+  String get authResetCodeLabel;
+
+  /// No description provided for @authResetCodeHint.
+  ///
+  /// In es, this message translates to:
+  /// **'123456'**
+  String get authResetCodeHint;
+
+  /// No description provided for @authNewPasswordLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Nueva contraseña'**
+  String get authNewPasswordLabel;
+
+  /// No description provided for @authNewPasswordHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Mínimo 8 caracteres'**
+  String get authNewPasswordHint;
+
+  /// No description provided for @authResetPasswordButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar contraseña'**
+  String get authResetPasswordButton;
+
+  /// No description provided for @authResetCodeSent.
+  ///
+  /// In es, this message translates to:
+  /// **'Código enviado a tu correo'**
+  String get authResetCodeSent;
+
+  /// No description provided for @authResetSuccess.
+  ///
+  /// In es, this message translates to:
+  /// **'¡Contraseña actualizada! Ya puedes iniciar sesión.'**
+  String get authResetSuccess;
+
+  /// No description provided for @authBackToLogin.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver a iniciar sesión'**
+  String get authBackToLogin;
+
+  /// No description provided for @authPasswordMinLength.
+  ///
+  /// In es, this message translates to:
+  /// **'Debe tener al menos 8 caracteres'**
+  String get authPasswordMinLength;
 }
 
 class _AppLocalizationsDelegate

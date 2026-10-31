@@ -823,7 +823,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authPasswordsMismatch => 'Passwords do not match';
 
   @override
-  String get authForgotPasswordTitle => 'Reset your password';
+  String get authForgotPasswordTitle => 'Reset password';
 
   @override
   String get authForgotPasswordDescription =>
@@ -1122,4 +1122,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cancel => 'Cancel';
+
+  @override
+  String get authForgotPasswordSubtitle =>
+      'Enter your email and we\'ll send you a 6-digit code.';
+
+  @override
+  String get authSendResetCode => 'Send code';
+
+  @override
+  String get authResetCodeLabel => '6-digit code';
+
+  @override
+  String get authResetCodeHint => '123456';
+
+  @override
+  String get authNewPasswordLabel => 'New password';
+
+  @override
+  String get authNewPasswordHint => 'At least 8 characters';
+
+  @override
+  String get authResetPasswordButton => 'Reset password';
+
+  @override
+  String get authResetCodeSent => 'Code sent to your email';
+
+  @override
+  String get authResetSuccess => 'Password updated! You can now log in.';
+
+  @override
+  String get authBackToLogin => 'Back to login';
+
+  @override
+  String get authPasswordMinLength => 'Must be at least 8 characters';
 }
