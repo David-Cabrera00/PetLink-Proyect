@@ -79,7 +79,7 @@ class ApiClient {
 
   static const defaultBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: '',
+    defaultValue: 'https://petlink-proyect-api.onrender.com/api/v1',
   );
 
   final http.Client _httpClient;
