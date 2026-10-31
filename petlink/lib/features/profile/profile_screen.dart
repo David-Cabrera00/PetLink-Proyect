@@ -85,7 +85,7 @@ class ProfileScreen extends ConsumerWidget {
         color: PetTokens.surfaceOf(context),
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: PetTokens.borderOf(context)),
-        boxShadow: PetTokens.shadowCard,
+        boxShadow: PetTokens.shadowCardThemed(context),
       ),
       child: Column(
         children: [
@@ -101,13 +101,11 @@ class ProfileScreen extends ConsumerWidget {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: PetTokens.isDark(context)
-                          ? const Color(0xFF381C22)
-                          : const Color(0xFFFCEEE8),
+                      color: PetTokens.lostBgOf(context),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     alignment: Alignment.center,
-                    child: PetPaw(size: 22, color: PetTokens.clayText),
+                    child: PetPaw(size: 22, color: PetTokens.lostTextOf(context)),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
@@ -118,21 +116,21 @@ class ProfileScreen extends ConsumerWidget {
                           l10n.reportsTitle,
                           style: PetTokens.body(
                             16,
-                            color: PetTokens.ink,
+                            color: PetTokens.inkOf(context),
                             weight: FontWeight.w700,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           l10n.profileDescription,
-                          style: PetTokens.body(13, color: PetTokens.muted),
+                          style: PetTokens.body(13, color: PetTokens.mutedOf(context)),
                         ),
                       ],
                     ),
                   ),
-                  const Icon(
+                  Icon(
                     Icons.chevron_right_rounded,
-                    color: PetTokens.muted,
+                    color: PetTokens.mutedOf(context),
                     size: 22,
                   ),
                 ],
@@ -143,7 +141,7 @@ class ProfileScreen extends ConsumerWidget {
           // Divisor suave
           Container(
             height: 1,
-            color: PetTokens.border,
+            color: PetTokens.borderOf(context),
             margin: const EdgeInsets.symmetric(horizontal: 16),
           ),
 
@@ -164,7 +162,7 @@ class ProfileScreen extends ConsumerWidget {
                     height: 44,
                     decoration: BoxDecoration(
                       color: PetTokens.isDark(context)
-                          ? const Color(0xFF2C2230)
+                          ? const Color(0xFF382338)
                           : const Color(0xFFEFE3EC),
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -172,7 +170,7 @@ class ProfileScreen extends ConsumerWidget {
                     child: Icon(
                       PhosphorIconsBold.pencilSimple,
                       size: 20,
-                      color: PetTokens.plum,
+                      color: PetTokens.plumAccentOf(context),
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -184,21 +182,21 @@ class ProfileScreen extends ConsumerWidget {
                           l10n.authName,
                           style: PetTokens.body(
                             16,
-                            color: PetTokens.ink,
+                            color: PetTokens.inkOf(context),
                             weight: FontWeight.w700,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           l10n.authNameHint,
-                          style: PetTokens.body(13, color: PetTokens.muted),
+                          style: PetTokens.body(13, color: PetTokens.mutedOf(context)),
                         ),
                       ],
                     ),
                   ),
-                  const Icon(
+                  Icon(
                     Icons.chevron_right_rounded,
-                    color: PetTokens.muted,
+                    color: PetTokens.mutedOf(context),
                     size: 22,
                   ),
                 ],
@@ -232,13 +230,13 @@ class ProfileScreen extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 4),
           child: Text.rich(
             TextSpan(
-              style: PetTokens.display(22, color: PetTokens.ink),
+              style: PetTokens.displayThemed(context, 22),
               children: [
                 TextSpan(
                   text: l10n.appearance,
                   style: PetTokens.display(
                     22,
-                    color: PetTokens.clayText,
+                    color: PetTokens.lostTextOf(context),
                     italic: true,
                   ),
                 ),
@@ -267,14 +265,16 @@ class ProfileScreen extends ConsumerWidget {
                       height: 68,
                       decoration: BoxDecoration(
                         color: currentTheme == mode
-                            ? PetTokens.surface
+                            ? PetTokens.surfaceOf(context)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(14),
                         boxShadow: currentTheme == mode
-                            ? const [
+                            ? [
                                 BoxShadow(
-                                  color: Color(0x1A2A1A29),
-                                  offset: Offset(0, 4),
+                                  color: PetTokens.isDark(context)
+                                      ? Colors.black.withValues(alpha: 0.25)
+                                      : const Color(0x1A2A1A29),
+                                  offset: const Offset(0, 4),
                                   blurRadius: 14,
                                 ),
                               ]
@@ -287,8 +287,8 @@ class ProfileScreen extends ConsumerWidget {
                             icon,
                             size: 22,
                             color: currentTheme == mode
-                                ? PetTokens.plum
-                                : PetTokens.muted,
+                                ? PetTokens.plumAccentOf(context)
+                                : PetTokens.mutedOf(context),
                           ),
                           const SizedBox(height: 6),
                           Text(
@@ -296,8 +296,8 @@ class ProfileScreen extends ConsumerWidget {
                             style: PetTokens.body(
                               13,
                               color: currentTheme == mode
-                                  ? PetTokens.plum
-                                  : PetTokens.muted,
+                                  ? PetTokens.plumAccentOf(context)
+                                  : PetTokens.mutedOf(context),
                               weight: currentTheme == mode
                                   ? FontWeight.w800
                                   : FontWeight.w600,
@@ -334,13 +334,13 @@ class ProfileScreen extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 4),
           child: Text.rich(
             TextSpan(
-              style: PetTokens.display(22, color: PetTokens.ink),
+              style: PetTokens.displayThemed(context, 22),
               children: [
                 TextSpan(
                   text: l10n.language,
                   style: PetTokens.display(
                     22,
-                    color: PetTokens.clayText,
+                    color: PetTokens.lostTextOf(context),
                     italic: true,
                   ),
                 ),
@@ -367,7 +367,7 @@ class ProfileScreen extends ConsumerWidget {
                     duration: PetTokens.dFast,
                     height: 52,
                     decoration: BoxDecoration(
-                      color: isSpanish ? PetTokens.surface : Colors.transparent,
+                      color: isSpanish ? PetTokens.surfaceOf(context) : Colors.transparent,
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: isSpanish ? PetTokens.shadowNav : null,
                     ),
@@ -376,7 +376,7 @@ class ProfileScreen extends ConsumerWidget {
                       l10n.languageSpanish,
                       style: PetTokens.body(
                         14,
-                        color: isSpanish ? PetTokens.plum : PetTokens.muted,
+                        color: isSpanish ? PetTokens.plumAccentOf(context) : PetTokens.mutedOf(context),
                         weight: isSpanish ? FontWeight.w800 : FontWeight.w600,
                       ),
                     ),
@@ -393,7 +393,7 @@ class ProfileScreen extends ConsumerWidget {
                     duration: PetTokens.dFast,
                     height: 52,
                     decoration: BoxDecoration(
-                      color: !isSpanish ? PetTokens.surface : Colors.transparent,
+                      color: !isSpanish ? PetTokens.surfaceOf(context) : Colors.transparent,
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: !isSpanish ? PetTokens.shadowNav : null,
                     ),
@@ -402,7 +402,7 @@ class ProfileScreen extends ConsumerWidget {
                       l10n.languageEnglish,
                       style: PetTokens.body(
                         14,
-                        color: !isSpanish ? PetTokens.plum : PetTokens.muted,
+                        color: !isSpanish ? PetTokens.plumAccentOf(context) : PetTokens.mutedOf(context),
                         weight: !isSpanish ? FontWeight.w800 : FontWeight.w600,
                       ),
                     ),
@@ -430,16 +430,22 @@ class ProfileScreen extends ConsumerWidget {
       child: Container(
         height: 52,
         decoration: BoxDecoration(
+          color: PetTokens.isDark(context) ? PetTokens.lostBgOf(context) : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE3D6CB), width: 1.5),
+          border: Border.all(
+            color: PetTokens.isDark(context)
+                ? PetTokens.lostBorderOf(context)
+                : const Color(0xFFE3D6CB),
+            width: 1.5,
+          ),
         ),
         alignment: Alignment.center,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               PhosphorIconsBold.signOut,
-              color: PetTokens.clayText,
+              color: PetTokens.lostTextOf(context),
               size: 20,
             ),
             const SizedBox(width: 8),
@@ -447,7 +453,7 @@ class ProfileScreen extends ConsumerWidget {
               l10n.profileLogout,
               style: PetTokens.body(
                 15,
-                color: PetTokens.clayText,
+                color: PetTokens.lostTextOf(context),
                 weight: FontWeight.w700,
               ),
             ),
@@ -492,27 +498,31 @@ class ProfileScreen extends ConsumerWidget {
     final name = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: PetTokens.surface,
+        backgroundColor: PetTokens.surfaceOf(dialogContext),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
         title: Text(
           'Cambiar nombre',
-          style: PetTokens.display(20, color: PetTokens.ink),
+          style: PetTokens.displayThemed(dialogContext, 20),
         ),
         content: TextField(
           controller: controller,
           autofocus: true,
           textCapitalization: TextCapitalization.words,
           maxLength: 60,
-          style: PetTokens.body(15, color: PetTokens.ink),
+          style: PetTokens.body(15, color: PetTokens.inkOf(dialogContext)),
           decoration: InputDecoration(
             hintText: 'Tu nombre o apodo',
+            hintStyle: PetTokens.body(15, color: PetTokens.placeholder),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(color: PetTokens.border),
+              borderSide: BorderSide(color: PetTokens.borderOf(dialogContext)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(color: PetTokens.plum, width: 2),
+              borderSide: BorderSide(
+                color: PetTokens.plumAccentOf(dialogContext),
+                width: 2,
+              ),
             ),
           ),
         ),
@@ -521,7 +531,11 @@ class ProfileScreen extends ConsumerWidget {
             onPressed: () => Navigator.pop(dialogContext),
             child: Text(
               'Cancelar',
-              style: PetTokens.body(14, color: PetTokens.muted, weight: FontWeight.w600),
+              style: PetTokens.body(
+                14,
+                color: PetTokens.mutedOf(dialogContext),
+                weight: FontWeight.w600,
+              ),
             ),
           ),
           FilledButton(
@@ -574,9 +588,11 @@ class _ProfileHero extends StatelessWidget {
     final top = MediaQuery.of(context).padding.top;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: PetTokens.plum,
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(36)),
+      decoration: BoxDecoration(
+        color: PetTokens.isDark(context)
+            ? const Color(0xFF2E1C2E)
+            : PetTokens.plum,
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(36)),
       ),
       child: Stack(
         children: [
@@ -747,7 +763,7 @@ class _OrbitalAvatarState extends State<_OrbitalAvatar>
             width: 86,
             height: 86,
             decoration: BoxDecoration(
-              color: PetTokens.cream,
+              color: PetTokens.isDark(context) ? const Color(0xFF2E2232) : PetTokens.cream,
               shape: BoxShape.circle,
               boxShadow: const [
                 BoxShadow(
@@ -785,7 +801,12 @@ class _OrbitalAvatarState extends State<_OrbitalAvatar>
                 decoration: BoxDecoration(
                   color: PetTokens.clay,
                   shape: BoxShape.circle,
-                  border: Border.all(color: PetTokens.plum, width: 3),
+                  border: Border.all(
+                    color: PetTokens.isDark(context)
+                        ? const Color(0xFF2E1C2E)
+                        : PetTokens.plum,
+                    width: 3,
+                  ),
                   boxShadow: const [
                     BoxShadow(
                       color: Color(0x26000000),
@@ -813,7 +834,7 @@ class _OrbitalAvatarState extends State<_OrbitalAvatar>
       _getInitials(widget.name),
       style: PetTokens.display(
         32,
-        color: PetTokens.plum,
+        color: PetTokens.isDark(context) ? PetTokens.plumAccentOf(context) : PetTokens.plum,
         italic: true,
       ),
     );
