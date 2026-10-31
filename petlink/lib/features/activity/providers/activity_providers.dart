@@ -13,7 +13,7 @@ final activityRepositoryProvider = Provider<ActivityRepository>((ref) {
 class ActivityNotifier extends AsyncNotifier<List<ActivityItem>> {
   @override
   Future<List<ActivityItem>> build() async {
-    ref.watch(authProvider.select((state) => state.user?.email));
+    if (ref.watch(currentUserEmailProvider) == null) return const [];
     return ref.read(activityRepositoryProvider).getActivity();
   }
 
