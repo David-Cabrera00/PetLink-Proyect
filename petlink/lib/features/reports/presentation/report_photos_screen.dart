@@ -57,7 +57,7 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: PetTokens.mintBg,
+                      color: PetTokens.mintBgOf(context),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     alignment: Alignment.center,
@@ -82,13 +82,15 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEFE3EC),
+                      color: PetTokens.isDark(context)
+                          ? const Color(0xFF382338)
+                          : const Color(0xFFEFE3EC),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     alignment: Alignment.center,
-                    child: const Icon(
+                    child: Icon(
                       PhosphorIconsBold.image,
-                      color: PetTokens.plum,
+                      color: PetTokens.plumAccentOf(context),
                       size: 22,
                     ),
                   ),
@@ -175,8 +177,12 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                             height: 10,
                             decoration: BoxDecoration(
                               color: i < photoCount
-                                  ? PetTokens.clay
-                                  : const Color(0xFFE3D6CB),
+                                  ? (PetTokens.isDark(context)
+                                      ? PetTokens.lostTextOf(context)
+                                      : PetTokens.clay)
+                                  : (PetTokens.isDark(context)
+                                      ? PetTokens.trackOf(context)
+                                      : const Color(0xFFE3D6CB)),
                               borderRadius: BorderRadius.circular(5),
                             ),
                           ),
@@ -194,8 +200,12 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                         height: 56,
                         decoration: BoxDecoration(
                           color: isFull
-                              ? const Color(0xFFE8E0D8)
-                              : const Color(0xFFEFE3EC),
+                              ? (PetTokens.isDark(context)
+                                  ? const Color(0xFF1E1924)
+                                  : const Color(0xFFE8E0D8))
+                              : (PetTokens.isDark(context)
+                                  ? const Color(0xFF382338)
+                                  : const Color(0xFFEFE3EC)),
                           borderRadius: BorderRadius.circular(18),
                         ),
                         alignment: Alignment.center,
@@ -204,7 +214,9 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                           children: [
                             Icon(
                               PhosphorIconsBold.cameraPlus,
-                              color: isFull ? PetTokens.muted : PetTokens.plum,
+                              color: isFull
+                                  ? PetTokens.mutedOf(context)
+                                  : PetTokens.plumAccentOf(context),
                               size: 22,
                             ),
                             const SizedBox(width: 10),
@@ -216,7 +228,9 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                                       : 'Agregar otra foto ($photoCount/3)'),
                               style: PetTokens.body(
                                 15,
-                                color: isFull ? PetTokens.muted : PetTokens.plum,
+                                color: isFull
+                                    ? PetTokens.mutedOf(context)
+                                    : PetTokens.plumAccentOf(context),
                                 weight: FontWeight.w700,
                               ),
                             ),
@@ -330,7 +344,9 @@ class _PolaroidStage extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(28),
             border: Border.all(
-              color: const Color(0xFFD6C6BA),
+              color: PetTokens.isDark(context)
+                  ? PetTokens.borderOf(context)
+                  : const Color(0xFFD6C6BA),
               width: 2,
               strokeAlign: BorderSide.strokeAlignInside,
             ),
@@ -342,25 +358,27 @@ class _PolaroidStage extends StatelessWidget {
                 width: 86,
                 height: 86,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEFE3EC),
+                  color: PetTokens.isDark(context)
+                      ? const Color(0xFF382338)
+                      : const Color(0xFFEFE3EC),
                   borderRadius: BorderRadius.circular(28),
                 ),
                 alignment: Alignment.center,
-                child: const Icon(
+                child: Icon(
                   PhosphorIconsBold.camera,
-                  color: PetTokens.plum,
+                  color: PetTokens.plumAccentOf(context),
                   size: 38,
                 ),
               ),
               const SizedBox(height: 14),
               Text(
-                'A\u00FAn no hay fotos',
-                style: PetTokens.display(18, color: PetTokens.ink),
+                'Aún no hay fotos',
+                style: PetTokens.displayThemed(context, 18),
               ),
               const SizedBox(height: 4),
               Text(
                 'Toca para tomar o elegir de frente, perfil o cuerpo.',
-                style: PetTokens.body(13, color: PetTokens.muted),
+                style: PetTokens.body(13, color: PetTokens.mutedOf(context)),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -410,12 +428,21 @@ class _PolaroidFrame extends StatelessWidget {
       width: 196,
       height: 236,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: PetTokens.isDark(context)
+            ? const Color(0xFF261F2C)
+            : Colors.white,
         borderRadius: BorderRadius.circular(10),
-        boxShadow: const [
+        border: Border.all(
+          color: PetTokens.isDark(context)
+              ? PetTokens.borderOf(context)
+              : Colors.transparent,
+        ),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x2E2A1A29),
-            offset: Offset(0, 14),
+            color: PetTokens.isDark(context)
+                ? Colors.black.withValues(alpha: 0.4)
+                : const Color(0x2E2A1A29),
+            offset: const Offset(0, 14),
             blurRadius: 30,
           ),
         ],
@@ -471,7 +498,7 @@ class _PolaroidFrame extends StatelessWidget {
             caption,
             style: PetTokens.display(
               15,
-              color: PetTokens.plum,
+              color: PetTokens.plumAccentOf(context),
               italic: true,
             ),
           ),
