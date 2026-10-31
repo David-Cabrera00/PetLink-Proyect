@@ -396,6 +396,7 @@ class _MatchItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         color: PetTokens.surfaceOf(context),
@@ -482,7 +483,7 @@ class _MatchItemCard extends StatelessWidget {
                             ),
                           ),
                           TextSpan(
-                            text: ' · tu reporte',
+                            text: l10n.radarYourReportSuffix,
                             style: PetTokens.body(
                               14,
                               color: PetTokens.muted,
@@ -494,7 +495,7 @@ class _MatchItemCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Alguien encontró una mascota parecida',
+                      l10n.radarMatchFoundNotice,
                       style: PetTokens.bodyThemed(context, 13, color: PetTokens.mutedOf(context)),
                     ),
                     const SizedBox(height: 6),
@@ -692,6 +693,7 @@ class _EmptyMatchesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = this.l10n ?? AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -720,7 +722,7 @@ class _EmptyMatchesCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Sin coincidencias aún',
+                  l10n.radarNoMatchesTitle,
                   style: PetTokens.bodyThemed(context, 15, color: PetTokens.inkOf(context), weight: FontWeight.w700),
                 ),
                 const SizedBox(height: 2),
@@ -742,6 +744,7 @@ class _EmptyNearbyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -759,7 +762,8 @@ class _EmptyNearbyCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(
-              Icons.pets_rounded,
+              Icons.pets_rounded,
+
               color: PetTokens.plumAccentOf(context),
               size: 22,
             ),
@@ -770,12 +774,12 @@ class _EmptyNearbyCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'No hay reportes cercanos',
+                  l10n.radarNoReportsTitle,
                   style: PetTokens.bodyThemed(context, 15, color: PetTokens.inkOf(context), weight: FontWeight.w700),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'No se encontraron mascotas perdidas o encontradas en tu radio.',
+                  l10n.radarNoReportsDescription,
                   style: PetTokens.bodyThemed(context, 13, color: PetTokens.mutedOf(context)),
                 ),
               ],

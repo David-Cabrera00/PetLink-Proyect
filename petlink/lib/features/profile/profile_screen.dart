@@ -468,6 +468,7 @@ class ProfileScreen extends ConsumerWidget {
   // OPERACIONES DE PERFIL
   // ---------------------------------------------------------------------------
   Future<void> _pickAvatar(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context)!;
     final image = await ImagePicker().pickImage(
       source: ImageSource.gallery,
       imageQuality: 85,
@@ -478,7 +479,7 @@ class ProfileScreen extends ConsumerWidget {
       await ref.read(authProvider.notifier).uploadAvatar(image.path);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Foto de perfil actualizada')),
+          SnackBar(content: Text(l10n.profilePhotoUpdated)),
         );
       }
     } catch (error) {
@@ -499,6 +500,7 @@ class ProfileScreen extends ConsumerWidget {
     WidgetRef ref,
     String currentName,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     final controller = TextEditingController(text: currentName);
     final name = await showDialog<String>(
       context: context,
@@ -506,7 +508,7 @@ class ProfileScreen extends ConsumerWidget {
         backgroundColor: PetTokens.surfaceOf(dialogContext),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
         title: Text(
-          'Cambiar nombre',
+          l10n.changeNameTitle,
           style: PetTokens.displayThemed(dialogContext, 20),
         ),
         content: TextField(
@@ -516,7 +518,7 @@ class ProfileScreen extends ConsumerWidget {
           maxLength: 60,
           style: PetTokens.body(15, color: PetTokens.inkOf(dialogContext)),
           decoration: InputDecoration(
-            hintText: 'Tu nombre o apodo',
+            hintText: l10n.nameOrNicknameHint,
             hintStyle: PetTokens.body(15, color: PetTokens.placeholder),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
@@ -566,7 +568,7 @@ class ProfileScreen extends ConsumerWidget {
       await ref.read(authProvider.notifier).updateName(name);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Nombre actualizado')),
+          SnackBar(content: Text(l10n.nameUpdated)),
         );
       }
     } catch (error) {
@@ -594,6 +596,7 @@ class _ProfileHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final top = MediaQuery.of(context).padding.top;
 
     return Container(
@@ -639,7 +642,7 @@ class _ProfileHero extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'MIEMBRO DE LA MANADA',
+                        l10n.packMemberBadge,
                         style: PetTokens.body(
                           11,
                           color: const Color(0xFFF3B79F),
