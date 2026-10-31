@@ -1,8 +1,8 @@
-import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma.service';
-import { ChangePasswordDto, LoginDto, RefreshTokenDto, RegisterDto, UpdateProfileDto } from './dto';
+import { ChangePasswordDto, ForgotPasswordDto, LoginDto, RefreshTokenDto, RegisterDto, ResetPasswordDto, UpdateProfileDto } from './dto';
 
 type TokenUser = { id: string; email: string };
 type TokenType = 'access' | 'refresh';
@@ -82,5 +82,101 @@ export class AuthService {
     const avatarUrl = `${baseUrl}/storage/v1/object/public/${bucket}/${storagePath}`;
     const user = await this.prisma.user.update({ where: { id }, data: { avatarUrl } });
     return this.safe(user);
+  }
+
+  async forgotPassword(dto: ForgotPasswordDto) {
+    const email = dto.email.trim().toLowerCase();
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return { success: true, message: 'Si el correo está registrado, recibirás un código de recuperación.' };
+    }
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const codeHash = await bcrypt.hash(code, 10);
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
+
+    await this.prisma.passwordReset.deleteMany({ where: { email } });
+    await this.prisma.passwordReset.create({
+      data: { email, codeHash, expiresAt },
+    });
+
+    await this.sendResetEmail(email, user.name, code);
+    return { success: true, message: 'Código de recuperación enviado' };
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    const email = dto.email.trim().toLowerCase();
+    const record = await this.prisma.passwordReset.findFirst({
+      where: {
+        email,
+        expiresAt: { gt: new Date() },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!record) {
+      throw new BadRequestException('El código es inválido o ha expirado');
+    }
+
+    const isValid = await bcrypt.compare(dto.code.trim(), record.codeHash);
+    if (!isValid) {
+      throw new BadRequestException('El código de verificación es incorrecto');
+    }
+
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    const newPasswordHash = await bcrypt.hash(dto.newPassword, 12);
+    await this.prisma.user.update({
+      where: { email },
+      data: { passwordHash: newPasswordHash },
+    });
+
+    await this.prisma.passwordReset.deleteMany({ where: { email } });
+    return { success: true, message: 'Contraseña restablecida correctamente' };
+  }
+
+  private async sendResetEmail(to: string, name: string, code: string) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      console.log(`\n========================================`);
+      console.log(`[PASSWORD RESET] Para ${to}: CÓDIGO = ${code}`);
+      console.log(`========================================\n`);
+      return;
+    }
+
+    try {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: process.env.EMAIL_FROM ?? 'PetLink <onboarding@resend.dev>',
+          to: [to],
+          subject: `${code} es tu código de recuperación de PetLink`,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 24px; border: 1px solid #EADFD6; border-radius: 16px; background-color: #FBF6F1;">
+              <h2 style="color: #4A2D4A; margin-bottom: 8px;">Recuperación de contraseña</h2>
+              <p style="color: #6E5C67; font-size: 15px;">Hola <strong>${name}</strong>,</p>
+              <p style="color: #6E5C67; font-size: 15px;">Has solicitado restablecer tu contraseña en PetLink. Ingresa este código de 6 dígitos en la aplicación:</p>
+              <div style="background-color: #4A2D4A; color: #FFFFFF; font-size: 32px; font-weight: bold; letter-spacing: 8px; text-align: center; padding: 18px; border-radius: 12px; margin: 24px 0;">
+                ${code}
+              </div>
+              <p style="color: #8E7D87; font-size: 13px;">Este código expirará en 15 minutos. Si no solicitaste este cambio, puedes ignorar este mensaje.</p>
+              <p style="color: #E07A5F; font-size: 13px; font-weight: bold;">El equipo de PetLink · Cada huella cuenta</p>
+            </div>
+          `,
+        }),
+      });
+      if (!response.ok) {
+        console.error(`[RESEND ERROR] Status ${response.status}: ${await response.text()}`);
+      }
+    } catch (err) {
+      console.error('[RESEND EXCEPTION]', err);
+    }
   }
 }

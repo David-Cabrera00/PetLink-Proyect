@@ -79,7 +79,7 @@ class ApiClient {
 
   static const defaultBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: '',
+    defaultValue: 'https://petlink-proyect-api.onrender.com/api/v1',
   );
 
   final http.Client _httpClient;
@@ -176,6 +176,19 @@ class ApiClient {
         },
         skipAuthRefresh: true,
       );
+
+  Future<Map<String, dynamic>> analyzePetImage(String localPathOrUrl) async {
+    if (localPathOrUrl.startsWith('http')) {
+      final res = await post(
+        '/ai/analyze-image',
+        body: {'imageUrl': localPathOrUrl},
+      );
+      return (res as Map).cast<String, dynamic>();
+    } else {
+      final res = await uploadFile(localPathOrUrl, '/ai/analyze-image');
+      return (res as Map).cast<String, dynamic>();
+    }
+  }
 
   Future<dynamic> uploadFile(String path, String endpoint) async {
     Future<http.StreamedResponse> send() async {

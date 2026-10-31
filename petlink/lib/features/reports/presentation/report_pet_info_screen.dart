@@ -151,7 +151,31 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                         summary: summary,
                         tintColor: _resolveTint(_colorController.text),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 14),
+
+                      if (draft.breed.isNotEmpty || draft.color.isNotEmpty) ...[
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: PetTokens.plum.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: PetTokens.plum.withValues(alpha: 0.2)),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.auto_awesome, color: PetTokens.clay, size: 18),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'Datos precargados con IA a partir de tu foto. Puedes editarlos libremente.',
+                                  style: PetTokens.bodyThemed(context, 13, color: PetTokens.inkOf(context), weight: FontWeight.w600),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                      ],
 
                       // Nombre
                       _buildFieldLabel(
