@@ -9,10 +9,11 @@ export class JwtAuthGuard implements CanActivate {
     const header = request.headers.authorization;
     if (!header?.startsWith('Bearer ')) throw new UnauthorizedException();
     try {
-      const payload = this.jwt.verify<{ sub: string; email: string }>(
+      const payload = this.jwt.verify<{ sub: string; email: string; typ?: string }>(
         header.slice(7),
         { secret: process.env.JWT_ACCESS_SECRET },
       );
+      if (payload.typ !== undefined && payload.typ !== 'access') throw new Error('Not an access token');
       request.user = payload;
       return true;
     } catch {
