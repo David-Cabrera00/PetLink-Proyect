@@ -1094,7 +1094,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get authHelloAgain => 'HOLA DE NUEVO';
 
   @override
-  String get authWeWereWaiting => 'Te estábamos\\n';
+  String get authWeWereWaiting => 'Te estábamos';
 
   @override
   String get authWaitingForYou => 'esperando';
