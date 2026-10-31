@@ -83,6 +83,28 @@ class ReportDraftNotifier extends StateNotifier<ReportDraft> {
     state = state.copyWith(isPetWithFinder: value);
   }
 
+  void applyAiAnalysis(Map<String, dynamic> analysis) {
+    final species = analysis['species']?.toString();
+    final breed = analysis['breed']?.toString();
+    final color = analysis['color']?.toString();
+    final size = analysis['size']?.toString();
+    final sex = analysis['sex']?.toString();
+    final traits = analysis['visibleTraits'] is List
+        ? (analysis['visibleTraits'] as List).join(', ')
+        : analysis['visibleTraits']?.toString();
+
+    state = state.copyWith(
+      species: (species != null && species.isNotEmpty) ? species : state.species,
+      breed: (breed != null && breed.isNotEmpty) ? breed : state.breed,
+      color: (color != null && color.isNotEmpty) ? color : state.color,
+      size: (size != null && size.isNotEmpty) ? size : state.size,
+      sex: (sex != null && sex.isNotEmpty) ? sex : state.sex,
+      traits: (traits != null && traits.isNotEmpty && state.traits.isEmpty)
+          ? traits
+          : state.traits,
+    );
+  }
+
   void clearDraft() {
     state = const ReportDraft();
   }

@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
+import '../../../core/network/api_client.dart';
 import '../../../core/theme/pet_tokens.dart';
 import '../../../shared/widgets/photo_preview.dart';
 import '../providers/report_draft_provider.dart';
@@ -18,6 +19,9 @@ class ReportPhotosScreen extends ConsumerStatefulWidget {
 }
 
 class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
+  bool _isAnalyzing = false;
+  String? _aiNotice;
+
   Future<void> _pickPhoto(ImageSource source) async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(
@@ -27,6 +31,34 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
     );
     if (picked != null) {
       ref.read(reportDraftProvider.notifier).addPhoto(picked.path);
+      _analyzePhoto(picked.path);
+    }
+  }
+
+  Future<void> _analyzePhoto(String path) async {
+    setState(() {
+      _isAnalyzing = true;
+      _aiNotice = null;
+    });
+    try {
+      final analysis = await ApiClient.instance.analyzePetImage(path);
+      ref.read(reportDraftProvider.notifier).applyAiAnalysis(analysis);
+      if (mounted) {
+        final breed = analysis['breed']?.toString();
+        final species = analysis['species']?.toString();
+        final summary = (breed != null && breed.isNotEmpty)
+            ? '$species • $breed'
+            : (species ?? 'Mascota identificada');
+        setState(() {
+          _aiNotice = '✨ IA detectó: $summary';
+        });
+      }
+    } catch (_) {
+      // Ignorar para no bloquear al usuario si falla la conexión
+    } finally {
+      if (mounted) {
+        setState(() => _isAnalyzing = false);
+      }
     }
   }
 
@@ -164,6 +196,57 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
                       },
                       onTapAdd: isFull ? null : _showSourcePicker,
                     ),
+                    if (_isAnalyzing) ...[
+                      const SizedBox(height: 14),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: PetTokens.plum.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: PetTokens.plum.withValues(alpha: 0.2)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(PetTokens.clay),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              'Analizando foto con IA para autocompletar raza y rasgos...',
+                              style: PetTokens.bodyThemed(context, 13, color: PetTokens.inkOf(context), weight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ] else if (_aiNotice != null) ...[
+                      const SizedBox(height: 14),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: PetTokens.clay.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: PetTokens.clay.withValues(alpha: 0.3)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.auto_awesome, color: PetTokens.clay, size: 18),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                '$_aiNotice (precargado en el siguiente paso)',
+                                style: PetTokens.bodyThemed(context, 13, color: PetTokens.inkOf(context), weight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 20),
 
                     // Indicador de 3 puntos (dots)
