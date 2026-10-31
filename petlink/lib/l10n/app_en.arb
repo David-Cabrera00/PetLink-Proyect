@@ -338,5 +338,14 @@
   "noPhotosAttached": "No photo attached",
   "locationNotSpecified": "Location not specified",
   "lastSeenAtPrefix": "Last seen",
-  "foundDatePrefix": "Found date"
+  "foundDatePrefix": "Found date",
+  "errorGeneric": "Something went wrong. Please try again.",
+  "errorNoConnection": "No internet connection. Check your network and try again.",
+  "errorTimeout": "The connection took too long. Please try again.",
+  "errorServer": "The server is unavailable. Please try again later.",
+  "errorTooManyRequests": "Too many attempts. Please wait a moment.",
+  "authInvalidCredentials": "Incorrect email or password.",
+  "authEmailInUse": "That email is already registered.",
+  "authSessionExpired": "Your session expired. Please sign in again.",
+  "authGoogleUnavailable": "Google Sign-In is not available yet."
 }
