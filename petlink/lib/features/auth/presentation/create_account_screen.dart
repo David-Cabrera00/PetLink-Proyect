@@ -147,7 +147,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                         TextFormField(
                           controller: _nameController,
                           textInputAction: TextInputAction.next,
-                          style: PetTokens.body(16, color: PetTokens.ink),
+                          style: PetTokens.bodyThemed(context, 16, color: PetTokens.inkOf(context)),
                           decoration: _inputDecoration(
                             hint: 'Nombre',
                             prefixIcon: Icons.person_outline_rounded,
@@ -168,7 +168,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.next,
-                          style: PetTokens.body(16, color: PetTokens.ink),
+                          style: PetTokens.bodyThemed(context, 16, color: PetTokens.inkOf(context)),
                           decoration: _inputDecoration(
                             hint: 'Correo electrónico',
                             prefixIcon: Icons.mail_outline_rounded,
@@ -196,7 +196,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                           ],
                           obscureText: _obscurePassword,
                           textInputAction: TextInputAction.next,
-                          style: PetTokens.body(16, color: PetTokens.ink),
+                          style: PetTokens.bodyThemed(context, 16, color: PetTokens.inkOf(context)),
                           decoration: _inputDecoration(
                             hint: 'Contraseña',
                             prefixIcon: Icons.lock_outline_rounded,
@@ -237,7 +237,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                           obscureText: _obscureConfirmation,
                           textInputAction: TextInputAction.done,
                           onFieldSubmitted: (_) => _submit(),
-                          style: PetTokens.body(16, color: PetTokens.ink),
+                          style: PetTokens.bodyThemed(context, 16, color: PetTokens.inkOf(context)),
                           decoration: _inputDecoration(
                             hint: 'Confirmar contraseña',
                             prefixIcon: Icons.lock_reset_rounded,
@@ -281,7 +281,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                               l10n.authAlreadyHaveAccount,
                               style: PetTokens.body(
                                 15,
-                                color: PetTokens.muted,
+                                color: PetTokens.mutedOf(context),
                               ),
                             ),
                             const SizedBox(width: 6),
@@ -291,7 +291,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                                 l10n.authLogin,
                                 style: PetTokens.body(
                                   15,
-                                  color: PetTokens.clayText,
+                                  color: PetTokens.lostTextOf(context),
                                   weight: FontWeight.w800,
                                 ),
                               ),
@@ -306,7 +306,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                           textAlign: TextAlign.center,
                           style: PetTokens.display(
                             15,
-                            color: PetTokens.placeholder,
+                            color: PetTokens.mutedOf(context),
                             italic: true,
                           ),
                         ),
@@ -329,27 +329,27 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   }) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: PetTokens.body(16, color: PetTokens.placeholder),
+      hintStyle: PetTokens.body(16, color: PetTokens.mutedOf(context)),
       prefixIcon: Icon(prefixIcon, color: PetTokens.muted2, size: 20),
       suffixIcon: suffixIcon,
       filled: true,
-      fillColor: PetTokens.surface,
+      fillColor: PetTokens.surfaceHigherOf(context),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(PetTokens.rInput),
-        borderSide: BorderSide(color: PetTokens.border, width: 1.5),
+        borderSide: BorderSide(color: PetTokens.borderOf(context), width: 1.5),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(PetTokens.rInput),
-        borderSide: BorderSide(color: PetTokens.border, width: 1.5),
+        borderSide: BorderSide(color: PetTokens.borderOf(context), width: 1.5),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(PetTokens.rInput),
-        borderSide: BorderSide(color: PetTokens.plum, width: 2),
+        borderSide: BorderSide(color: PetTokens.plumAccentOf(context), width: 2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(PetTokens.rInput),
-        borderSide: BorderSide(color: PetTokens.lostBg, width: 1.5),
+        borderSide: BorderSide(color: PetTokens.lostBorderOf(context), width: 1.5),
       ),
     );
   }
@@ -365,7 +365,7 @@ class _FieldLabel extends StatelessWidget {
       padding: const EdgeInsets.only(left: 4),
       child: Text(
         label,
-        style: PetTokens.body(13, color: PetTokens.ink, weight: FontWeight.w700),
+        style: PetTokens.body(13, color: PetTokens.inkOf(context), weight: FontWeight.w700),
       ),
     );
   }
@@ -541,7 +541,7 @@ class _PasswordStrengthMeter extends StatelessWidget {
           for (var i = 1; i <= 4; i++) ...[
             PetPaw(
               size: 18,
-              color: i <= level ? PetTokens.clay : PetTokens.track,
+              color: i <= level ? PetTokens.clay : PetTokens.trackOf(context),
             ),
             if (i < 4) const SizedBox(width: 8),
           ],
@@ -553,8 +553,8 @@ class _PasswordStrengthMeter extends StatelessWidget {
               color: level == 0
                   ? PetTokens.muted2
                   : (level == 1
-                      ? PetTokens.clayText
-                      : (level == 4 ? PetTokens.mint : PetTokens.muted)),
+                      ? PetTokens.lostTextOf(context)
+                      : (level == 4 ? PetTokens.mintTextOf(context) : PetTokens.mutedOf(context))),
               weight: FontWeight.w600,
             ),
           ),
