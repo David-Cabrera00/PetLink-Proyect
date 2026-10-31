@@ -14,8 +14,8 @@ final savedReportIdsProvider = StateProvider<Set<String>>((ref) => <String>{});
 
 final myReportsProvider = FutureProvider<List<PetReport>>((ref) async {
   // Makes Riverpod discard the previous account's cached reports when the
-  // authenticated user changes.
-  ref.watch(authProvider.select((state) => state.user?.email));
+  // authenticated user changes, and skips the API without a session.
+  if (ref.watch(currentUserEmailProvider) == null) return const [];
   final repository = ref.watch(petReportRepositoryProvider);
   final filter = ref.watch(reportsFilterProvider);
 
@@ -38,7 +38,7 @@ final reportByIdProvider = FutureProvider.family<PetReport?, String>((
   id,
 ) async {
   // Never reuse the ownership state from another authenticated account.
-  ref.watch(authProvider.select((state) => state.user?.email));
+  if (ref.watch(currentUserEmailProvider) == null) return null;
   final repository = ref.watch(petReportRepositoryProvider);
   return repository.getReportById(id);
 });

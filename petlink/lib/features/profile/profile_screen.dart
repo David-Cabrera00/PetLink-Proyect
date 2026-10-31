@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
+import '../../core/network/api_error_message.dart';
 import '../../core/theme/pet_tokens.dart';
 import '../../shared/widgets/pet_paw_painters.dart';
 import '../auth/providers/auth_provider.dart';
@@ -483,7 +484,11 @@ class ProfileScreen extends ConsumerWidget {
     } catch (error) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No se pudo actualizar la foto: $error')),
+          SnackBar(
+            content: Text(
+              apiErrorMessage(AppLocalizations.of(context)!, error),
+            ),
+          ),
         );
       }
     }
@@ -567,7 +572,11 @@ class ProfileScreen extends ConsumerWidget {
     } catch (error) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No se pudo actualizar el nombre: $error')),
+          SnackBar(
+            content: Text(
+              apiErrorMessage(AppLocalizations.of(context)!, error),
+            ),
+          ),
         );
       }
     }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 
+import '../../../core/network/api_error_message.dart';
 import '../../../core/theme/pet_tokens.dart';
 import '../../../shared/widgets/pet_paw_painters.dart';
 import '../providers/auth_provider.dart';
@@ -86,11 +87,21 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
-    await ref.read(authProvider.notifier).register(
-          name: _nameController.text.trim(),
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      await ref.read(authProvider.notifier).register(
+            name: _nameController.text.trim(),
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(content: Text(apiErrorMessage(l10n, error))),
         );
+    }
   }
 
   @override

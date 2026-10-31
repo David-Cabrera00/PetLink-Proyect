@@ -872,4 +872,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get foundDatePrefix => 'Found date';
+
+  @override
+  String get errorGeneric => 'Something went wrong. Please try again.';
+
+  @override
+  String get errorNoConnection =>
+      'No internet connection. Check your network and try again.';
+
+  @override
+  String get errorTimeout => 'The connection took too long. Please try again.';
+
+  @override
+  String get errorServer =>
+      'The server is unavailable. Please try again later.';
+
+  @override
+  String get errorTooManyRequests => 'Too many attempts. Please wait a moment.';
+
+  @override
+  String get authInvalidCredentials => 'Incorrect email or password.';
+
+  @override
+  String get authEmailInUse => 'That email is already registered.';
+
+  @override
+  String get authSessionExpired =>
+      'Your session expired. Please sign in again.';
+
+  @override
+  String get authGoogleUnavailable => 'Google Sign-In is not available yet.';
 }

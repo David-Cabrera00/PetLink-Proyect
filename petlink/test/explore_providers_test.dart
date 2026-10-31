@@ -7,6 +7,7 @@ import 'package:petlink/shared/models/pet.dart';
 import 'package:petlink/shared/models/pet_report.dart';
 import 'package:petlink/shared/models/report_draft.dart';
 import 'package:petlink/shared/repositories/pet_report_repository.dart';
+import 'package:petlink/features/auth/providers/auth_provider.dart';
 import 'package:petlink/features/radar/providers/radar_providers.dart';
 
 void main() {
@@ -56,6 +57,7 @@ void main() {
 ProviderContainer _createContainer(List<PetReport> reports) {
   return ProviderContainer(
     overrides: [
+      currentUserEmailProvider.overrideWithValue('test@petlink.app'),
       petReportRepositoryProvider.overrideWithValue(
         _FakePetReportRepository(reports),
       ),

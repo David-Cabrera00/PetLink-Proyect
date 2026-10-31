@@ -1711,6 +1711,60 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Fecha de hallazgo'**
   String get foundDatePrefix;
+
+  /// No description provided for @errorGeneric.
+  ///
+  /// In es, this message translates to:
+  /// **'Algo salió mal. Inténtalo de nuevo.'**
+  String get errorGeneric;
+
+  /// No description provided for @errorNoConnection.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin conexión a internet. Revisa tu red e inténtalo de nuevo.'**
+  String get errorNoConnection;
+
+  /// No description provided for @errorTimeout.
+  ///
+  /// In es, this message translates to:
+  /// **'La conexión tardó demasiado. Inténtalo de nuevo.'**
+  String get errorTimeout;
+
+  /// No description provided for @errorServer.
+  ///
+  /// In es, this message translates to:
+  /// **'El servidor no está disponible. Inténtalo más tarde.'**
+  String get errorServer;
+
+  /// No description provided for @errorTooManyRequests.
+  ///
+  /// In es, this message translates to:
+  /// **'Demasiados intentos. Espera un momento.'**
+  String get errorTooManyRequests;
+
+  /// No description provided for @authInvalidCredentials.
+  ///
+  /// In es, this message translates to:
+  /// **'Correo o contraseña incorrectos.'**
+  String get authInvalidCredentials;
+
+  /// No description provided for @authEmailInUse.
+  ///
+  /// In es, this message translates to:
+  /// **'Ese correo ya está registrado.'**
+  String get authEmailInUse;
+
+  /// No description provided for @authSessionExpired.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu sesión expiró. Inicia sesión de nuevo.'**
+  String get authSessionExpired;
+
+  /// No description provided for @authGoogleUnavailable.
+  ///
+  /// In es, this message translates to:
+  /// **'Google Sign-In aún no está disponible.'**
+  String get authGoogleUnavailable;
 }
 
 class _AppLocalizationsDelegate

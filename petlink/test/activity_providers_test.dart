@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:petlink/features/activity/providers/activity_providers.dart';
+import 'package:petlink/features/auth/providers/auth_provider.dart';
 import 'package:petlink/shared/models/activity_item.dart';
 import 'package:petlink/shared/repositories/activity_repository.dart';
 
@@ -62,6 +63,7 @@ void main() {
 
     final container = ProviderContainer(
       overrides: [
+        currentUserEmailProvider.overrideWithValue('test@petlink.app'),
         activityRepositoryProvider.overrideWithValue(fakeRepo),
       ],
     );
@@ -107,6 +109,7 @@ void main() {
 
     final container = ProviderContainer(
       overrides: [
+        currentUserEmailProvider.overrideWithValue('test@petlink.app'),
         activityRepositoryProvider.overrideWithValue(fakeRepo),
       ],
     );
@@ -123,4 +126,3 @@ void main() {
     expect(fakeRepo.markedAllReadCalled, isTrue);
   });
 }
-

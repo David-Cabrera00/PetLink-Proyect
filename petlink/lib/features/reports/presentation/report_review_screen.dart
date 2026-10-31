@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
+import '../../../core/network/api_error_message.dart';
 import '../../../core/theme/pet_tokens.dart';
 import '../../../shared/models/pet_report.dart';
 import '../../../shared/widgets/pet_paw_painters.dart';
@@ -46,7 +47,7 @@ class _ReportReviewScreenState extends ConsumerState<ReportReviewScreen> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(l10n.publishError(e)),
+            content: Text(apiErrorMessage(l10n, e)),
             backgroundColor: PetTokens.clayText,
           ),
         );

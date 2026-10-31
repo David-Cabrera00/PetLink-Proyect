@@ -12,7 +12,7 @@ import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, validationSchema: Joi.object({ DATABASE_URL: Joi.string().required(), JWT_ACCESS_SECRET: Joi.string().min(16).required() }) }),
+    ConfigModule.forRoot({ isGlobal: true, validationSchema: Joi.object({ DATABASE_URL: Joi.string().required(), JWT_ACCESS_SECRET: Joi.string().min(16).required(), JWT_REFRESH_SECRET: Joi.string().min(16).optional(), JWT_ACCESS_TTL: Joi.string().optional(), JWT_REFRESH_TTL: Joi.string().optional() }) }),
     PrismaModule,
     AuthModule,
     ReportsModule,

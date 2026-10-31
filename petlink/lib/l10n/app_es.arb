@@ -338,5 +338,14 @@
   "noPhotosAttached": "Sin fotografía adjunta",
   "locationNotSpecified": "Ubicación no especificada",
   "lastSeenAtPrefix": "Última vez vista",
-  "foundDatePrefix": "Fecha de hallazgo"
+  "foundDatePrefix": "Fecha de hallazgo",
+  "errorGeneric": "Algo salió mal. Inténtalo de nuevo.",
+  "errorNoConnection": "Sin conexión a internet. Revisa tu red e inténtalo de nuevo.",
+  "errorTimeout": "La conexión tardó demasiado. Inténtalo de nuevo.",
+  "errorServer": "El servidor no está disponible. Inténtalo más tarde.",
+  "errorTooManyRequests": "Demasiados intentos. Espera un momento.",
+  "authInvalidCredentials": "Correo o contraseña incorrectos.",
+  "authEmailInUse": "Ese correo ya está registrado.",
+  "authSessionExpired": "Tu sesión expiró. Inicia sesión de nuevo.",
+  "authGoogleUnavailable": "Google Sign-In aún no está disponible."
 }
