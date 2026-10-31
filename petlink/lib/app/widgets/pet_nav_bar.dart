@@ -115,7 +115,7 @@ class _NavItem extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 48, minWidth: 48),
           child: destination.isPrimary
-              ? _buildPrimary(cs, label)
+              ? _buildPrimary(context, cs, label)
               : _buildRegular(color, activeColor, label),
         ),
       ),
@@ -187,7 +187,7 @@ class _NavItem extends StatelessWidget {
     );
   }
 
-  Widget _buildPrimary(ColorScheme cs, Widget label) {
+  Widget _buildPrimary(BuildContext context, ColorScheme cs, Widget label) {
     return Stack(
       alignment: Alignment.center,
       clipBehavior: Clip.none,
@@ -202,12 +202,14 @@ class _NavItem extends StatelessWidget {
               width: 54,
               height: 54,
               decoration: BoxDecoration(
-                color: PetTokens.plum,
+                color: PetTokens.isDark(context) ? const Color(0xFF6B366B) : PetTokens.plum,
                 borderRadius: BorderRadius.circular(PetTokens.rFab),
-                boxShadow: const [
+                boxShadow: [
                   BoxShadow(
-                    color: Color(0x594A2D4A),
-                    offset: Offset(0, 10),
+                    color: PetTokens.isDark(context)
+                        ? Colors.black.withValues(alpha: 0.35)
+                        : const Color(0x594A2D4A),
+                    offset: const Offset(0, 10),
                     blurRadius: 22,
                   ),
                 ],
