@@ -78,14 +78,12 @@ class _ReportTypeScreenState extends ConsumerState<ReportTypeScreen> {
                     // Opción A: Perdí a mi mascota
                     _OptionCard(
                       isSelected: _selectedType == ReportType.lost,
-                      borderColor: PetTokens.clayText,
-                      selectedBg: PetTokens.isDark(context)
-                          ? const Color(0xFF381C22)
-                          : const Color(0xFFFCEEE8),
+                      borderColor: PetTokens.lostTextOf(context),
+                      selectedBg: PetTokens.optionSelectedBgOf(context, isLost: true),
                       artWidget: const _SwingingLeashArt(),
                       title: l10n.reportLostTitle,
                       subtitle: l10n.reportLostDescription,
-                      radioColor: PetTokens.clayText,
+                      radioColor: PetTokens.lostTextOf(context),
                       onTap: () => _onSelect(ReportType.lost),
                     ),
                     const SizedBox(height: 16),
@@ -93,14 +91,12 @@ class _ReportTypeScreenState extends ConsumerState<ReportTypeScreen> {
                     // Opción B: Encontré una mascota
                     _OptionCard(
                       isSelected: _selectedType == ReportType.found,
-                      borderColor: PetTokens.mint,
-                      selectedBg: PetTokens.isDark(context)
-                          ? const Color(0xFF1B312A)
-                          : const Color(0xFFE8F3EF),
+                      borderColor: PetTokens.mintTextOf(context),
+                      selectedBg: PetTokens.optionSelectedBgOf(context, isLost: false),
                       artWidget: const _BeatingHeartPetArt(),
                       title: l10n.reportFoundTitle,
                       subtitle: l10n.reportFoundDescription,
-                      radioColor: PetTokens.mint,
+                      radioColor: PetTokens.mintTextOf(context),
                       onTap: () => _onSelect(ReportType.found),
                     ),
                   ],
@@ -125,7 +121,11 @@ class _ReportTypeScreenState extends ConsumerState<ReportTypeScreen> {
                   duration: PetTokens.dFast,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: hasSelection ? PetTokens.plum : const Color(0xFFE6DCD3),
+                    color: hasSelection
+                        ? PetTokens.plum
+                        : (PetTokens.isDark(context)
+                            ? const Color(0xFF28212F)
+                            : const Color(0xFFE6DCD3)),
                     borderRadius: BorderRadius.circular(18),
                     boxShadow: hasSelection ? PetTokens.shadowButton : null,
                   ),
@@ -245,7 +245,11 @@ class _OptionCard extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? radioColor : const Color(0xFFCDBFB4),
+                  color: isSelected
+                      ? radioColor
+                      : (PetTokens.isDark(context)
+                          ? const Color(0xFF4A3E50)
+                          : const Color(0xFFCDBFB4)),
                   width: 2,
                 ),
               ),
