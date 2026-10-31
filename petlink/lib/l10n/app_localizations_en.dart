@@ -1093,7 +1093,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authHelloAgain => 'WELCOME BACK';
 
   @override
-  String get authWeWereWaiting => 'We were\\n';
+  String get authWeWereWaiting => 'We were';
 
   @override
   String get authWaitingForYou => 'waiting for you';

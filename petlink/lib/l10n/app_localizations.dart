@@ -2093,7 +2093,7 @@ abstract class AppLocalizations {
   /// No description provided for @authWeWereWaiting.
   ///
   /// In es, this message translates to:
-  /// **'Te estábamos\\n'**
+  /// **'Te estábamos'**
   String get authWeWereWaiting;
 
   /// No description provided for @authWaitingForYou.

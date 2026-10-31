@@ -378,7 +378,7 @@ class _LoginHeader extends StatelessWidget {
           Positioned(
             left: 24,
             top: top + 64,
-            right: 170,
+            right: 140,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -389,13 +389,13 @@ class _LoginHeader extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text.rich(
                   TextSpan(
-                    style: PetTokens.display(36, color: PetTokens.cream),
+                    style: PetTokens.display(28, color: PetTokens.cream),
                     children: [
-                      TextSpan(text: l10n.authWeWereWaiting),
+                      TextSpan(text: '${l10n.authWeWereWaiting}\n'),
                       TextSpan(
                         text: l10n.authWaitingForYou,
                         style: PetTokens.display(
-                          36,
+                          28,
                           color: PetTokens.clayOnDark,
                           italic: true,
                         ),
@@ -412,7 +412,7 @@ class _LoginHeader extends StatelessWidget {
             right: 16,
             bottom: 12,
             child: ReactivePetAvatar(
-              size: 150,
+              size: 135,
               lookAtEmail: lookAtEmail,
               coverEyes: coverEyes,
               peeking: peeking,

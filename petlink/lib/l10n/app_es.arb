@@ -459,7 +459,7 @@
   "authPasswordVeryStrong": "Muy fuerte",
   "authTagline": "Cada huella cuenta.",
   "authHelloAgain": "HOLA DE NUEVO",
-  "authWeWereWaiting": "Te estábamos\\n",
+  "authWeWereWaiting": "Te estábamos",
   "authWaitingForYou": "esperando",
   "timeWeeksAgo": "{weeks, plural, =1{Hace 1 semana} other{Hace {weeks} semanas}}",
   "@timeWeeksAgo": {

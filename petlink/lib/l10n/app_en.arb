@@ -459,7 +459,7 @@
   "authPasswordVeryStrong": "Very strong",
   "authTagline": "Every paw print counts.",
   "authHelloAgain": "WELCOME BACK",
-  "authWeWereWaiting": "We were\\n",
+  "authWeWereWaiting": "We were",
   "authWaitingForYou": "waiting for you",
   "timeWeeksAgo": "{weeks, plural, =1{1 week ago} other{{weeks} weeks ago}}",
   "@timeWeeksAgo": {
