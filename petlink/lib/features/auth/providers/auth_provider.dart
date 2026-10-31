@@ -217,6 +217,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
     await _client.clearSession();
     if (!_disposed) state = const AuthState();
   }
+
+  Future<void> forgotPassword(String email) => _client.forgotPassword(email);
+
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) =>
+      _client.resetPassword(
+        email: email,
+        code: code,
+        newPassword: newPassword,
+      );
 }
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>(

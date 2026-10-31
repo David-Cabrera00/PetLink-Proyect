@@ -329,7 +329,7 @@
   "authConfirmPasswordHint": "Repite tu contraseña",
   "authConfirmPasswordRequired": "Confirma tu contraseña",
   "authPasswordsMismatch": "Las contraseñas no coinciden",
-  "authForgotPasswordTitle": "Recupera tu contraseña",
+  "authForgotPasswordTitle": "Recuperar contraseña",
   "authForgotPasswordDescription": "Te enviaremos instrucciones para recuperar el acceso a tu cuenta.",
   "authSendInstructions": "Enviar instrucciones",
   "authForgotPasswordConfirmation": "Si el correo está registrado, recibirás instrucciones para recuperar tu contraseña.",
@@ -477,5 +477,16 @@
       }
     }
   },
-  "cancel": "Cancelar"
+  "cancel": "Cancelar",
+  "authForgotPasswordSubtitle": "Ingresa tu correo y te enviaremos un código de 6 dígitos.",
+  "authSendResetCode": "Enviar código",
+  "authResetCodeLabel": "Código de 6 dígitos",
+  "authResetCodeHint": "123456",
+  "authNewPasswordLabel": "Nueva contraseña",
+  "authNewPasswordHint": "Mínimo 8 caracteres",
+  "authResetPasswordButton": "Cambiar contraseña",
+  "authResetCodeSent": "Código enviado a tu correo",
+  "authResetSuccess": "¡Contraseña actualizada! Ya puedes iniciar sesión.",
+  "authBackToLogin": "Volver a iniciar sesión",
+  "authPasswordMinLength": "Debe tener al menos 8 caracteres"
 }

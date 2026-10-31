@@ -159,6 +159,24 @@ class ApiClient {
 
   Future<dynamic> delete(String path) => _request('DELETE', path);
 
+  Future<void> forgotPassword(String email) =>
+      post('/auth/forgot-password', body: {'email': email}, skipAuthRefresh: true);
+
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) =>
+      post(
+        '/auth/reset-password',
+        body: {
+          'email': email,
+          'code': code,
+          'newPassword': newPassword,
+        },
+        skipAuthRefresh: true,
+      );
+
   Future<dynamic> uploadFile(String path, String endpoint) async {
     Future<http.StreamedResponse> send() async {
       final request = http.MultipartRequest(
