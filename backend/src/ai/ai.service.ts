@@ -95,10 +95,15 @@ export class AiService {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`;
 
     const prompt = `Analiza esta imagen de mascota para un reporte de rescate o pérdida.
+Reglas estrictas:
+- Identifica primero la ESPECIE real del animal que se ve (Perro, Gato u Otro). Un gato NUNCA es un perro.
+- Para la raza: solo indica una raza concreta si estás muy seguro (confianza alta). Si dudas, usa "Criollo" (perros) o "Mestizo" (gatos). No inventes razas.
+- No asumas sexo si no es evidente: usa null.
+- El campo "confidence" (0 a 1) refleja qué tan seguro estás de la raza y la especie; usa un valor bajo (< 0.6) si la imagen es borrosa, parcial o ambigua.
 Responde EXCLUSIVAMENTE con un JSON válido con la siguiente estructura y valores exactos:
 {
   "species": "Perro" | "Gato" | "Otro",
-  "breed": "Nombre de la raza identificada (o Criollo si es mestizo o no definida)",
+  "breed": "Nombre de la raza identificada (o Criollo/Mestizo si no estás seguro)",
   "color": "Color predominante en español (ej: Dorado, Negro, Café, Blanco, Gris, Bicolor, Atigrado)",
   "size": "Pequeño" | "Mediano" | "Grande",
   "sex": "Macho" | "Hembra" | null,
@@ -141,7 +146,7 @@ Responde EXCLUSIVAMENTE con un JSON válido con la siguiente estructura y valore
 
     const parsed = JSON.parse(rawText);
     return {
-      species: parsed.species || 'Perro',
+      species: parsed.species || '',
       breed: parsed.breed || '',
       color: parsed.color || '',
       size: parsed.size || 'Mediano',
@@ -184,7 +189,7 @@ Responde EXCLUSIVAMENTE con un JSON válido con la siguiente estructura y valore
     const json = content.replace(/^```json\s*|\s*```$/g, '').trim();
     const parsed = JSON.parse(json);
     return {
-      species: parsed.species || 'Perro',
+      species: parsed.species || '',
       breed: parsed.breed || '',
       color: parsed.color || '',
       size: parsed.size || 'Mediano',

@@ -69,13 +69,16 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
           final sx = analysis['sex']?.toString();
           if (sx != null && sx.isNotEmpty) _sex = sx;
 
-          _aiFeedback = '✨ ¡Datos completados por Gemini IA! Revisa y ajusta si es necesario.';
+          final confidence = (analysis['confidence'] as num?)?.toDouble() ?? 1.0;
+          _aiFeedback = confidence < 0.6
+              ? '⚠️ La IA no está segura de estos datos (foto poco clara). Revisa la especie y la raza y corrígelas si hace falta.'
+              : '✨ Datos sugeridos por la IA. Revisa y ajusta si es necesario.';
         });
       }
     } catch (e) {
       if (mounted) {
         setState(() {
-          _aiFeedback = '⚠️ No se pudo autocompletar (' + e.toString() + '). Puedes llenar los campos manualmente.';
+          _aiFeedback = '⚠️ No se pudo autocompletar ($e). Puedes llenar los campos manualmente.';
         });
       }
     } finally {

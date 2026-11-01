@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:petlink/l10n/app_localizations.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/theme/pet_colors.dart';
 import '../../../core/theme/pet_spacing.dart';
@@ -14,6 +15,7 @@ import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/error_state.dart';
 import '../../../shared/widgets/section_header.dart';
 import '../providers/matches_providers.dart';
+import '../../radar/providers/radar_providers.dart';
 
 class MatchDetailScreen extends ConsumerWidget {
   final String matchId;
@@ -32,7 +34,7 @@ class MatchDetailScreen extends ConsumerWidget {
           if (match == null) {
             return _buildNotFound(context);
           }
-          return _buildMatchDetail(context, match);
+          return _buildMatchDetail(context, ref, match);
         },
         loading: () => _buildLoading(context),
         error: (Object _, StackTrace _) => ErrorState(
@@ -77,7 +79,7 @@ class MatchDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMatchDetail(BuildContext context, PetMatch match) {
+  Widget _buildMatchDetail(BuildContext context, WidgetRef ref, PetMatch match) {
     final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(PetSpacing.lg),
@@ -103,7 +105,7 @@ class MatchDetailScreen extends ConsumerWidget {
               const SizedBox(height: PetSpacing.md),
               _buildParticularTraitsSection(context, match),
               const SizedBox(height: PetSpacing.xl),
-              _buildCTASection(context),
+              _buildCTASection(context, ref, match),
               const SizedBox(height: PetSpacing.xl),
             ],
           );
@@ -192,6 +194,7 @@ class MatchDetailScreen extends ConsumerWidget {
         ? l10n.matchDetailYourReport
         : l10n.matchDetailFoundPet;
     final subtitle = report.address.split(',').first;
+    final photoUrl = report.pet.primaryPhotoUrl as String?;
 
     return Container(
       padding: const EdgeInsets.all(PetSpacing.md),
@@ -203,6 +206,25 @@ class MatchDetailScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (photoUrl != null && photoUrl.isNotEmpty) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                photoUrl,
+                height: 120,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => Container(
+                  height: 120,
+                  color: PetColors.border,
+                  child: const Center(
+                    child: Icon(PhosphorIconsRegular.pawPrint, color: PetColors.textSecondary, size: 32),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: PetSpacing.sm),
+          ],
           Row(
             children: [
               Expanded(
@@ -246,7 +268,10 @@ class MatchDetailScreen extends ConsumerWidget {
               ),
               const SizedBox(width: PetSpacing.xs),
               Text(
-                isLost ? l10n.timeHoursAgo(5) : l10n.timeHoursAgo(3),
+                _formatDuration(
+                  l10n,
+                  DateTime.now().difference(report.createdAt as DateTime),
+                ),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -262,20 +287,55 @@ class MatchDetailScreen extends ConsumerWidget {
     bool isNarrow,
   ) {
     final l10n = AppLocalizations.of(context)!;
+    final lostPet = match.lostReport.pet;
+    final foundPet = match.foundReport.pet;
+
+    String cleanVal(String? val) {
+      if (val == null || val.trim().isEmpty) return 'No especificado';
+      return val.trim();
+    }
+
+    bool isMatch(String? a, String? b) {
+      if (a == null || b == null || a.trim().isEmpty || b.trim().isEmpty) return false;
+      return a.trim().toLowerCase() == b.trim().toLowerCase();
+    }
+
     final comparisons = [
-      (l10n.matchDetailSpecies, l10n.matchValueDog, l10n.matchValueDog),
+      (
+        l10n.matchDetailSpecies,
+        cleanVal(lostPet.species),
+        cleanVal(foundPet.species),
+        isMatch(lostPet.species, foundPet.species),
+      ),
       (
         l10n.matchDetailBreed,
-        l10n.matchValueGoldenRetriever,
-        l10n.matchValueGoldenRetriever,
+        cleanVal(lostPet.breed),
+        cleanVal(foundPet.breed),
+        isMatch(lostPet.breed, foundPet.breed),
       ),
-      (l10n.matchDetailColor, l10n.matchValueGold, l10n.matchValueGold),
-      (l10n.matchDetailSize, l10n.matchValueLarge, l10n.matchValueLarge),
-      (l10n.matchDetailSex, l10n.matchValueFemale, l10n.matchValueFemale),
+      (
+        l10n.matchDetailColor,
+        cleanVal(lostPet.color),
+        cleanVal(foundPet.color),
+        isMatch(lostPet.color, foundPet.color),
+      ),
+      (
+        l10n.matchDetailSize,
+        cleanVal(lostPet.size),
+        cleanVal(foundPet.size),
+        isMatch(lostPet.size, foundPet.size),
+      ),
+      (
+        l10n.matchDetailSex,
+        cleanVal(lostPet.sex),
+        cleanVal(foundPet.sex),
+        isMatch(lostPet.sex, foundPet.sex),
+      ),
     ];
 
     return Column(
       children: comparisons.map((comp) {
+        final matches = comp.$4;
         return Container(
           margin: const EdgeInsets.only(bottom: PetSpacing.md),
           padding: const EdgeInsets.all(PetSpacing.md),
@@ -310,24 +370,24 @@ class MatchDetailScreen extends ConsumerWidget {
                             vertical: PetSpacing.xs,
                           ),
                           decoration: BoxDecoration(
-                            color: PetColors.foundSoft,
+                            color: matches ? PetColors.foundSoft : PetColors.border.withValues(alpha: 0.3),
                             borderRadius: PetRadius.smAll,
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(
-                                PhosphorIconsBold.check,
+                              Icon(
+                                matches ? PhosphorIconsBold.check : PhosphorIconsRegular.minus,
                                 size: 14,
-                                color: PetColors.found,
+                                color: matches ? PetColors.found : PetColors.textSecondary,
                               ),
                               const SizedBox(width: PetSpacing.xs),
                               Text(
-                                l10n.matchDetailMatches,
+                                matches ? l10n.matchDetailMatches : 'Difiere',
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  color: PetColors.found,
+                                  color: matches ? PetColors.found : PetColors.textSecondary,
                                 ),
                               ),
                             ],
@@ -369,24 +429,24 @@ class MatchDetailScreen extends ConsumerWidget {
                         vertical: PetSpacing.xs,
                       ),
                       decoration: BoxDecoration(
-                        color: PetColors.foundSoft,
+                        color: matches ? PetColors.foundSoft : PetColors.border.withValues(alpha: 0.3),
                         borderRadius: PetRadius.smAll,
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
-                            PhosphorIconsBold.check,
+                          Icon(
+                            matches ? PhosphorIconsBold.check : PhosphorIconsRegular.minus,
                             size: 14,
-                            color: PetColors.found,
+                            color: matches ? PetColors.found : PetColors.textSecondary,
                           ),
                           const SizedBox(width: PetSpacing.xs),
                           Text(
-                            l10n.matchDetailMatches,
+                            matches ? l10n.matchDetailMatches : 'Difiere',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: PetColors.found,
+                              color: matches ? PetColors.found : PetColors.textSecondary,
                             ),
                           ),
                         ],
@@ -538,25 +598,19 @@ class MatchDetailScreen extends ConsumerWidget {
   Widget _buildParticularTraitsSection(BuildContext context, PetMatch match) {
     final l10n = AppLocalizations.of(context)!;
     const unspecified = 'No especificado';
-    String value(String text) => text.trim().isEmpty ? unspecified : text;
-    final lostTraits = [
-      '${l10n.reportDetailColor}: ${value(match.lostReport.pet.color)}',
-      '${l10n.reportDetailPhysicalMark}: ${value(match.lostReport.traits)}',
-    ];
-    final foundTraits = [
-      '${l10n.reportDetailColor}: ${value(match.foundReport.pet.color)}',
-      '${l10n.reportDetailPhysicalMark}: ${value(match.foundReport.traits)}',
-    ];
+    String value(String? text) => (text == null || text.trim().isEmpty) ? unspecified : text.trim();
 
     return Column(
-      children: List.generate(lostTraits.length, (index) {
-        return Container(
+      children: [
+        // Tarjeta Mascota Perdida
+        Container(
+          width: double.infinity,
           margin: const EdgeInsets.only(bottom: PetSpacing.md),
           padding: const EdgeInsets.all(PetSpacing.md),
           decoration: BoxDecoration(
             color: PetColors.surface,
             borderRadius: PetRadius.lgAll,
-            border: Border.all(color: PetColors.border),
+            border: Border.all(color: PetColors.lost.withValues(alpha: 0.3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -574,14 +628,51 @@ class MatchDetailScreen extends ConsumerWidget {
                     ),
                     child: Text(
                       l10n.statusLost,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                         color: PetColors.lost,
                       ),
                     ),
                   ),
-                  const SizedBox(width: PetSpacing.md),
+                  const SizedBox(width: PetSpacing.sm),
+                  Text(
+                    match.lostReport.pet.name,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: PetSpacing.md),
+              Text(
+                '${l10n.reportDetailColor}: ${value(match.lostReport.pet.color)}',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: PetSpacing.xs),
+              Text(
+                '${l10n.reportDetailPhysicalMark}: ${value(match.lostReport.traits)}',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+          ),
+        ),
+
+        // Tarjeta Mascota Encontrada
+        Container(
+          width: double.infinity,
+          margin: const EdgeInsets.only(bottom: PetSpacing.md),
+          padding: const EdgeInsets.all(PetSpacing.md),
+          decoration: BoxDecoration(
+            color: PetColors.surface,
+            borderRadius: PetRadius.lgAll,
+            border: Border.all(color: PetColors.found.withValues(alpha: 0.3)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: PetSpacing.sm,
@@ -593,51 +684,78 @@ class MatchDetailScreen extends ConsumerWidget {
                     ),
                     child: Text(
                       l10n.statusFound,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                         color: PetColors.found,
                       ),
                     ),
+                  ),
+                  const SizedBox(width: PetSpacing.sm),
+                  Text(
+                    match.foundReport.pet.name,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                 ],
               ),
               const SizedBox(height: PetSpacing.md),
               Text(
-                lostTraits[index],
-                style: Theme.of(context).textTheme.bodyMedium,
+                '${l10n.reportDetailColor}: ${value(match.foundReport.pet.color)}',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
-              const SizedBox(height: PetSpacing.sm),
+              const SizedBox(height: PetSpacing.xs),
               Text(
-                foundTraits[index],
+                '${l10n.reportDetailPhysicalMark}: ${value(match.foundReport.traits)}',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
           ),
-        );
-      }),
+        ),
+      ],
     );
   }
 
-  Widget _buildCTASection(BuildContext context) {
+  Widget _buildCTASection(
+    BuildContext context,
+    WidgetRef ref,
+    PetMatch match,
+  ) {
     final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PetButton(
           label: l10n.matchDetailContactFinder,
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(l10n.matchDetailContactFinder)),
+          onPressed: () async {
+            final email = match.foundReport.ownerEmail;
+            if (email == null || email.trim().isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.noContactData)),
+              );
+              return;
+            }
+            final uri = Uri(
+              scheme: 'mailto',
+              path: email,
+              queryParameters: {'subject': l10n.contactEmailSubject},
             );
+            if (!await launchUrl(uri) && context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.contactEmailError)),
+              );
+            }
           },
           icon: PhosphorIconsRegular.phone,
         ),
         const SizedBox(height: PetSpacing.md),
         OutlinedButton(
           onPressed: () {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(l10n.matchDetailDismiss)));
+            ref.read(dismissedMatchIdsProvider.notifier).update(
+                  (ids) => {...ids, match.id},
+                );
+            context.go('/radar');
           },
           style: OutlinedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: PetSpacing.md),
