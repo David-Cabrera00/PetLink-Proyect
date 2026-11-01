@@ -191,7 +191,38 @@ export class AuthService {
       }
     }
 
-    // 2. Fallback: Resend API
+// 2. Fallback: Brevo API (HTTPS)
+    const brevoKey = process.env.BREVO_API_KEY;
+    if (brevoKey) {
+      try {
+        const brevoResponse = await fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: {
+            'api-key': brevoKey,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            sender: {
+              email: process.env.EMAIL_FROM ?? 'petlink@example.com',
+              name: 'PetLink',
+            },
+            to: [{ email: to, name }],
+            subject: `${code} es tu código de recuperación de PetLink`,
+            htmlContent: htmlBody,
+          }),
+        });
+        if (brevoResponse.ok) {
+          this.logger.log(`[PASSWORD RESET] Correo enviado a ${to} vía Brevo`);
+          return;
+        }
+        const errText = await brevoResponse.text();
+        this.logger.error(`[BREVO ERROR] Status ${brevoResponse.status}: ${errText}`);
+      } catch (err: any) {
+        this.logger.error('[BREVO EXCEPTION]', err.message);
+      }
+    }
+
+    // 3. Fallback: Resend API
     if (resendKey) {
       try {
         const response = await fetch('https://api.resend.com/emails', {
