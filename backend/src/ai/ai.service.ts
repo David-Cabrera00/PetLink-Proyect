@@ -56,7 +56,7 @@ export class AiService {
       throw new BadGatewayException('No image provided for analysis (file, imageBase64, or imageUrl required)');
     }
 
-    // 2. Prioridad: Google Gemini Vision (rápido y de alta precisión)
+    // 2. Prioridad: Google Gemini Vision con reintentos y modelo estable
     let lastError: string | null = null;
     if (geminiKey) {
       try {
@@ -67,10 +67,10 @@ export class AiService {
       }
     }
 
-    // 3. Fallback: OpenRouter
-    if (openRouterKey && options.imageUrl) {
+    // 3. Fallback: OpenRouter (acepta base64 o imageUrl)
+    if (openRouterKey) {
       try {
-        return await this.analyzeWithOpenRouter(options.imageUrl, openRouterKey);
+        return await this.analyzeWithOpenRouter(base64Data, mimeType, options.imageUrl, openRouterKey);
       } catch (err: any) {
         lastError = err.message;
         this.logger.error(`OpenRouter analysis failed: ${err.message}`);
@@ -91,8 +91,13 @@ export class AiService {
     mimeType: string,
     geminiKey: string,
   ): Promise<PetAnalysisResult> {
-    const model = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`;
+    // Lista de modelos en orden de preferencia (gemini-2.5-flash y gemini-1.5-flash son los más rápidos y estables)
+    const candidateModels = [
+      process.env.GEMINI_MODEL,
+      'gemini-2.5-flash',
+      'gemini-1.5-flash',
+      'gemini-1.5-flash-latest',
+    ].filter(Boolean) as string[];
 
     const prompt = `Analiza esta imagen de mascota para un reporte de rescate o pérdida.
 Reglas estrictas:
@@ -129,38 +134,55 @@ Responde EXCLUSIVAMENTE con un JSON válido con la siguiente estructura y valore
       },
     };
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+    let lastError = '';
+    for (const model of candidateModels) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`Gemini API error (${response.status}): ${errText}`);
+        if (!response.ok) {
+          const errText = await response.text();
+          lastError = `Gemini (${model}) error (${response.status}): ${errText}`;
+          this.logger.warn(lastError);
+          continue; // Intenta con el siguiente modelo si está en sobrecarga (503/429)
+        }
+
+        const data = await response.json();
+        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!rawText) throw new Error(`Empty response from Gemini ${model}`);
+
+        const parsed = JSON.parse(rawText);
+        return {
+          species: parsed.species || '',
+          breed: parsed.breed || '',
+          color: parsed.color || '',
+          size: parsed.size || 'Mediano',
+          sex: parsed.sex || null,
+          visibleTraits: Array.isArray(parsed.visibleTraits) ? parsed.visibleTraits : [],
+          confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.9,
+        };
+      } catch (err: any) {
+        lastError = err.message;
+        this.logger.warn(`Error trying model ${model}: ${err.message}`);
+      }
     }
 
-    const data = await response.json();
-    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!rawText) throw new Error('Empty response from Gemini');
-
-    const parsed = JSON.parse(rawText);
-    return {
-      species: parsed.species || '',
-      breed: parsed.breed || '',
-      color: parsed.color || '',
-      size: parsed.size || 'Mediano',
-      sex: parsed.sex || null,
-      visibleTraits: Array.isArray(parsed.visibleTraits) ? parsed.visibleTraits : [],
-      confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.9,
-    };
+    throw new Error(lastError || 'All Gemini models failed');
   }
 
   private async analyzeWithOpenRouter(
-    imageUrl: string,
+    base64Data: string,
+    mimeType: string,
+    imageUrl: string | undefined,
     apiKey: string,
   ): Promise<PetAnalysisResult> {
-    const model = process.env.OPENROUTER_MODEL || 'openrouter/free';
+    const model = process.env.OPENROUTER_MODEL || 'google/gemini-2.0-flash-exp:free';
+    const imageUri = imageUrl ?? `data:${mimeType};base64,${base64Data}`;
+
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -171,13 +193,13 @@ Responde EXCLUSIVAMENTE con un JSON válido con la siguiente estructura y valore
       },
       body: JSON.stringify({
         model,
-        temperature: 0,
+        temperature: 0.1,
         max_tokens: 400,
         messages: [{
           role: 'user',
           content: [
             { type: 'text', text: 'Analiza esta mascota. Responde unicamente JSON valido con: species, breed, color, size, sex, visibleTraits, confidence.' },
-            { type: 'image_url', image_url: { url: imageUrl } },
+            { type: 'image_url', image_url: { url: imageUri } },
           ],
         }],
       }),
