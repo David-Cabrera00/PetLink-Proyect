@@ -6,6 +6,7 @@ export interface PetAnalysisResult {
   color: string;
   size: string;
   sex: string | null;
+  description?: string;
   visibleTraits: string[];
   confidence: number;
 }
@@ -91,28 +92,33 @@ export class AiService {
     mimeType: string,
     geminiKey: string,
   ): Promise<PetAnalysisResult> {
-    // Lista de modelos en orden de preferencia (gemini-2.5-flash y gemini-1.5-flash son los más rápidos y estables)
+    // Lista de modelos oficiales de Gemini Vision
     const candidateModels = [
       process.env.GEMINI_MODEL,
-      'gemini-2.5-flash',
+      'gemini-2.0-flash',
       'gemini-1.5-flash',
-      'gemini-1.5-flash-latest',
+      'gemini-1.5-pro',
     ].filter(Boolean) as string[];
 
-    const prompt = `Analiza esta imagen de mascota para un reporte de rescate o pérdida.
-Reglas estrictas:
-- Identifica primero la ESPECIE real del animal que se ve (Perro, Gato u Otro). Un gato NUNCA es un perro.
-- Para la raza: solo indica una raza concreta si estás muy seguro (confianza alta). Si dudas, usa "Criollo" (perros) o "Mestizo" (gatos). No inventes razas.
-- No asumas sexo si no es evidente: usa null.
-- El campo "confidence" (0 a 1) refleja qué tan seguro estás de la raza y la especie; usa un valor bajo (< 0.6) si la imagen es borrosa, parcial o ambigua.
-Responde EXCLUSIVAMENTE con un JSON válido con la siguiente estructura y valores exactos:
+    const prompt = `Eres un veterinario experto identificando mascotas para rescate o búsqueda.
+Analiza la foto con atención y extrae:
+1. Especie exacta: "Perro", "Gato" u "Otro". Si es un felino/gato NUNCA digas perro.
+2. Raza: si es clara dilo (ej: "Siamés", "Labrador"), si es mestizo pon "Criollo" (perro) o "Mestizo" (gato).
+3. Color predominante: en español (ej: "Gris", "Atigrado", "Bicolor", "Negro y blanco", "Dorado", "Café").
+4. Tamaño aproximado: "Pequeño", "Mediano" o "Grande".
+5. Sexo: "Macho", "Hembra" o null si no se distingue.
+6. Descripción detallada: 1 o 2 oraciones describiendo el aspecto general de la mascota.
+7. Señas o rasgos físicos visibles (patrones de pelaje, manchas, hocico, orejas, etc.).
+
+Responde EXCLUSIVAMENTE un JSON válido con esta estructura:
 {
   "species": "Perro" | "Gato" | "Otro",
-  "breed": "Nombre de la raza identificada (o Criollo/Mestizo si no estás seguro)",
-  "color": "Color predominante en español (ej: Dorado, Negro, Café, Blanco, Gris, Bicolor, Atigrado)",
+  "breed": "Raza o Criollo/Mestizo",
+  "color": "Color predominante",
   "size": "Pequeño" | "Mediano" | "Grande",
   "sex": "Macho" | "Hembra" | null,
-  "visibleTraits": ["rasgo 1", "rasgo 2"],
+  "description": "Breve descripción general de la mascota observada",
+  "visibleTraits": ["rasgo 1", "rasgo 2", "rasgo 3"],
   "confidence": 0.95
 }`;
 
@@ -157,11 +163,12 @@ Responde EXCLUSIVAMENTE con un JSON válido con la siguiente estructura y valore
 
         const parsed = JSON.parse(rawText);
         return {
-          species: parsed.species || '',
-          breed: parsed.breed || '',
+          species: parsed.species || 'Otro',
+          breed: parsed.breed || 'Criollo',
           color: parsed.color || '',
           size: parsed.size || 'Mediano',
           sex: parsed.sex || null,
+          description: parsed.description || '',
           visibleTraits: Array.isArray(parsed.visibleTraits) ? parsed.visibleTraits : [],
           confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.9,
         };
@@ -211,11 +218,12 @@ Responde EXCLUSIVAMENTE con un JSON válido con la siguiente estructura y valore
     const json = content.replace(/^```json\s*|\s*```$/g, '').trim();
     const parsed = JSON.parse(json);
     return {
-      species: parsed.species || '',
-      breed: parsed.breed || '',
+      species: parsed.species || 'Otro',
+      breed: parsed.breed || 'Criollo',
       color: parsed.color || '',
       size: parsed.size || 'Mediano',
       sex: parsed.sex || null,
+      description: parsed.description || '',
       visibleTraits: Array.isArray(parsed.visibleTraits) ? parsed.visibleTraits : [],
       confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.8,
     };
