@@ -102,7 +102,10 @@ export class AuthService {
       data: { email, codeHash, expiresAt },
     });
 
-    await this.sendResetEmail(email, user.name, code);
+    // Disparar envío de correo en segundo plano para que la app responda al instante
+    this.sendResetEmail(email, user.name, code).catch((err) => {
+      this.logger.error(`[RESET EMAIL BACKGROUND ERROR] ${err.message}`);
+    });
     return { success: true, message: 'Código de recuperación enviado' };
   }
 
@@ -162,11 +165,16 @@ export class AuthService {
     if (smtpUser && smtpPass) {
       try {
         const transporter = nodemailer.createTransport({
-          service: 'gmail',
+          host: 'smtp.gmail.com',
+          port: 465,
+          secure: true,
           auth: {
             user: smtpUser,
             pass: smtpPass.replace(/\s+/g, ''),
           },
+          connectionTimeout: 10000,
+          greetingTimeout: 10000,
+          socketTimeout: 15000,
         });
 
         await transporter.sendMail({
