@@ -22,8 +22,9 @@ export class AiService {
   private readonly logger = new Logger(AiService.name);
 
   async analyzePetImage(options: AnalyzeImageOptions): Promise<PetAnalysisResult> {
-    const geminiKey = process.env.GEMINI_API_KEY;
+    const groqKey = process.env.GROQ_API_KEY;
     const metaKey = process.env.META_API_KEY;
+    const geminiKey = process.env.GEMINI_API_KEY;
     const openRouterKey = process.env.OPENROUTER_API_KEY;
 
     // 1. Obtener los bytes base64 y mimeType de la imagen
@@ -60,7 +61,17 @@ export class AiService {
 
     let lastError: string | null = null;
 
-    // 2. Prioridad: Meta AI (dev.meta.ai - Llama / Muse Vision)
+    // 2. Prioridad 1: Groq Vision (Llama 3.2 Vision - Ultra rápido)
+    if (groqKey) {
+      try {
+        return await this.analyzeWithGroq(base64Data, mimeType, groqKey);
+      } catch (err: any) {
+        lastError = err.message;
+        this.logger.error(`Groq analysis failed: ${err.message}`);
+      }
+    }
+
+    // 3. Fallback: Meta AI (dev.meta.ai)
     if (metaKey) {
       try {
         return await this.analyzeWithMetaAi(base64Data, mimeType, metaKey);
@@ -70,7 +81,7 @@ export class AiService {
       }
     }
 
-    // 3. Fallback: Google Gemini Vision
+    // 4. Fallback: Google Gemini Vision
     if (geminiKey) {
       try {
         return await this.analyzeWithGemini(base64Data, mimeType, geminiKey);
@@ -80,7 +91,7 @@ export class AiService {
       }
     }
 
-    // 4. Fallback: OpenRouter
+    // 5. Fallback: OpenRouter
     if (openRouterKey) {
       try {
         return await this.analyzeWithOpenRouter(base64Data, mimeType, options.imageUrl, openRouterKey);
@@ -90,7 +101,7 @@ export class AiService {
       }
     }
 
-    if (!metaKey && !geminiKey && !openRouterKey) {
+    if (!groqKey && !metaKey && !geminiKey && !openRouterKey) {
       throw new ServiceUnavailableException('AI Vision service is not configured');
     }
 
@@ -191,6 +202,72 @@ Responde EXCLUSIVAMENTE un JSON válido con esta estructura:
     }
 
     throw new Error(lastError || 'All Gemini models failed');
+  }
+
+  private async analyzeWithGroq(
+    base64Data: string,
+    mimeType: string,
+    apiKey: string,
+  ): Promise<PetAnalysisResult> {
+    const model = process.env.GROQ_MODEL || 'llama-3.2-11b-vision-preview';
+    const imageUri = `data:${mimeType};base64,${base64Data}`;
+
+    const prompt = `Eres un asistente veterinario experto. Analiza la imagen de la mascota para un reporte de rescate o pérdida.
+Devuelve EXCLUSIVAMENTE un objeto JSON con la siguiente estructura:
+{
+  "species": "Perro" o "Gato" o "Otro",
+  "breed": "Nombre de la raza identificada (o Criollo si es mestizo o dudas)",
+  "color": "Color predominante del pelaje en español",
+  "size": "Pequeño" o "Mediano" o "Grande",
+  "sex": "Macho" o "Hembra" o null,
+  "description": "Descripción general y clara de la mascota",
+  "visibleTraits": ["rasgo 1", "rasgo 2"],
+  "confidence": 0.95
+}`;
+
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: prompt },
+              { type: 'image_url', image_url: { url: imageUri } },
+            ],
+          },
+        ],
+        temperature: 0.2,
+        response_format: { type: 'json_object' },
+      }),
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error(`Groq API error (${response.status}): ${err}`);
+    }
+
+    const raw = await response.text();
+    const data = JSON.parse(raw);
+    const content = data.choices?.[0]?.message?.content ?? '{}';
+    const json = content.replace(/^```json\s*|\s*```$/g, '').trim();
+    const parsed = JSON.parse(json);
+
+    return {
+      species: parsed.species || 'Otro',
+      breed: parsed.breed || 'Criollo',
+      color: parsed.color || '',
+      size: parsed.size || 'Mediano',
+      sex: parsed.sex || null,
+      description: parsed.description || '',
+      visibleTraits: Array.isArray(parsed.visibleTraits) ? parsed.visibleTraits : [],
+      confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.9,
+    };
   }
 
   private async analyzeWithMetaAi(

@@ -282,7 +282,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
                                   ),
                                   const SizedBox(width: 10),
                                   Text(
-                                    'Analizando con Gemini IA...',
+                                    'Analizando mascota con IA...',
                                     style: PetTokens.bodyThemed(
                                       context,
                                       13,
