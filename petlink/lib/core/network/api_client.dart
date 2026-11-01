@@ -185,12 +185,16 @@ class ApiClient {
       );
       return (res as Map).cast<String, dynamic>();
     } else {
-      final res = await uploadFile(localPathOrUrl, '/ai/analyze-image');
+      final res = await uploadFile(
+        localPathOrUrl,
+        '/ai/analyze-image',
+        customTimeout: const Duration(seconds: 90),
+      );
       return (res as Map).cast<String, dynamic>();
     }
   }
 
-  Future<dynamic> uploadFile(String path, String endpoint) async {
+  Future<dynamic> uploadFile(String path, String endpoint, {Duration? customTimeout}) async {
     Future<http.StreamedResponse> send() async {
       final request = http.MultipartRequest(
         'POST',
@@ -201,7 +205,7 @@ class ApiClient {
       return _httpClient.send(request);
     }
 
-    var response = await _performStreamed(send);
+    var response = await _performStreamed(send, customTimeout: customTimeout);
 
     if (response.statusCode == 401 && await _tryRefresh()) {
       response = await _performStreamed(send);
@@ -323,10 +327,11 @@ class ApiClient {
   }
 
   Future<http.StreamedResponse> _performStreamed(
-    Future<http.StreamedResponse> Function() send,
-  ) async {
+    Future<http.StreamedResponse> Function() send, {
+    Duration? customTimeout,
+  }) async {
     try {
-      return await send().timeout(timeout);
+      return await send().timeout(customTimeout ?? timeout);
     } on TimeoutException {
       throw const ApiException(
         0,

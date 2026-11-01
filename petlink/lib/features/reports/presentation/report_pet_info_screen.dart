@@ -36,8 +36,8 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
     final picker = ImagePicker();
     final picked = await picker.pickImage(
       source: source,
-      imageQuality: 85,
-      maxWidth: 1200,
+      imageQuality: 70,
+      maxWidth: 800,
     );
     if (picked == null) return;
 
@@ -652,6 +652,7 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
     required String label,
     required bool isSelected,
     required VoidCallback onTap,
+    IconData? icon,
   }) {
     return Expanded(
       child: InkWell(
@@ -677,14 +678,32 @@ class _ReportPetInfoScreenState extends ConsumerState<ReportPetInfoScreen> {
             ),
           ),
           alignment: Alignment.center,
-          child: Text(
-            label,
-            style: PetTokens.bodyThemed(
-              context,
-              13,
-              color: isSelected ? Colors.white : PetTokens.inkOf(context),
-              weight: isSelected ? FontWeight.w700 : FontWeight.w500,
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (icon != null) ...[
+                Icon(
+                  icon,
+                  size: 17,
+                  color: isSelected
+                      ? Colors.white
+                      : (PetTokens.isDark(context)
+                          ? PetTokens.clayOnDark
+                          : PetTokens.clay),
+                ),
+                const SizedBox(width: 6),
+              ],
+              Text(
+                label,
+                style: PetTokens.bodyThemed(
+                  context,
+                  13,
+                  color: isSelected ? Colors.white : PetTokens.inkOf(context),
+                  weight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ),
       ),

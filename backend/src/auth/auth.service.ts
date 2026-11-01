@@ -1,4 +1,5 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import * as nodemailer from 'nodemailer';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma.service';
@@ -9,6 +10,7 @@ type TokenType = 'access' | 'refresh';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   constructor(private readonly prisma: PrismaService, private readonly jwt: JwtService) {}
   private safe(user: { id: string; name: string; email: string; avatarUrl: string | null }) { return { id: user.id, name: user.name, email: user.email, avatarUrl: user.avatarUrl }; }
 
@@ -139,44 +141,77 @@ export class AuthService {
   }
 
   private async sendResetEmail(to: string, name: string, code: string) {
-    const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) {
-      console.log(`\n========================================`);
-      console.log(`[PASSWORD RESET] Para ${to}: CÓDIGO = ${code}`);
-      console.log(`========================================\n`);
-      return;
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+    const resendKey = process.env.RESEND_API_KEY;
+
+    const htmlBody = `
+      <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 24px; border: 1px solid #EADFD6; border-radius: 16px; background-color: #FBF6F1;">
+        <h2 style="color: #4A2D4A; margin-bottom: 8px;">Recuperación de contraseña</h2>
+        <p style="color: #6E5C67; font-size: 15px;">Hola <strong>${name}</strong>,</p>
+        <p style="color: #6E5C67; font-size: 15px;">Has solicitado restablecer tu contraseña en PetLink. Ingresa este código de 6 dígitos en la aplicación:</p>
+        <div style="background-color: #4A2D4A; color: #FFFFFF; font-size: 32px; font-weight: bold; letter-spacing: 8px; text-align: center; padding: 18px; border-radius: 12px; margin: 24px 0;">
+          ${code}
+        </div>
+        <p style="color: #8E7D87; font-size: 13px;">Este código expirará en 15 minutos. Si no solicitaste este cambio, puedes ignorar este mensaje.</p>
+        <p style="color: #E07A5F; font-size: 13px; font-weight: bold;">El equipo de PetLink · Cada huella cuenta</p>
+      </div>
+    `;
+
+    // 1. Prioridad: Gmail SMTP vía Nodemailer (envía a cualquier dominio de correo sin costo)
+    if (smtpUser && smtpPass) {
+      try {
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: smtpUser,
+            pass: smtpPass.replace(/\s+/g, ''),
+          },
+        });
+
+        await transporter.sendMail({
+          from: process.env.SMTP_FROM ?? `PetLink <${smtpUser}>`,
+          to,
+          subject: `${code} es tu código de recuperación de PetLink`,
+          html: htmlBody,
+        });
+
+        this.logger.log(`[PASSWORD RESET] Correo enviado exitosamente a ${to} vía Gmail SMTP`);
+        return;
+      } catch (err: any) {
+        this.logger.error(`[SMTP ERROR] Falló el envío a ${to}: ${err.message}`);
+      }
     }
 
-    try {
-      const response = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: process.env.EMAIL_FROM ?? 'PetLink <onboarding@resend.dev>',
-          to: [to],
-          subject: `${code} es tu código de recuperación de PetLink`,
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 24px; border: 1px solid #EADFD6; border-radius: 16px; background-color: #FBF6F1;">
-              <h2 style="color: #4A2D4A; margin-bottom: 8px;">Recuperación de contraseña</h2>
-              <p style="color: #6E5C67; font-size: 15px;">Hola <strong>${name}</strong>,</p>
-              <p style="color: #6E5C67; font-size: 15px;">Has solicitado restablecer tu contraseña en PetLink. Ingresa este código de 6 dígitos en la aplicación:</p>
-              <div style="background-color: #4A2D4A; color: #FFFFFF; font-size: 32px; font-weight: bold; letter-spacing: 8px; text-align: center; padding: 18px; border-radius: 12px; margin: 24px 0;">
-                ${code}
-              </div>
-              <p style="color: #8E7D87; font-size: 13px;">Este código expirará en 15 minutos. Si no solicitaste este cambio, puedes ignorar este mensaje.</p>
-              <p style="color: #E07A5F; font-size: 13px; font-weight: bold;">El equipo de PetLink · Cada huella cuenta</p>
-            </div>
-          `,
-        }),
-      });
-      if (!response.ok) {
-        console.error(`[RESEND ERROR] Status ${response.status}: ${await response.text()}`);
+    // 2. Fallback: Resend API
+    if (resendKey) {
+      try {
+        const response = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${resendKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: process.env.EMAIL_FROM ?? 'PetLink <onboarding@resend.dev>',
+            to: [to],
+            subject: `${code} es tu código de recuperación de PetLink`,
+            html: htmlBody,
+          }),
+        });
+        if (response.ok) {
+          this.logger.log(`[PASSWORD RESET] Correo enviado a ${to} vía Resend`);
+          return;
+        }
+        this.logger.error(`[RESEND ERROR] Status ${response.status}: ${await response.text()}`);
+      } catch (err: any) {
+        this.logger.error('[RESEND EXCEPTION]', err.message);
       }
-    } catch (err) {
-      console.error('[RESEND EXCEPTION]', err);
     }
+
+    // 3. Fallback en consola para desarrollo
+    console.log(`\n========================================`);
+    console.log(`[PASSWORD RESET DEV] Para ${to}: CÓDIGO = ${code}`);
+    console.log(`========================================\n`);
   }
 }

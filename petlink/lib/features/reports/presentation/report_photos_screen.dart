@@ -26,8 +26,8 @@ class _ReportPhotosScreenState extends ConsumerState<ReportPhotosScreen> {
     final picker = ImagePicker();
     final picked = await picker.pickImage(
       source: source,
-      imageQuality: 85,
-      maxWidth: 1200,
+      imageQuality: 75,
+      maxWidth: 1000,
     );
     if (picked != null) {
       ref.read(reportDraftProvider.notifier).addPhoto(picked.path);
