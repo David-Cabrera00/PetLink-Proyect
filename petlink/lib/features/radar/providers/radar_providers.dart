@@ -44,10 +44,16 @@ final nearbyReportsProvider = FutureProvider<List<PetReport>>((ref) async {
   return reports.where((report) => !report.isOwner).toList();
 });
 
+/// Coincidencias descartadas por el usuario (se conservan mientras la app esté
+/// abierta).
+final dismissedMatchIdsProvider = StateProvider<Set<String>>((ref) => {});
+
 final matchesProvider = FutureProvider<List<PetMatch>>((ref) async {
   if (ref.watch(currentUserEmailProvider) == null) return const [];
+  final dismissed = ref.watch(dismissedMatchIdsProvider);
   final repository = ref.watch(matchRepositoryProvider);
-  return repository.getMatchesForUser();
+  final matches = await repository.getMatchesForUser();
+  return matches.where((m) => !dismissed.contains(m.id)).toList();
 });
 
 final radarSummaryProvider = Provider<RadarSummary>((ref) {
