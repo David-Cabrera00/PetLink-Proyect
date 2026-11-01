@@ -3,7 +3,7 @@ import * as nodemailer from 'nodemailer';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma.service';
-import { ChangePasswordDto, ForgotPasswordDto, LoginDto, RefreshTokenDto, RegisterDto, ResetPasswordDto, UpdateProfileDto } from './dto';
+import { ChangePasswordDto, ForgotPasswordDto, GoogleAuthDto, LoginDto, RefreshTokenDto, RegisterDto, ResetPasswordDto, UpdateProfileDto } from './dto';
 
 type TokenUser = { id: string; email: string };
 type TokenType = 'access' | 'refresh';
@@ -47,6 +47,50 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({ where: { email: dto.email.trim().toLowerCase() } });
     if (!user || !(await bcrypt.compare(dto.password, user.passwordHash))) throw new UnauthorizedException('Invalid credentials');
     return { user: this.safe(user), ...this.tokens(user) };
+  }
+
+  async googleAuth(dto: GoogleAuthDto) {
+    try {
+      const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${dto.idToken}`);
+      if (!response.ok) {
+        throw new UnauthorizedException('Token de Google inválido o expirado');
+      }
+      const payload: any = await response.json();
+
+      const email = payload.email?.toLowerCase();
+      if (!email || payload.email_verified === 'false' || payload.email_verified === false) {
+        throw new BadRequestException('El correo de Google no está verificado');
+      }
+
+      const name = payload.name || payload.given_name || 'Usuario Google';
+      const picture = payload.picture || null;
+
+      let user = await this.prisma.user.findUnique({ where: { email } });
+      if (!user) {
+        const randomPassword = await bcrypt.hash(Math.random().toString(36) + Date.now(), 12);
+        user = await this.prisma.user.create({
+          data: {
+            name,
+            email,
+            passwordHash: randomPassword,
+            avatarUrl: picture,
+          },
+        });
+      } else if (!user.avatarUrl && picture) {
+        user = await this.prisma.user.update({
+          where: { id: user.id },
+          data: { avatarUrl: picture },
+        });
+      }
+
+      return { user: this.safe(user), ...this.tokens(user) };
+    } catch (err: any) {
+      if (err instanceof UnauthorizedException || err instanceof BadRequestException) {
+        throw err;
+      }
+      this.logger.error(`[GOOGLE AUTH ERROR] ${err.message}`);
+      throw new UnauthorizedException('Error al validar con Google');
+    }
   }
   async refresh(dto: RefreshTokenDto) {
     let payload: { sub?: string; typ?: string };
