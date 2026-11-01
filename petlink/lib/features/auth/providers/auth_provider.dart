@@ -148,6 +148,24 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<void> loginWithGoogle(String idToken) async {
+    state = state.copyWith(isLoading: true, sessionExpired: false);
+    try {
+      final result = await _client.post(
+        '/auth/google',
+        body: {'idToken': idToken},
+        skipAuthRefresh: true,
+      ) as Map;
+      await _persistSession(result);
+      state = AuthState(user: _userFromJson(result['user'] as Map));
+      await _requestNotificationPermission();
+    } finally {
+      if (!_disposed && state.isLoading) {
+        state = state.copyWith(isLoading: false);
+      }
+    }
+  }
+
   Future<void> register({
     required String name,
     required String email,

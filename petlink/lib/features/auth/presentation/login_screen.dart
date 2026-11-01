@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -73,9 +74,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _continueWithGoogle() async {
     final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(l10n.authGoogleUnavailable)));
+    try {
+      final googleSignIn = GoogleSignIn(
+        serverClientId: '823710733637-ck7cve6d7dt4h51voctd6f36qioa67l7.apps.googleusercontent.com',
+        scopes: ['email', 'profile'],
+      );
+      final account = await googleSignIn.signIn();
+      if (account == null) return;
+      final auth = await account.authentication;
+      final idToken = auth.idToken;
+      if (idToken == null) throw Exception('No se pudo obtener el token de Google');
+      await ref.read(authProvider.notifier).loginWithGoogle(idToken);
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(content: Text(apiErrorMessage(l10n, error, isLogin: true))),
+        );
+    }
   }
 
   @override
