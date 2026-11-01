@@ -23,6 +23,7 @@ export class AiService {
 
   async analyzePetImage(options: AnalyzeImageOptions): Promise<PetAnalysisResult> {
     const geminiKey = process.env.GEMINI_API_KEY;
+    const metaKey = process.env.META_API_KEY;
     const openRouterKey = process.env.OPENROUTER_API_KEY;
 
     // 1. Obtener los bytes base64 y mimeType de la imagen
@@ -57,8 +58,19 @@ export class AiService {
       throw new BadGatewayException('No image provided for analysis (file, imageBase64, or imageUrl required)');
     }
 
-    // 2. Prioridad: Google Gemini Vision con reintentos y modelo estable
     let lastError: string | null = null;
+
+    // 2. Prioridad: Meta AI (dev.meta.ai - Llama / Muse Vision)
+    if (metaKey) {
+      try {
+        return await this.analyzeWithMetaAi(base64Data, mimeType, metaKey);
+      } catch (err: any) {
+        lastError = err.message;
+        this.logger.error(`Meta AI analysis failed: ${err.message}`);
+      }
+    }
+
+    // 3. Fallback: Google Gemini Vision
     if (geminiKey) {
       try {
         return await this.analyzeWithGemini(base64Data, mimeType, geminiKey);
@@ -68,7 +80,7 @@ export class AiService {
       }
     }
 
-    // 3. Fallback: OpenRouter (acepta base64 o imageUrl)
+    // 4. Fallback: OpenRouter
     if (openRouterKey) {
       try {
         return await this.analyzeWithOpenRouter(base64Data, mimeType, options.imageUrl, openRouterKey);
@@ -78,8 +90,8 @@ export class AiService {
       }
     }
 
-    if (!geminiKey && !openRouterKey) {
-      throw new ServiceUnavailableException('AI Vision service is not configured (missing GEMINI_API_KEY)');
+    if (!metaKey && !geminiKey && !openRouterKey) {
+      throw new ServiceUnavailableException('AI Vision service is not configured');
     }
 
     throw new BadGatewayException(
@@ -179,6 +191,67 @@ Responde EXCLUSIVAMENTE un JSON válido con esta estructura:
     }
 
     throw new Error(lastError || 'All Gemini models failed');
+  }
+
+  private async analyzeWithMetaAi(
+    base64Data: string,
+    mimeType: string,
+    apiKey: string,
+  ): Promise<PetAnalysisResult> {
+    const model = process.env.META_MODEL || 'muse-spark-1.3';
+    const imageUri = `data:${mimeType};base64,${base64Data}`;
+
+    const prompt = `Analiza esta imagen de mascota para un reporte de rescate o pérdida.
+Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura:
+{
+  "species": "Perro" o "Gato" o "Otro",
+  "breed": "Nombre de la raza identificada (o Criollo/Mestizo si dudas)",
+  "color": "Color predominante en español (ej: Gris, Bicolor, Negro, Dorado)",
+  "size": "Pequeño" o "Mediano" o "Grande",
+  "sex": "Macho" o "Hembra" o null,
+  "description": "Breve descripción general de la mascota",
+  "visibleTraits": ["rasgo 1", "rasgo 2"],
+  "confidence": 0.95
+}`;
+
+    const response = await fetch('https://api.meta.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'text', text: prompt },
+            { type: 'image_url', image_url: { url: imageUri } },
+          ],
+        }],
+      }),
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error(`Meta API error (${response.status}): ${err}`);
+    }
+
+    const raw = await response.text();
+    const content = JSON.parse(raw).choices?.[0]?.message?.content ?? '{}';
+    const json = content.replace(/^```json\s*|\s*```$/g, '').trim();
+    const parsed = JSON.parse(json);
+
+    return {
+      species: parsed.species || 'Otro',
+      breed: parsed.breed || 'Criollo',
+      color: parsed.color || '',
+      size: parsed.size || 'Mediano',
+      sex: parsed.sex || null,
+      description: parsed.description || '',
+      visibleTraits: Array.isArray(parsed.visibleTraits) ? parsed.visibleTraits : [],
+      confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.9,
+    };
   }
 
   private async analyzeWithOpenRouter(
