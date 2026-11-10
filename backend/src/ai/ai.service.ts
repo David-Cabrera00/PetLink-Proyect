@@ -1,4 +1,5 @@
 import { BadGatewayException, Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
+import { BedrockRuntimeClient, ConverseCommand } from '@aws-sdk/client-bedrock-runtime';
 
 export interface PetAnalysisResult {
   species: string;
@@ -26,6 +27,9 @@ export class AiService {
     const metaKey = process.env.META_API_KEY;
     const geminiKey = process.env.GEMINI_API_KEY;
     const openRouterKey = process.env.OPENROUTER_API_KEY;
+    const awsConfigured = Boolean(
+      process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY,
+    );
 
     // 1. Obtener los bytes base64 y mimeType de la imagen
     let base64Data: string;
@@ -101,7 +105,17 @@ export class AiService {
       }
     }
 
-    if (!groqKey && !metaKey && !geminiKey && !openRouterKey) {
+    // 6. Fallback: Amazon Bedrock / Nova Lite
+    if (awsConfigured) {
+      try {
+        return await this.analyzeWithBedrock(base64Data, mimeType);
+      } catch (err: any) {
+        lastError = err.message;
+        this.logger.error(`Amazon Bedrock analysis failed: ${err.message}`);
+      }
+    }
+
+    if (!groqKey && !metaKey && !geminiKey && !openRouterKey && !awsConfigured) {
       throw new ServiceUnavailableException('AI Vision service is not configured');
     }
 
@@ -377,5 +391,66 @@ Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura:
       visibleTraits: Array.isArray(parsed.visibleTraits) ? parsed.visibleTraits : [],
       confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.8,
     };
+  }
+
+  private async analyzeWithBedrock(
+    base64Data: string,
+    mimeType: string,
+  ): Promise<PetAnalysisResult> {
+    const region = process.env.AWS_REGION || 'us-east-1';
+    const modelId = process.env.AWS_BEDROCK_MODEL_ID || 'amazon.nova-lite-v1:0';
+    const format = this.bedrockImageFormat(mimeType);
+    const prompt = `Analiza la imagen de esta mascota para un reporte de pérdida o rescate.
+Devuelve exclusivamente JSON válido con esta estructura:
+{
+  "species": "Perro" | "Gato" | "Otro",
+  "breed": "Raza o Criollo/Mestizo",
+  "color": "Color predominante en español",
+  "size": "Pequeño" | "Mediano" | "Grande",
+  "sex": "Macho" | "Hembra" | null,
+  "description": "Descripción breve",
+  "visibleTraits": ["rasgo 1", "rasgo 2"],
+  "confidence": 0.0
+}`;
+
+    const client = new BedrockRuntimeClient({ region });
+    const response = await client.send(new ConverseCommand({
+      modelId,
+      messages: [{
+        role: 'user',
+        content: [
+          { text: prompt },
+          { image: { format, source: { bytes: Buffer.from(base64Data, 'base64') } } },
+        ],
+      }],
+      inferenceConfig: { maxTokens: 500, temperature: 0.1 },
+    }));
+
+    const rawText = response.output?.message?.content
+      ?.map((item: any) => ('text' in item ? item.text : ''))
+      .join('')
+      .trim();
+    if (!rawText) throw new Error(`Amazon Bedrock returned an empty response (${modelId})`);
+
+    const json = rawText.replace(/^```json\s*|\s*```$/g, '').trim();
+    const parsed = JSON.parse(json);
+    return {
+      species: parsed.species || 'Otro',
+      breed: parsed.breed || 'Criollo',
+      color: parsed.color || '',
+      size: parsed.size || 'Mediano',
+      sex: parsed.sex || null,
+      description: parsed.description || '',
+      visibleTraits: Array.isArray(parsed.visibleTraits) ? parsed.visibleTraits : [],
+      confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.8,
+    };
+  }
+
+  private bedrockImageFormat(mimeType: string): 'jpeg' | 'png' | 'gif' | 'webp' {
+    const normalized = mimeType.toLowerCase().split(';')[0];
+    if (normalized === 'image/png') return 'png';
+    if (normalized === 'image/gif') return 'gif';
+    if (normalized === 'image/webp') return 'webp';
+    return 'jpeg';
   }
 }

@@ -9,6 +9,7 @@ import { SightingsModule } from './sightings/sightings.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { ActivityModule } from './activity/activity.module';
 import { AiModule } from './ai/ai.module';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -22,5 +23,6 @@ import { AiModule } from './ai/ai.module';
     ActivityModule,
     AiModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule {}
