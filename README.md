@@ -63,6 +63,12 @@ Un flujo guiado con animaciones y stepper visual interactivo:
 - **Línea de Tiempo Conectada**: Historial agrupado cronológicamente (*Hoy*, *Ayer*, *Hace X días*) con nodos iconográficos temáticos para avistamientos, coincidencias y actualizaciones de estado.
 - **Lectura en Lote**: Opción de marcar todas las novedades como leídas con un solo clic.
 
+### 🤖 IA de visión
+- Al seleccionar una foto, el backend analiza la mascota y sugiere especie, raza, color, tamaño, sexo y rasgos visibles.
+- La respuesta se aplica al borrador del reporte, pero siempre debe revisarse antes de publicar.
+- La IA actual es de autocompletado visual; el matching entre reportes todavía compara campos estructurados y distancia geográfica, no similitud directa entre fotografías.
+- Para producción se debe configurar al menos un proveedor mediante `OPENROUTER_API_KEY`/`OPENROUTER_MODEL`, `GEMINI_API_KEY` o `GROQ_API_KEY`.
+
 ### 🌗 Tema Adaptativo (Dark / Light Mode)
 - **Sincronización Total**: Inversión contextual de contrastes (`PetTokens.bgOf`, `surfaceOf`, `inkOf`, `borderOf`).
 - **Selector en Perfil**: Soporte para *Modo del Sistema*, *Claro* y *Oscuro* persistente mediante `SharedPreferences`.
@@ -279,7 +285,7 @@ Asegúrate de contar con las siguientes herramientas instaladas:
      ```bash
      flutter run
      ```
-     > Si se omite la variable `API_BASE_URL`, PetLink arranca automáticamente en modo de prueba visual con datos mockeados.
+     > Si se omite la variable `API_BASE_URL`, la app usa la URL por defecto configurada en `ApiClient`; para mocks locales hay que ejecutar en modo debug con un cliente sin URL configurada.
 
 ---
 

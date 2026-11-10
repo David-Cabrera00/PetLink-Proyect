@@ -40,4 +40,12 @@ services:
         sync: false
       - key: OPENROUTER_MODEL
         value: google/gemini-2.0-flash-exp:free
+      - key: AWS_REGION
+        value: us-east-1
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_BEDROCK_MODEL_ID
+        value: amazon.nova-lite-v1:0
 
