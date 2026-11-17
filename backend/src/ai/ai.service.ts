@@ -412,8 +412,17 @@ Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura:
       }),
     });
 
-    if (!response.ok) throw new Error(`OpenRouter error (${response.status})`);
     const raw = await response.text();
+    if (!response.ok) {
+      let detail = raw;
+      try {
+        const parsedError = JSON.parse(raw);
+        detail = parsedError?.error?.message || parsedError?.message || raw;
+      } catch {
+        // Keep the provider response as-is when it is not JSON.
+      }
+      throw new Error(`OpenRouter error (${response.status}): ${detail.slice(0, 500)}`);
+    }
     const content = JSON.parse(raw).choices?.[0]?.message?.content ?? '{}';
     const json = content.replace(/^```json\s*|\s*```$/g, '').trim();
     const parsed = JSON.parse(json);
