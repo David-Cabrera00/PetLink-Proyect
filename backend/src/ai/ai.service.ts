@@ -430,7 +430,10 @@ Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura:
         messages: [{
           role: 'user',
           content: [
-            { type: 'text', text: 'Analiza esta mascota. Responde unicamente JSON valido con: species, breed, color, size, sex, visibleTraits, confidence.' },
+            {
+              type: 'text',
+              text: 'Analiza esta mascota y responde TODO en español. Devuelve únicamente JSON válido con estas claves exactas: species, breed, color, size, sex, description, visibleTraits, confidence. Usa species=Perro, Gato u Otro; size=Pequeño, Mediano o Grande; sex=Macho, Hembra o null. La raza, el color, la descripción y cada rasgo visible también deben estar escritos en español.',
+            },
             { type: 'image_url', image_url: { url: imageUri } },
           ],
         }],
