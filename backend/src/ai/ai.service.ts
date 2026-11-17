@@ -1,5 +1,6 @@
 import { BadGatewayException, Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import { BedrockRuntimeClient, ConverseCommand } from '@aws-sdk/client-bedrock-runtime';
+import sharp from 'sharp';
 
 export interface PetAnalysisResult {
   species: string;
@@ -62,6 +63,19 @@ export class AiService {
       }
     } else {
       throw new BadGatewayException('No image provided for analysis (file, imageBase64, or imageUrl required)');
+    }
+
+    // Normalizar cualquier entrada (HEIC/PNG/WEBP/JPEG, etc.) a JPEG para que
+    // los proveedores de visión reciban siempre un MIME y bytes compatibles.
+    try {
+      const normalizedImage = await sharp(Buffer.from(base64Data, 'base64'))
+        .rotate()
+        .jpeg({ quality: 85 })
+        .toBuffer();
+      base64Data = normalizedImage.toString('base64');
+      mimeType = 'image/jpeg';
+    } catch (err: any) {
+      throw new BadGatewayException(`No se pudo convertir la imagen a JPEG: ${err.message}`);
     }
 
     // Permite elegir explícitamente Bedrock en producción sin depender de los
