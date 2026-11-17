@@ -80,6 +80,22 @@ export class AiService {
       }
     }
 
+    // Permite elegir explícitamente OpenRouter en producción sin pasar por
+    // otros proveedores ni terminar accidentalmente en Bedrock.
+    if (configuredProvider === 'openrouter') {
+      if (!openRouterKey) {
+        throw new ServiceUnavailableException(
+          'OpenRouter está seleccionado, pero falta OPENROUTER_API_KEY',
+        );
+      }
+      try {
+        return await this.analyzeWithOpenRouter(base64Data, mimeType, options.imageUrl, openRouterKey);
+      } catch (err: any) {
+        this.logger.error(`OpenRouter analysis failed: ${err.message}`);
+        throw new BadGatewayException(`OpenRouter no pudo analizar la imagen: ${err.message}`);
+      }
+    }
+
     let lastError: string | null = null;
 
     // 2. Prioridad 1: Groq Vision (Llama 3.2 Vision - Ultra rápido)
