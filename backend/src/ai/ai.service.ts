@@ -388,7 +388,9 @@ Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura:
     apiKey: string,
   ): Promise<PetAnalysisResult> {
     const model = process.env.OPENROUTER_MODEL || 'google/gemini-2.0-flash-exp:free';
-    const imageUri = imageUrl ?? `data:${mimeType};base64,${base64Data}`;
+    // Enviar los bytes directamente evita que el proveedor tenga que descargar
+    // una URL privada o temporal de Supabase.
+    const imageUri = `data:${mimeType};base64,${base64Data}`;
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -417,11 +419,11 @@ Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura:
       let detail = raw;
       try {
         const parsedError = JSON.parse(raw);
-        detail = parsedError?.error?.message || parsedError?.message || raw;
+        detail = JSON.stringify(parsedError?.error ?? parsedError);
       } catch {
         // Keep the provider response as-is when it is not JSON.
       }
-      throw new Error(`OpenRouter error (${response.status}): ${detail.slice(0, 500)}`);
+      throw new Error(`OpenRouter error (${response.status}): ${detail.slice(0, 1200)}`);
     }
     const content = JSON.parse(raw).choices?.[0]?.message?.content ?? '{}';
     const json = content.replace(/^```json\s*|\s*```$/g, '').trim();
