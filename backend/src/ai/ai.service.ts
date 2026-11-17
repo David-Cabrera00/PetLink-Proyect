@@ -1,6 +1,8 @@
 import { BadGatewayException, Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import { BedrockRuntimeClient, ConverseCommand } from '@aws-sdk/client-bedrock-runtime';
-import sharp from 'sharp';
+import * as sharpModule from 'sharp';
+
+const sharp = ((sharpModule as any).default ?? sharpModule) as (input: Buffer) => any;
 
 export interface PetAnalysisResult {
   species: string;
