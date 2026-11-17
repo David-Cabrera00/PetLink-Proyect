@@ -387,7 +387,10 @@ Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura:
     imageUrl: string | undefined,
     apiKey: string,
   ): Promise<PetAnalysisResult> {
-    const model = process.env.OPENROUTER_MODEL || 'google/gemini-2.0-flash-exp:free';
+    // Usar un modelo de pago con visión y un proveedor estable. El modelo free
+    // estaba enrutando la imagen a proveedores que la rechazaban o no aceptaban
+    // correctamente el data URL.
+    const model = 'openai/gpt-4o-mini';
     // Enviar los bytes directamente evita que el proveedor tenga que descargar
     // una URL privada o temporal de Supabase.
     const imageUri = `data:${mimeType};base64,${base64Data}`;
@@ -402,6 +405,10 @@ Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura:
       },
       body: JSON.stringify({
         model,
+        provider: {
+          order: ['OpenAI'],
+          allow_fallbacks: false,
+        },
         temperature: 0.1,
         max_tokens: 400,
         messages: [{
