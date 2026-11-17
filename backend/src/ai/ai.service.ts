@@ -82,7 +82,10 @@ export class AiService {
 
     // Permite elegir explícitamente OpenRouter en producción sin pasar por
     // otros proveedores ni terminar accidentalmente en Bedrock.
-    if (configuredProvider === 'openrouter') {
+    if (
+      configuredProvider === 'openrouter' ||
+      (configuredProvider !== 'aws' && configuredProvider !== 'bedrock' && Boolean(openRouterKey))
+    ) {
       if (!openRouterKey) {
         throw new ServiceUnavailableException(
           'OpenRouter está seleccionado, pero falta OPENROUTER_API_KEY',
