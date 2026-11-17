@@ -2,6 +2,9 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { Prisma, ReportStatus } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { CreateReportDto, ListReportsDto, UpdateReportDto } from './dto';
+import * as sharpModule from 'sharp';
+
+const sharp = ((sharpModule as any).default ?? sharpModule) as (input: Buffer) => any;
 
 @Injectable()
 export class ReportsService {
@@ -22,14 +25,20 @@ export class ReportsService {
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const bucket = process.env.SUPABASE_STORAGE_BUCKET ?? 'pet-photos';
     if (!baseUrl || !serviceKey) throw new Error('Supabase Storage is not configured');
-    const storagePath = `${ownerId}/${id}/${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-    const response = await fetch(`${baseUrl}/storage/v1/object/${bucket}/${storagePath}`, { method: 'POST', headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': file.mimetype, 'x-upsert': 'false' }, body: new Uint8Array(file.buffer) });
+    let uploadBuffer: Buffer;
+    try {
+      uploadBuffer = await sharp(file.buffer).rotate().jpeg({ quality: 85 }).toBuffer();
+    } catch (err: any) {
+      throw new Error(`Could not convert photo for storage: ${err.message}`);
+    }
+    const storagePath = `${ownerId}/${id}/${Date.now()}-photo.jpg`;
+    const response = await fetch(`${baseUrl}/storage/v1/object/${bucket}/${storagePath}`, { method: 'POST', headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'image/jpeg', 'x-upsert': 'false' }, body: new Uint8Array(uploadBuffer) });
     if (!response.ok) {
       const detail = await response.text();
       throw new Error(`Storage upload failed (${response.status}): ${detail.slice(0, 500)}`);
     }
     const url = `${baseUrl}/storage/v1/object/public/${bucket}/${storagePath}`;
-    const photo = await this.prisma.photo.create({ data: { reportId: id, url, storagePath, mimeType: file.mimetype, sizeBytes: file.size } });
+    const photo = await this.prisma.photo.create({ data: { reportId: id, url, storagePath, mimeType: 'image/jpeg', sizeBytes: uploadBuffer.length } });
     return photo;
   }
 }
