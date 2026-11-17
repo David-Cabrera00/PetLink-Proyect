@@ -30,6 +30,7 @@ export class AiService {
     const awsConfigured = Boolean(
       process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY,
     );
+    const configuredProvider = (process.env.AI_PROVIDER ?? '').trim().toLowerCase();
 
     // 1. Obtener los bytes base64 y mimeType de la imagen
     let base64Data: string;
@@ -61,6 +62,22 @@ export class AiService {
       }
     } else {
       throw new BadGatewayException('No image provided for analysis (file, imageBase64, or imageUrl required)');
+    }
+
+    // Permite elegir explícitamente Bedrock en producción sin depender de los
+    // proveedores configurados como fallback.
+    if (configuredProvider === 'aws' || configuredProvider === 'bedrock') {
+      if (!awsConfigured) {
+        throw new ServiceUnavailableException(
+          'AWS Bedrock está seleccionado, pero faltan AWS_ACCESS_KEY_ID o AWS_SECRET_ACCESS_KEY',
+        );
+      }
+      try {
+        return await this.analyzeWithBedrock(base64Data, mimeType);
+      } catch (err: any) {
+        this.logger.error(`AWS Bedrock analysis failed: ${err.message}`);
+        throw new BadGatewayException(`AWS Bedrock no pudo analizar la imagen: ${err.message}`);
+      }
     }
 
     let lastError: string | null = null;
